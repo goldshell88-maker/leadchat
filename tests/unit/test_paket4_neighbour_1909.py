@@ -377,8 +377,10 @@ def test_версия_судьи_поднята_и_имя_правила_в_жу
     """Правило меняет `auto_decide` — версия судьи растёт (контракт шапки
     `VERDICT_VERSION`), обход починки вернёт хвост сам. Единственный assert с
     числом в пакете 20.09: поднять при следующей смене судьи (тем же коммитом,
-    что и константу); воркерные тесты сравнивают с `g.VERDICT_VERSION`."""
-    assert g.VERDICT_VERSION == 2
+    что и константу); воркерные тесты сравнивают с `g.VERDICT_VERSION`.
+    25.09: 3 — массив-улица карты называет пункт клиента, гаражный кооператив
+    без слова клиента не его улица (`tests/unit/test_geo_2509.py`)."""
+    assert g.VERDICT_VERSION == 3
     assert g.RULE_NEIGHBOUR_SETTLEMENT == "neighbour_settlement"
     assert g.NEIGHBOUR_KM < g.SUBURB_KM
 

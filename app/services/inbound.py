@@ -2248,6 +2248,52 @@ async def _maybe_extract_address(
     return ("address_suggested" if записано.впервые else "address_refined"), на_проверку, False
 
 
+#: Номер кусками (бой 25.09, `phone_parse.from_fragments`): куски — реплики
+#: клиента подряд, не дальше этого окна от текущей. Номер, разбитый на сообщения,
+#: отправляют за секунды; десять минут — запас на медленный набор, а не на
+#: разговор между кусками.
+_ОКНО_КУСКОВ = timedelta(minutes=10)
+#: Предыдущих реплик-кусков не больше десяти: в номере одиннадцать цифр, и одна
+#: из них — в текущей реплике.
+_КУСКОВ_ДО_ТЕКУЩЕЙ = 10
+
+
+async def _номер_по_кускам(
+    db: AsyncSession, conv: Conversation, msg: Message, речь: str | None
+) -> phone_parse.Found | None:
+    """«8900» → «111» → «2247» (бой 25.09, цифры вымышленные): номер тремя репликами.
+
+    Зовётся, только когда в самой реплике номера нет, а она целиком — кусок
+    номера; проверка чистая, так что прочие входящие запроса не порождают.
+    Куски — входящие ПОДРЯД: исходящее между ними (ответ оператора, бота) кончает
+    склейку — это уже разговор, а не диктовка номера. Только строго раньше
+    текущей: при равном времени порядок кусков неизвестен, а переставленные
+    куски — чужой номер.
+    """
+    if not phone_parse.is_fragment(речь):
+        return None
+    когда = _aware_utc(msg.created_at)
+    лента = (
+        await db.execute(
+            select(Message.direction, voice_service.speech_sql().label("речь"))
+            .where(
+                Message.conversation_id == conv.id,
+                Message.direction.in_(("in", "out")),
+                Message.created_at < когда,
+                Message.created_at >= когда - _ОКНО_КУСКОВ,
+            )
+            .order_by(Message.created_at.desc())
+            .limit(_КУСКОВ_ДО_ТЕКУЩЕЙ)
+        )
+    ).all()
+    подряд: list[str | None] = []
+    for направление, текст in лента:
+        if направление != "in":
+            break
+        подряд.append(текст)
+    return phone_parse.from_fragments([*reversed(подряд), речь])
+
+
 async def _maybe_extract_phone(
     db: AsyncSession,
     conv: Conversation,
@@ -2302,8 +2348,14 @@ async def _maybe_extract_phone(
     # — от неё, и подсказка `hint_word` ищет по ней же.
     речь = client_speech(msg)
     found = phone_parse.find_all(речь.text)
+    текст = речь.text
     if not found:
-        return None
+        # «8900» → «111» → «2247» (бой 25.09): номер кусками в репликах подряд.
+        # Строка для `absorb_phones` — склейка кусков: смещения `found` от неё.
+        по_кускам = await _номер_по_кускам(db, conv, msg, речь.text)
+        if по_кускам is None:
+            return None
+        found, текст = [по_кускам], по_кускам.raw
     own = phone_rules.parse_own_numbers(await app_settings.get(db, app_settings.PHONE_OWN_NUMBERS))
     годные = [
         hit for hit in found if hit.value not in own and not phone_rules.is_toll_free(hit.value)
@@ -2328,7 +2380,7 @@ async def _maybe_extract_phone(
         account_id=conv.account_id,
         message_id=msg.id,
         message_at=_aware_utc(msg.created_at),
-        text=речь.text,
+        text=текст,
         found=found,
         now=now,
         autofill=autofill,

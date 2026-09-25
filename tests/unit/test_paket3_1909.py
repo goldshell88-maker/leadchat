@@ -1324,7 +1324,8 @@ async def test_разбор_сейчас_повторяет_порядок_жи�
         await s.flush()
         походов = 0
         found = await inbound.разбор_реплики_сейчас(s, conv, msg, client_id=cid)
-        assert found is not None and (found.street, found.house) == ("10 квартал", "12")
+        # 10 в Ангарске — микрорайон: номер до 33 (замер боя 25.09).
+        assert found is not None and (found.street, found.house) == ("10 мкр", "12")
         assert походов == 1
         # «85-11» — адрес и без вопроса (85 — не час): в ленту — один раз, за
         # `про_адрес` невода (как на живом пути), а не второй раз за форму города.
