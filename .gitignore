@@ -1,0 +1,46 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# uv.lock НЕ игнорируется — лок-файл коммитится (воспроизводимая сборка, 07 §4.7 D4)
+
+# --- Node ---
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- Env / секреты (реальный .env не попадает в git никогда, 05 §4) ---
+.env
+.env.*
+!.env.example
+!.env.prod.example
+
+# --- Rust / Tauri (десктоп) ---
+# Cargo.lock десктопа НЕ игнорируется — он коммитится (воспроизводимая сборка, 12 §2)
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+
+# --- OS / IDE ---
+.DS_Store
+.idea/
+.vscode/
+
+# --- Нагрузочные прогоны (07 §3): k6 пишет сводку в cwd ---
+summary.json
+tests/load/*.ndjson
+
+# Локальные разборы и отчёты проверок — в историю не входят
+analysis-check/
+
+# Карта знаний graphify: 21 МБ graph.json + кэш. Строится локально, в бой не едет.
+graphify-out/
+
+# Версию шлюза пишет gateway/deploy.sh перед rsync — это не исходник.
+gateway/VERSION

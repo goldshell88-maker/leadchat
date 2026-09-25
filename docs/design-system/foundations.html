@@ -1,0 +1,1600 @@
+<!-- @dsCard group="Основа" -->
+<meta charset="utf-8">
+<title>Основа LeadChat</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.4 акцент */
+    --lc-a-50: #eefaee;
+    --lc-a-100: #d6f4d5;
+    --lc-a-200: #ade7ac;
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-a-900: #123f12;
+    --lc-a-950: #0b2a0c;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 синий, §1.3 красный, §1.5 янтарь, §1.6 фиолетовый */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-red-700: #b91c1c;
+    --lc-red-950: #2c1113;
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+    --lc-slate-500: #64748b;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bubble-in: #181f1c;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+    --lc-disabled-edge: #505a55;
+    --lc-disabled-bg: var(--lc-bg-raise);
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-empty-art: #6f7a73;
+    --lc-disabled-text: var(--lc-text-4);
+
+    /* роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-primary-solid-hover: var(--lc-a-400);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+    --lc-focus-border: var(--lc-a-500);
+
+    /* состояния */
+    --lc-success: var(--lc-a-500);
+    --lc-success-solid: var(--lc-a-600);
+    --lc-on-success: var(--lc-ink-on-accent);
+    --lc-success-subtle: #10240f;
+    --lc-success-text: var(--lc-a-300);
+
+    --lc-warn: var(--lc-amber-500);
+    --lc-on-warn: #1a1204;
+    --lc-warning: var(--lc-warn);
+    --lc-warning-solid: var(--lc-warn);
+    --lc-warning-subtle: #241a05;
+    --lc-warn-text: #d9a94e;
+    --lc-warning-text: var(--lc-warn-text);
+
+    --lc-danger: #e5484d;
+    --lc-danger-solid: #dc2626;
+    --lc-on-danger: #ffffff;
+    --lc-danger-subtle: var(--lc-red-950);
+    --lc-danger-text: #ff9ea1;
+
+    --lc-info: var(--lc-blue-500);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+    --lc-link: var(--lc-blue-400);
+
+    --lc-accent: var(--lc-purple-500);
+    --lc-accent-solid: var(--lc-purple-600);
+    --lc-on-accent: #ffffff;
+    --lc-accent-subtle: var(--lc-purple-950);
+    --lc-accent-text: var(--lc-purple-300);
+
+    /* статусы диалога */
+    --lc-status-new-bg: var(--lc-blue-950);
+    --lc-status-new-text: var(--lc-blue-300);
+    --lc-status-inprogress-bg: #10240f;
+    --lc-status-inprogress-text: var(--lc-a-300);
+    --lc-status-waiting-bg: var(--lc-purple-950);
+    --lc-status-waiting-text: var(--lc-purple-300);
+    --lc-status-closed-bg: #1f2522;
+    --lc-status-closed-text: var(--lc-text-2);
+
+    --lc-unread-bg: var(--lc-a-600);
+    --lc-unread-text: var(--lc-ink-on-accent);
+    --lc-presence-online: var(--lc-a-500);
+    --lc-presence-offline: #6f7a73;
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+    --lc-space-9: 64px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-xl: 20px;
+    --lc-radius-pill: 999px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-font-mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-h-lg: 48px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-px-lg: 20px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+    --lc-shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ═══════════════════════════════ КАРКАС СПРАВОЧНИКА ═══════════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: 1600px;
+    padding: var(--lc-space-6) var(--lc-space-6) var(--lc-space-8);
+  }
+
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--lc-space-5);
+    padding-bottom: var(--lc-space-4);
+    border-bottom: 1px solid var(--lc-border);
+    margin-bottom: var(--lc-space-6);
+  }
+
+  .head__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+  }
+
+  .head__sub {
+    margin: var(--lc-space-2) 0 0;
+    max-width: 68ch;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  .head__meta {
+    display: flex;
+    gap: var(--lc-space-2);
+    flex: none;
+  }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    height: 24px;
+    padding: 0 var(--lc-space-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-surface);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-micro);
+    font-family: var(--lc-font-mono);
+  }
+
+  .sect { margin-bottom: var(--lc-space-6); }
+
+  .sect__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--lc-space-3);
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .sect__title {
+    margin: 0;
+    font-size: var(--lc-fz-section);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+  }
+
+  .sect__note {
+    margin: 0;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  .card {
+    background: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    padding: var(--lc-space-4) var(--lc-space-5);
+  }
+
+  /* Строка «подпись слева — образцы справа»: приём из UI Kit продукта. */
+  .row {
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    gap: var(--lc-space-4);
+    align-items: start;
+    padding: var(--lc-space-3) 0;
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .row:first-child { border-top: none; padding-top: 0; }
+  .row:last-child { padding-bottom: 0; }
+
+  .row__label {
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+    padding-top: var(--lc-space-1);
+  }
+
+  .row__label small {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    color: var(--lc-text-4);
+    line-height: 1.4;
+  }
+
+  .row__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lc-space-3);
+  }
+
+  /* ─────────────────────────────────── образцы цвета ─────────────────── */
+
+  .sw { width: 132px; }
+
+  .sw__chip {
+    height: 52px;
+    border-radius: var(--lc-radius-sm);
+    border: 1px solid var(--lc-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .sw__name {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sw__hex {
+    display: block;
+    margin-top: 1px;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    font-variant-numeric: var(--lc-num);
+    text-transform: uppercase;
+  }
+
+  .sw__role {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+  }
+
+  /* Матрица «роль × состояние»: у каждого акцента пара, и пара обязана быть видна. */
+  .matrix {
+    display: grid;
+    grid-template-columns: 168px repeat(5, 1fr);
+    gap: var(--lc-space-3);
+    align-items: start;
+  }
+
+  .matrix__col {
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+    padding-bottom: var(--lc-space-1);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  .matrix__col small {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    color: var(--lc-text-4);
+  }
+
+  .matrix__row {
+    grid-column: 1;
+    padding-top: var(--lc-space-3);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+  }
+
+  .matrix__row small {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    color: var(--lc-text-4);
+    line-height: 1.4;
+  }
+
+  .cell__chip {
+    height: 52px;
+    border-radius: var(--lc-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lc-space-2);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .cell__chip--line {
+    background: var(--lc-bg-raise);
+    border: 1.5px solid currentColor;
+  }
+
+  .cell__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--lc-radius-pill);
+    background: currentColor;
+  }
+
+  /* Рампа акцента — сплошной шкалой, чтобы шаг читался соседями. */
+  .ramp {
+    display: flex;
+    width: 100%;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-sm);
+    overflow: hidden;
+  }
+
+  .ramp__step {
+    flex: 1;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: var(--lc-space-1) 0 var(--lc-space-2) var(--lc-space-2);
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    font-variant-numeric: var(--lc-num);
+    text-transform: uppercase;
+  }
+
+  .ramp__step b { font-weight: var(--lc-fw-semibold); }
+  .ramp__step span { opacity: 0.75; }
+
+  .ramp__mark {
+    position: absolute;
+    margin-top: -14px;
+  }
+
+  .ramp-roles {
+    display: flex;
+    gap: var(--lc-space-5);
+    margin-top: var(--lc-space-3);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+  }
+
+  .ramp-roles b {
+    color: var(--lc-text-2);
+    font-family: var(--lc-font-mono);
+    font-weight: var(--lc-fw-regular);
+  }
+
+  /* ─────────────────────────────────────── типографика ───────────────── */
+
+  .type-row {
+    display: grid;
+    grid-template-columns: 168px 68px 1fr;
+    gap: var(--lc-space-4);
+    align-items: baseline;
+    padding: var(--lc-space-3) 0;
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .type-row:first-child { border-top: none; padding-top: 0; }
+
+  .type-row__sample {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: var(--lc-lh-heading);
+  }
+
+  .type-row__name {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+  }
+
+  .type-row__name small {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    line-height: 1.4;
+  }
+
+  .type-row__size {
+    text-align: right;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ─────────────────────────────── шаг для больших мониторов ─────────── */
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--lc-space-4);
+    align-items: start;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--lc-space-4);
+    align-items: start;
+  }
+
+  table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .tbl th {
+    text-align: left;
+    padding: 0 var(--lc-space-3) var(--lc-space-2) 0;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-4);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  .tbl td {
+    padding: 7px var(--lc-space-3) 7px 0;
+    border-bottom: 1px solid var(--lc-border);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-2);
+  }
+
+  .tbl tr:last-child td { border-bottom: none; }
+
+  .tbl td.k {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+  }
+
+  .tbl td.n { text-align: right; width: 88px; }
+  .tbl th.n { text-align: right; }
+  .tbl td.now { color: var(--lc-text-4); }
+  .tbl td.big { color: var(--lc-primary-text); font-weight: var(--lc-fw-medium); }
+
+  .bump {
+    display: flex;
+    align-items: baseline;
+    gap: var(--lc-space-3);
+    justify-content: flex-end;
+    width: 132px;
+  }
+
+  .bump span:first-child { color: var(--lc-text-4); }
+  .bump span:last-child { color: var(--lc-text-1); }
+
+  /* ───────────────────────────────── отступы и радиусы ───────────────── */
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 104px 48px 1fr;
+    gap: var(--lc-space-3);
+    align-items: center;
+    padding: 5px 0;
+  }
+
+  .bar-row__k {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+  }
+
+  .bar-row__v {
+    text-align: right;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .bar {
+    height: 12px;
+    background: var(--lc-primary);
+    border-radius: 2px;
+  }
+
+  .radii {
+    display: flex;
+    gap: var(--lc-space-3);
+    flex-wrap: wrap;
+  }
+
+  .radius-box {
+    width: 92px;
+    height: 72px;
+    border: 1px solid var(--lc-border-strong);
+    background: var(--lc-bg-selected);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .radius-box b {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    color: var(--lc-text-2);
+  }
+
+  .radius-box span {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ───────────────────────────────────────── кнопки ──────────────────── */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lc-btn-gap);
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-btn-px-md);
+    border-radius: var(--lc-btn-radius);
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-medium);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  .btn--sm { height: var(--lc-btn-h-sm); padding: 0 var(--lc-btn-px-sm); font-size: var(--lc-fz-note); }
+  .btn--lg { height: var(--lc-btn-h-lg); padding: 0 var(--lc-btn-px-lg); }
+
+  .btn--filled {
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .btn--outline {
+    background: transparent;
+    border-color: var(--lc-primary);
+    color: var(--lc-primary-text);
+  }
+
+  .btn--subtle {
+    background: transparent;
+    color: var(--lc-text-2);
+  }
+
+  .btn--danger {
+    background: var(--lc-danger-solid);
+    color: var(--lc-on-danger);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .btn--disabled {
+    background: var(--lc-disabled-bg);
+    border-color: var(--lc-disabled-edge);
+    color: var(--lc-disabled-text);
+  }
+
+  .btn-cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    align-items: flex-start;
+  }
+
+  .btn-cell__cap {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    line-height: 1.4;
+  }
+
+  .btn-cell__cap b {
+    display: block;
+    color: var(--lc-text-3);
+    font-family: var(--lc-font-mono);
+    font-weight: var(--lc-fw-regular);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .heights {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--lc-space-5);
+  }
+
+  /* ──────────────────────────────────── поля ввода ───────────────────── */
+
+  .field { width: 100%; }
+
+  .field__label {
+    display: block;
+    margin-bottom: var(--lc-space-1);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+  }
+
+  .input {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-space-3);
+    background: var(--lc-bg-0);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-body);
+  }
+
+  .input svg { color: var(--lc-text-3); flex: none; }
+  .input .ph { color: var(--lc-text-3); }
+
+  .input--focus {
+    border-color: var(--lc-focus-border);
+    box-shadow: 0 0 0 3px var(--lc-focus-ring);
+  }
+
+  .input--error { border-color: var(--lc-danger); }
+
+  .input__caret {
+    display: inline-block;
+    width: 1px;
+    height: 18px;
+    background: var(--lc-primary);
+    margin-left: 1px;
+  }
+
+  .field__err {
+    margin-top: var(--lc-space-1);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-danger-text);
+  }
+
+  .field__hint {
+    margin-top: var(--lc-space-1);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+  }
+
+  /* ───────────────────────────── пилюли, чипы, счётчики ──────────────── */
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 var(--lc-space-3);
+    border-radius: var(--lc-radius-pill);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+  }
+
+  .pill--new { background: var(--lc-status-new-bg); color: var(--lc-status-new-text); }
+  .pill--work { background: var(--lc-status-inprogress-bg); color: var(--lc-status-inprogress-text); }
+  .pill--wait { background: var(--lc-status-waiting-bg); color: var(--lc-status-waiting-text); }
+  .pill--closed { background: var(--lc-status-closed-bg); color: var(--lc-status-closed-text); }
+
+  .tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+  }
+
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-md);
+    border: 1px solid transparent;
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+    color: var(--lc-text-2);
+    font-family: inherit;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+  }
+
+  .tab--hover { background: var(--lc-surface-hover); color: var(--lc-text-1); }
+
+  .tab--active {
+    background: var(--lc-selected);
+    border-color: var(--lc-primary);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--lc-radius-pill);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lc-unread-bg);
+    color: var(--lc-unread-text);
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-semibold);
+    line-height: 1;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .count--queue { background: var(--lc-danger-solid); color: var(--lc-on-danger); }
+
+  .bell {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-selected);
+    color: var(--lc-text-2);
+  }
+
+  .bell .count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    border: 2px solid var(--lc-surface);
+    height: 18px;
+    min-width: 18px;
+  }
+
+  .badge-line {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-5);
+  }
+
+  .badge-line__cell {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+  }
+
+  /* ─────────────────────────────── пустое состояние ──────────────────── */
+
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-5) var(--lc-space-4);
+  }
+
+  .empty__title {
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+  }
+
+  .empty__desc {
+    margin-top: var(--lc-space-1);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+    max-width: 34ch;
+  }
+
+  /* ───────────────────────────────────────── тосты ───────────────────── */
+
+  .toast {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    background: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    box-shadow: var(--lc-shadow-2);
+  }
+
+  .toast__ico { flex: none; padding-top: 1px; }
+  .toast--success .toast__ico { color: var(--lc-success); }
+  .toast--danger .toast__ico { color: var(--lc-danger); }
+
+  .toast__title {
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+  }
+
+  .toast__desc {
+    margin-top: 2px;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+  }
+
+  .toast__bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 62%;
+    background: var(--lc-success);
+  }
+
+  .toast__close {
+    margin-left: auto;
+    color: var(--lc-text-4);
+    flex: none;
+  }
+
+  /* Внутренний блок карточки: подпись сверху, образцы во всю ширину. */
+  .mini + .mini {
+    margin-top: var(--lc-space-4);
+    padding-top: var(--lc-space-4);
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .mini__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--lc-space-3);
+    margin-bottom: var(--lc-space-3);
+  }
+
+  .mini__title {
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+  }
+
+  .mini__hint {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    text-align: right;
+  }
+
+  .mini__items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .legend {
+    margin-top: var(--lc-space-3);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    line-height: 1.5;
+  }
+
+  .legend b { color: var(--lc-text-3); font-weight: var(--lc-fw-medium); }
+</style>
+
+<div class="page">
+
+  <header class="head">
+    <div>
+      <h1 class="head__title">Основа LeadChat</h1>
+      <p class="head__sub">
+        Справочник, по которому собираются экраны консоли. Цвет, кегль, отступы и высоты
+        контролов берутся только отсюда: HEX внутри компонента — ошибка ревью.
+      </p>
+    </div>
+    <div class="head__meta">
+      <span class="stamp">app/lc-vars.css</span>
+      <span class="stamp">тёмная тема</span>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════ ПАЛИТРА ══════════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Палитра</h2>
+      <p class="sect__note">Цвет несёт ровно один смысл — срочность. Янтарь: клиент ждёт. Красный: диалог брошен. Зелёный: действие.</p>
+    </div>
+
+    <div class="card">
+
+      <div class="row">
+        <div class="row__label">Поверхности<small>Хром глубже содержимого: колонки читаются приподнятыми</small></div>
+        <div class="row__items">
+          <div class="sw">
+            <div class="sw__chip" style="background:#080a09"></div>
+            <span class="sw__name">--lc-bg-app</span><span class="sw__hex">#080A09</span>
+            <span class="sw__role">полотно</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:#0b0e0d"></div>
+            <span class="sw__name">--lc-bg-panel</span><span class="sw__hex">#0B0E0D</span>
+            <span class="sw__role">панель, рельс</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:#1a221e"></div>
+            <span class="sw__name">--lc-bg-raise</span><span class="sw__hex">#1A221E</span>
+            <span class="sw__role">карточка, --lc-surface</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:#141b18"></div>
+            <span class="sw__name">--lc-bg-selected</span><span class="sw__hex">#141B18</span>
+            <span class="sw__role">наведение на строку</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:#1e2c24"></div>
+            <span class="sw__name">--lc-selected</span><span class="sw__hex">#1E2C24</span>
+            <span class="sw__role">выбранное «вы здесь»</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:#181f1c"></div>
+            <span class="sw__name">--lc-bubble-in</span><span class="sw__hex">#181F1C</span>
+            <span class="sw__role">входящий пузырь</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row__label">Границы<small>Рамка держит край карточки там, где тень на чёрном не видна</small></div>
+        <div class="row__items">
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);border:1px solid #333c37"></div>
+            <span class="sw__name">--lc-line</span><span class="sw__hex">#333C37</span>
+            <span class="sw__role">обычная, 1.43 к карточке</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);border:1px solid #39433d"></div>
+            <span class="sw__name">--lc-line-strong</span><span class="sw__hex">#39433D</span>
+            <span class="sw__role">разделитель, ползунок</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);border:1px solid #505a55"></div>
+            <span class="sw__name">--lc-disabled-edge</span><span class="sw__hex">#505A55</span>
+            <span class="sw__role">форма выключенной кнопки</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row__label">Текст<small>Пятая ступень — только «выключено», информацию ею красить нельзя</small></div>
+        <div class="row__items">
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#e7ede9;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-text-1</span><span class="sw__hex">#E7EDE9</span>
+            <span class="sw__role">заголовки, сообщения</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#c7d2c9;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-text-2</span><span class="sw__hex">#C7D2C9</span>
+            <span class="sw__role">тело, подписи полей</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#949e97;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-text-3</span><span class="sw__hex">#949E97</span>
+            <span class="sw__role">приглушённое, плейсхолдер</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#7c877f;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-text-4</span><span class="sw__hex">#7C877F</span>
+            <span class="sw__role">мета, подпись выключенной</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#5a645e;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-text-5</span><span class="sw__hex">#5A645E</span>
+            <span class="sw__role">только «выключено»</span>
+          </div>
+          <div class="sw">
+            <div class="sw__chip" style="background:var(--lc-bg-raise);color:#6f7a73;font-size:var(--lc-fz-section)">Аа Яя</div>
+            <span class="sw__name">--lc-empty-art</span><span class="sw__hex">#6F7A73</span>
+            <span class="sw__role">рисунок пустого экрана</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row__label">Акцент<small>Одна рампа на весь продукт, якорь — фирменный #3CC13B</small></div>
+        <div>
+          <div class="ramp">
+            <div class="ramp__step" style="background:#eefaee;color:#04160a"><b>50</b><span>#EEFAEE</span></div>
+            <div class="ramp__step" style="background:#d6f4d5;color:#04160a"><b>100</b><span>#D6F4D5</span></div>
+            <div class="ramp__step" style="background:#ade7ac;color:#04160a"><b>200</b><span>#ADE7AC</span></div>
+            <div class="ramp__step" style="background:#7ed77c;color:#04160a"><b>300</b><span>#7ED77C</span></div>
+            <div class="ramp__step" style="background:#57ca55;color:#04160a"><b>400</b><span>#57CA55</span></div>
+            <div class="ramp__step" style="background:#3cc13b;color:#04160a"><b>500</b><span>#3CC13B</span></div>
+            <div class="ramp__step" style="background:#2c9c2b;color:#04160a"><b>600</b><span>#2C9C2B</span></div>
+            <div class="ramp__step" style="background:#217b20;color:#ffffff"><b>700</b><span>#217B20</span></div>
+            <div class="ramp__step" style="background:#1b631a;color:#ffffff"><b>800</b><span>#1B631A</span></div>
+            <div class="ramp__step" style="background:#123f12;color:#e7ede9"><b>900</b><span>#123F12</span></div>
+            <div class="ramp__step" style="background:#0b2a0c;color:#e7ede9"><b>950</b><span>#0B2A0C</span></div>
+          </div>
+          <div class="ramp-roles">
+            <span><b>--lc-primary</b> = 500 · графика, рамки, фокус · 8.20 на панели</span>
+            <span><b>--lc-primary-solid</b> = 600 · заливка под текст</span>
+            <span><b>--lc-primary-text</b> = 300 · текст акцентом · 10.99</span>
+            <span><b>--lc-on-primary</b> = #04160A · чернила на любой зелёной заливке</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:var(--lc-space-3)">
+      <div class="matrix">
+        <div></div>
+        <div class="matrix__col">Успех<small>тот же цвет, что и акцент</small></div>
+        <div class="matrix__col">Тревога<small>клиент ждёт</small></div>
+        <div class="matrix__col">Опасность<small>диалог брошен, не дошло</small></div>
+        <div class="matrix__col">Сведения<small>ссылка, «просто знайте»</small></div>
+        <div class="matrix__col">Бот<small>сделано автоматикой</small></div>
+
+        <div class="matrix__row">Графика<small>рамки, значки, точки, фокус. Норма 3:1</small></div>
+        <div>
+          <div class="cell__chip cell__chip--line" style="color:#3cc13b"><span class="cell__dot"></span>В сети</div>
+          <span class="sw__name">--lc-success</span><span class="sw__hex">#3CC13B</span>
+        </div>
+        <div>
+          <div class="cell__chip cell__chip--line" style="color:#f59e0b"><span class="cell__dot"></span>Отошёл</div>
+          <span class="sw__name">--lc-warn</span><span class="sw__hex">#F59E0B</span>
+        </div>
+        <div>
+          <div class="cell__chip cell__chip--line" style="color:#e5484d"><span class="cell__dot"></span>Не доставлено</div>
+          <span class="sw__name">--lc-danger</span><span class="sw__hex">#E5484D</span>
+        </div>
+        <div>
+          <div class="cell__chip cell__chip--line" style="color:#3b82f6"><span class="cell__dot"></span>Значок сведений</div>
+          <span class="sw__name">--lc-info</span><span class="sw__hex">#3B82F6</span>
+        </div>
+        <div>
+          <div class="cell__chip cell__chip--line" style="color:#8b5cf6"><span class="cell__dot"></span>Бот включён</div>
+          <span class="sw__name">--lc-accent</span><span class="sw__hex">#8B5CF6</span>
+        </div>
+
+        <div class="matrix__row">Заливка под текст<small>вместе с парными чернилами. Норма 4.5:1</small></div>
+        <div>
+          <div class="cell__chip" style="background:#2c9c2b;color:#04160a">Принять диалог</div>
+          <span class="sw__name">--lc-success-solid</span><span class="sw__hex">#2C9C2B · чернила #04160A</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#f59e0b;color:#1a1204">Ждёт 17 мин</div>
+          <span class="sw__name">--lc-warning-solid</span><span class="sw__hex">#F59E0B · чернила #1A1204</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#dc2626;color:#ffffff">Закрыть диалог</div>
+          <span class="sw__name">--lc-danger-solid</span><span class="sw__hex">#DC2626 · чернила #FFFFFF</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#2563eb;color:#ffffff">Открыть на Авито</div>
+          <span class="sw__name">--lc-blue-600</span><span class="sw__hex">#2563EB · чернила #FFFFFF</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#7c3aed;color:#ffffff">Бот отвечает</div>
+          <span class="sw__name">--lc-accent-solid</span><span class="sw__hex">#7C3AED · чернила #FFFFFF</span>
+        </div>
+
+        <div class="matrix__row">Подложка и текст на ней<small>плашки, чипы, тихие предупреждения</small></div>
+        <div>
+          <div class="cell__chip" style="background:#10240f;color:#7ed77c">Диалог принят</div>
+          <span class="sw__name">--lc-success-subtle</span><span class="sw__hex">#10240F · текст #7ED77C</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#241a05;color:#d9a94e">Заметка для своих</div>
+          <span class="sw__name">--lc-warning-subtle</span><span class="sw__hex">#241A05 · текст #D9A94E</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#2c1113;color:#ff9ea1">Не отправлено</div>
+          <span class="sw__name">--lc-danger-subtle</span><span class="sw__hex">#2C1113 · текст #FF9EA1</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#0d1b33;color:#93c5fd">Только чтение</div>
+          <span class="sw__name">--lc-info-subtle</span><span class="sw__hex">#0D1B33 · текст #93C5FD</span>
+        </div>
+        <div>
+          <div class="cell__chip" style="background:#1e1439;color:#c4b5fd">Ждёт клиента</div>
+          <span class="sw__name">--lc-accent-subtle</span><span class="sw__hex">#1E1439 · текст #C4B5FD</span>
+        </div>
+      </div>
+
+      <p class="legend">
+        <b>У каждого акцента два токена, и путать их нельзя.</b> Графический идёт на рамки, значки,
+        фокус и точки — ему хватает 3:1. Заливка носит текст и обязана дать 4.5:1 парным чернилам.
+        Ступени у них разные: на зелёном графика светлее заливки, потому что чернила тёмные.<br>
+        <b>Успех — тот же цвет, что и главное действие.</b> Отдельный зелёный для подтверждения
+        добавил бы пятый зелёный ровно туда, где убрали четыре; различие несут значок и слово, а не тон.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════════════════════════ ТИПОГРАФИКА ═══════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Кегль</h2>
+      <p class="sect__note">Восемь ступеней и ни одной мимо: любое «на глаз рядом» схлопывает иерархию. Интерлиньяж тела 150%, заголовков 125%.</p>
+    </div>
+
+    <div class="card">
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-page<small>заголовок страницы · Semibold</small></div>
+        <div class="type-row__size">28 px</div>
+        <div class="type-row__sample" style="font-size:28px;font-weight:600;letter-spacing:-0.01em">Диалоги</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-metric<small>крупная цифра сводки · Semibold</small></div>
+        <div class="type-row__size">24 px</div>
+        <div class="type-row__sample" style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums">2 148 обращений за неделю</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-section<small>заголовок секции · Semibold</small></div>
+        <div class="type-row__size">20 px</div>
+        <div class="type-row__sample" style="font-size:20px;font-weight:600">Быстрые ответы</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-card<small>заголовок карточки, имя клиента · Medium</small></div>
+        <div class="type-row__size">16 px</div>
+        <div class="type-row__sample" style="font-size:16px;font-weight:500">Валентин Горохов</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-body<small>основной текст, сообщения · Regular</small></div>
+        <div class="type-row__size">14 px</div>
+        <div class="type-row__sample" style="font-size:14px">Здравствуйте! Холодильник не морозит, гудит и тёплый. Сколько будет диагностика?</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-note<small>тело плотных таблиц, вкладки · Regular</small></div>
+        <div class="type-row__size">13 px</div>
+        <div class="type-row__sample" style="font-size:13px;color:var(--lc-text-2)">Ремонт холодильника Bosch · Санкт-Петербург, Приморский район</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-caption<small>подписи, время, пилюли статусов · Regular</small></div>
+        <div class="type-row__size">12 px</div>
+        <div class="type-row__sample" style="font-size:12px;color:var(--lc-text-3)">Ответила Надежда Фролова, 12 минут назад</div>
+      </div>
+      <div class="type-row">
+        <div class="type-row__name">--lc-fz-micro<small>мета, счётчики, имя канала · Regular</small></div>
+        <div class="type-row__size">11 px</div>
+        <div class="type-row__sample" style="font-size:11px;color:var(--lc-text-4)">! Парт - 7 / Ист - В43 МНЧ !</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ ШАГ ДЛЯ БОЛЬШИХ МОНИТОРОВ ════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Шаг шкалы от 1800 px</h2>
+      <p class="sect__note">На 27 дюймах логических пикселей вдвое больше, а физический — мельче. Шкала переобъявляется целиком, всеми восемью ступенями, иначе иерархия схлопывается ровно там, где места больше всего.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <table class="tbl">
+          <tr>
+            <th>Ступень</th>
+            <th class="n">до 1800</th>
+            <th class="n">от 1800</th>
+            <th>Образец рядом</th>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-page</td>
+            <td class="n now">28 px</td>
+            <td class="n big">32 px</td>
+            <td><span style="font-size:28px;color:var(--lc-text-4)">Аа</span> <span style="font-size:32px;font-weight:600">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-metric</td>
+            <td class="n now">24 px</td>
+            <td class="n big">27 px</td>
+            <td><span style="font-size:24px;color:var(--lc-text-4)">Аа</span> <span style="font-size:27px;font-weight:600">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-section</td>
+            <td class="n now">20 px</td>
+            <td class="n big">22 px</td>
+            <td><span style="font-size:20px;color:var(--lc-text-4)">Аа</span> <span style="font-size:22px;font-weight:600">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-card</td>
+            <td class="n now">16 px</td>
+            <td class="n big">17 px</td>
+            <td><span style="font-size:16px;color:var(--lc-text-4)">Аа</span> <span style="font-size:17px;font-weight:500">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-body</td>
+            <td class="n now">14 px</td>
+            <td class="n big">15 px</td>
+            <td><span style="font-size:14px;color:var(--lc-text-4)">Аа</span> <span style="font-size:15px">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-note</td>
+            <td class="n now">13 px</td>
+            <td class="n big">14 px</td>
+            <td><span style="font-size:13px;color:var(--lc-text-4)">Аа</span> <span style="font-size:14px">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-caption</td>
+            <td class="n now">12 px</td>
+            <td class="n big">13 px</td>
+            <td><span style="font-size:12px;color:var(--lc-text-4)">Аа</span> <span style="font-size:13px">Аа</span></td>
+          </tr>
+          <tr>
+            <td class="k">--lc-fz-micro</td>
+            <td class="n now">11 px</td>
+            <td class="n big">12 px</td>
+            <td><span style="font-size:11px;color:var(--lc-text-4)">Аа</span> <span style="font-size:12px">Аа</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <table class="tbl">
+          <tr>
+            <th>Высота контрола</th>
+            <th class="n">до 1800</th>
+            <th class="n">от 1800</th>
+            <th>Почему растёт</th>
+          </tr>
+          <tr>
+            <td class="k">--lc-btn-h-sm</td>
+            <td class="n now">32 px</td>
+            <td class="n big">34 px</td>
+            <td>32 под 15-пиксельной подписью выглядят обжатыми</td>
+          </tr>
+          <tr>
+            <td class="k">--lc-btn-h-md</td>
+            <td class="n now">40 px</td>
+            <td class="n big">42 px</td>
+            <td>кнопка растёт вместе с подписью</td>
+          </tr>
+          <tr>
+            <td class="k">--lc-btn-h-lg</td>
+            <td class="n now">48 px</td>
+            <td class="n big">50 px</td>
+            <td>мишень и без того была нижней границей нормы</td>
+          </tr>
+        </table>
+
+        <p class="legend">
+          <b>Порог 1800, а не 1600.</b> Он ловит не «большой монитор», а «много логических пикселей»:
+          2560 при 100 % даёт 2560, при 125 % — 2048, и в обоих случаях шаг нужен. При 150 % выходит 1707 —
+          там система уже увеличила всё сама, и второй раз увеличивать нельзя.<br>
+          <b>Растёт только кегль и высота кнопок.</b> Отступы и ширины колонок не трогаются: раскладка широких
+          экранов описана своими правилами, и двигать её вслепую значит менять то, чего никто не просил.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ ОТСТУПЫ И РАДИУСЫ ══════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Отступы и радиусы</h2>
+      <p class="sect__note">Сетка 8pt; шаги 0 и 1 полушаговые — иконка с текстом и внутренности бейджа в 8 px не укладываются.</p>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns:460px 1fr">
+      <div class="card">
+        <div class="bar-row"><span class="bar-row__k">--lc-space-0</span><span class="bar-row__v">2</span><span class="bar" style="width:2px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-1</span><span class="bar-row__v">4</span><span class="bar" style="width:4px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-2</span><span class="bar-row__v">8</span><span class="bar" style="width:8px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-3</span><span class="bar-row__v">12</span><span class="bar" style="width:12px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-4</span><span class="bar-row__v">16</span><span class="bar" style="width:16px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-5</span><span class="bar-row__v">24</span><span class="bar" style="width:24px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-6</span><span class="bar-row__v">32</span><span class="bar" style="width:32px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-7</span><span class="bar-row__v">40</span><span class="bar" style="width:40px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-8</span><span class="bar-row__v">48</span><span class="bar" style="width:48px"></span></div>
+        <div class="bar-row"><span class="bar-row__k">--lc-space-9</span><span class="bar-row__v">64</span><span class="bar" style="width:64px"></span></div>
+        <p class="legend">
+          Колонки рабочего места: список <b>340</b>, лента растягивается, карточка клиента <b>380</b>,
+          зазор между ними <b>24</b>. Абзац шире <b>68ch</b> не набирается, форма в одну колонку — не шире <b>880 px</b>.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="radii">
+          <div class="radius-box" style="border-radius:6px"><b>xs</b><span>6 px</span></div>
+          <div class="radius-box" style="border-radius:8px"><b>sm</b><span>8 px</span></div>
+          <div class="radius-box" style="border-radius:12px;border-color:var(--lc-primary)"><b>md</b><span>12 px</span></div>
+          <div class="radius-box" style="border-radius:16px"><b>lg</b><span>16 px</span></div>
+          <div class="radius-box" style="border-radius:20px"><b>xl</b><span>20 px</span></div>
+          <div class="radius-box" style="border-radius:999px"><b>pill</b><span>999 px</span></div>
+        </div>
+        <p class="legend">
+          <b>md — кнопки, поля ввода, дропдауны и меню, без исключений.</b> Ровно поэтому он выделен рамкой:
+          из шести радиусов в интерфейсе чаще всего встречается один. <b>lg</b> — карточки и тосты,
+          <b>xl</b> — модальные окна и крупные панели, <b>pill</b> — только то, что означает «выбери одно из»:
+          статусы, вкладки, счётчики.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════════════════════ ВЫСОТЫ КНОПОК ════════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Три высоты кнопок</h2>
+      <p class="sect__note">Ступени отвечают на три разных вопроса, а не значат «маленькая, средняя, большая». Радиус у всех трёх один — 12 px.</p>
+    </div>
+
+    <div class="card">
+      <div class="heights">
+        <div class="btn-cell">
+          <button class="btn btn--filled btn--sm">Передать</button>
+          <span class="btn-cell__cap"><b>sm · 32 / 12</b>плотный ряд: шапка ленты,<br>панель таблицы, тулбар</span>
+        </div>
+        <div class="btn-cell">
+          <button class="btn btn--filled">Сохранить распределение</button>
+          <span class="btn-cell__cap"><b>md · 40 / 16</b>форма, окно, шапка страницы:<br>кнопок одна-две, попадать не глядя</span>
+        </div>
+        <div class="btn-cell">
+          <button class="btn btn--filled btn--lg">Войти</button>
+          <span class="btn-cell__cap"><b>lg · 48 / 20</b>единственное действие на экране:<br>вход, пустое состояние</span>
+        </div>
+        <p class="legend" style="max-width:64ch;margin:0 0 2px var(--lc-space-6)">
+          <b>Нижняя ступень — 32, а не 22.</b> Двадцать два пикселя не проходят норму мишени 24×24,
+          и по таким кнопкам промахиваются пальцем на ноутбучном тачпаде. До сведения шкалы высот
+          на экранах было десять: 22, 24, 26, 28, 30, 32, 34, 36, 40, 42.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ ЭЛЕМЕНТЫ В ДЕЛЕ ════ -->
+  <section class="sect">
+    <div class="sect__head">
+      <h2 class="sect__title">Элементы в деле</h2>
+      <p class="sect__note">Состояние читается цветом и формой; подпись к нему не приставляется.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:var(--lc-space-4)">
+
+      <div class="card">
+        <div class="mini">
+          <div class="mini__head">
+            <span class="mini__title">Кнопки</span>
+            <span class="mini__hint">главная на экране одна</span>
+          </div>
+          <div class="mini__items">
+            <button class="btn btn--filled">Принять диалог</button>
+            <button class="btn btn--outline">Передать</button>
+            <button class="btn btn--subtle">Отмена</button>
+            <button class="btn btn--disabled">Отправить</button>
+          </div>
+        </div>
+        <p class="legend">
+          <b>Чернила на зелёном тёмные, а не белые:</b> белый на #3CC13B даёт 2.36 — это ограничение
+          самого цвета, а не вкус. <b>Выключенная получает рамку,</b> потому что растворялась не подпись,
+          а сама форма: заливка карточки против полотна давала 1.22.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="mini">
+          <div class="mini__head">
+            <span class="mini__title">Поле ввода</span>
+            <span class="mini__hint">высота и радиус — те же, что у кнопки</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--lc-space-3)">
+            <div class="field">
+              <span class="field__label">Поиск по диалогам</span>
+              <div class="input">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span class="ph">Имя, телефон или текст сообщения</span>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field__label">Имя сотрудника</span>
+              <div class="input input--focus">
+                <span>Надежда Фролова</span><span class="input__caret"></span>
+              </div>
+              <span class="field__hint">Кольцо фокуса одно на весь продукт</span>
+            </div>
+            <div class="field">
+              <span class="field__label">Телефон клиента</span>
+              <div class="input input--error"><span>+7 900 1</span></div>
+              <span class="field__err">Номер неполный — 11 цифр</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="mini">
+          <div class="mini__head">
+            <span class="mini__title">Пилюли статусов</span>
+            <span class="mini__hint">путь диалога, он же порядок во всех фильтрах</span>
+          </div>
+          <div class="mini__items">
+            <span class="pill pill--new">Новый</span>
+            <span class="pill pill--work">В работе</span>
+            <span class="pill pill--wait">Ждёт клиента</span>
+            <span class="pill pill--closed">Закрыт</span>
+          </div>
+        </div>
+        <div class="mini">
+          <div class="mini__head">
+            <span class="mini__title">Вкладки-чипы</span>
+            <span class="mini__hint">капсула означает «выбери одно из»</span>
+          </div>
+          <div class="tabs">
+            <button class="tab">Входящие <span class="count count--queue">7</span></button>
+            <button class="tab tab--active">Мои <span class="count">12</span></button>
+            <button class="tab tab--hover">Все</button>
+          </div>
+          <p class="legend" style="margin-top:var(--lc-space-2)">
+            Слева направо: обычная, выбранная, под курсором.
+          </p>
+        </div>
+        <div class="mini">
+          <div class="mini__head">
+            <span class="mini__title">Значок с числом</span>
+            <span class="mini__hint">два счётчика про разное — и цвет у них разный</span>
+          </div>
+          <div class="badge-line">
+            <span class="badge-line__cell">
+              <span class="bell">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/><path d="M4 17h16a2 2 0 0 1-2-2v-4a6 6 0 1 0-12 0v4a2 2 0 0 1-2 2Z"/></svg>
+                <span class="count count--queue">7</span>
+              </span>
+              ждёт решения
+            </span>
+            <span class="badge-line__cell">
+              <span class="count">3</span> непрочитано
+            </span>
+            <span class="badge-line__cell">
+              <span class="count">99+</span> потолок счётчика
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:236px">
+        <div class="empty">
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none" aria-hidden="true">
+            <circle cx="44" cy="44" r="44" fill="var(--lc-success)" fill-opacity="0.1"/>
+            <g stroke="var(--lc-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(26 26)">
+              <path d="M4 18 L13 27 L32 8"/>
+            </g>
+          </svg>
+          <div>
+            <div class="empty__title">Очередь пуста</div>
+            <div class="empty__desc">Новые обращения появятся здесь — их будет видно и слышно</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;flex-direction:column;gap:var(--lc-space-3)">
+          <div class="toast toast--success">
+            <span class="toast__ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.8 10.5V12a10 10 0 1 1-5.9-9.1"/><path d="m9 11 3 3L22 4"/></svg>
+            </span>
+            <div>
+              <div class="toast__title">Диалог принят</div>
+              <div class="toast__desc">Клиент ждёт ответа</div>
+            </div>
+            <span class="toast__close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 6-12 12"/><path d="m6 6 12 12"/></svg>
+            </span>
+            <span class="toast__bar"></span>
+          </div>
+
+          <div class="toast toast--danger">
+            <span class="toast__ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            </span>
+            <div>
+              <div class="toast__title">Не удалось отправить</div>
+              <div class="toast__desc">Токен канала «! Парт - 7 / Ист - В43 МНЧ !» отозван</div>
+            </div>
+            <span class="toast__close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 6-12 12"/><path d="m6 6 12 12"/></svg>
+            </span>
+          </div>
+        </div>
+        <p class="legend">
+          <b>Полоса внизу рисуется, только когда тост действительно закроется сам,</b> и её длительность
+          равна фактической — 4 секунды. У ошибки полосы нет: она ждёт человека. Нарисовать полосу на
+          неисчезающем тосте значит показать, что сообщение сейчас уйдёт само; его досмотрят и отвернутся.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>

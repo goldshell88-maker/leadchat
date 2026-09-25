@@ -1,0 +1,1108 @@
+<!-- @dsCard group="Настройки" -->
+<meta charset="utf-8">
+<title>Аккаунты Авито</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.4 акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 синий, §1.3 красный, §1.5 янтарь, §1.6 фиолетовый */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-red-950: #2c1113;
+    --lc-amber-300: #fcd34d;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-950: #1e1439;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-text-disabled: var(--lc-text-5);
+
+    /* роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+
+    /* состояния */
+    --lc-success: var(--lc-a-500);
+    --lc-success-text: var(--lc-a-300);
+    --lc-warn: var(--lc-amber-500);
+    --lc-warn-text: #d9a94e;
+    --lc-warning: var(--lc-warn);
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-warning-subtle: #241a05;
+    --lc-danger: #e5484d;
+    --lc-danger-solid: #dc2626;
+    --lc-danger-text: #ff9ea1;
+    --lc-danger-subtle: var(--lc-red-950);
+    --lc-info: var(--lc-blue-500);
+    --lc-info-text: var(--lc-blue-300);
+
+    /* присутствие и состояние канала */
+    --lc-presence-online: var(--lc-a-500);
+    --lc-presence-offline: #6f7a73;
+
+    /* §5 палитра аватаров (тёмная тема) */
+    --lc-avatar-0-bg: #14343f;
+    --lc-avatar-0-ink: #7dd3fc;
+    --lc-avatar-1-bg: #14312a;
+    --lc-avatar-1-ink: #6ee7b7;
+    --lc-avatar-2-bg: #38300f;
+    --lc-avatar-2-ink: #fcd34d;
+    --lc-avatar-3-bg: #3b1d20;
+    --lc-avatar-3-ink: #fca5a5;
+    --lc-avatar-4-bg: #2a1f45;
+    --lc-avatar-4-ink: #c4b5fd;
+    --lc-avatar-5-bg: #3a2417;
+    --lc-avatar-5-ink: #fdba74;
+    --lc-avatar-6-bg: #17274a;
+    --lc-avatar-6-ink: #93c5fd;
+    --lc-avatar-7-bg: #2f2440;
+    --lc-avatar-7-ink: #f0abfc;
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-pill: 999px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+  }
+
+  /* ═════════════════════════════════ КАРКАС СТРАНИЦЫ ════════════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: 1600px;
+    padding: var(--lc-space-5);
+  }
+
+  /* Шапка раздела — канон PageHeader: h1, --lc-fz-page, вес 600,
+     описание одной строкой без точки в конце. */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--lc-space-5);
+    margin-bottom: var(--lc-space-5);
+  }
+
+  .page-header__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+  }
+
+  .page-header__description {
+    margin: var(--lc-space-1) 0 0;
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-3);
+  }
+
+  .btn-primary {
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-btn-px-md);
+    border: 0;
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+    font-family: inherit;
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-medium);
+    cursor: pointer;
+  }
+
+  /* ══════════════════════════════════ СПИСОК КАНАЛОВ ════════════════════ */
+
+  /*
+   * ОДНА СЕТКА НА ВЕСЬ СПИСОК, А НЕ ПО СЕТКЕ НА СТРОКУ.
+   *
+   * Ячейки — прямые дети контейнера, поэтому колонок физически ровно шесть на
+   * все тридцать пять каналов: у строки нет своей ширины, которую можно было
+   * бы посчитать иначе, и «съехать» ей нечем. Зазор между колонками отдан
+   * внутренним отступам ячеек, а не `gap`: иначе подложка строки рвалась бы
+   * просветами, и у выключенного канала полосы шли бы поперёк ряда.
+   */
+  /*
+   * ДОЛИ КОЛОНОК ПОСЧИТАНЫ ПО САМЫМ ДЛИННЫМ РЕАЛЬНЫМ ФРАЗАМ, а не на глаз.
+   * Мерилось прямо на этом макете: имя «Валентина · МНЧ» 135, числа недели
+   * 191, ряд из четырёх лиц со счётчиком 228, «Токен истёк» со знаком и
+   * кнопкой «Обновить токен» 215, «События нет заметно дольше обычного» с
+   * кнопкой «Обновить подписку» 434. Колонка, посчитанная по среднему, режет
+   * ровно ту строку, ради которой на страницу и зашли, — тревожную.
+   */
+  .list {
+    display: grid;
+    grid-template-columns:
+      minmax(150px, 1.04fr)  /* канал        */
+      minmax(140px, 1.14fr)  /* неделя       */
+      minmax(140px, 1.02fr)  /* операторы    */
+      minmax(110px, 0.95fr)  /* токен        */
+      minmax(130px, 1.85fr)  /* приём событий */
+      52px;                  /* меню «…»     */
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    background: var(--lc-surface);
+    box-shadow: var(--lc-shadow-1);
+    overflow: hidden;
+  }
+
+  /* Подписи колонок: список читают восемь часов подряд, и «что это за число»
+     не должно выясняться наведением. Кегль micro, тон text-4 — тише всего,
+     что стоит под ними. */
+  .h {
+    padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-2) 0;
+    border-bottom: 1px solid var(--lc-border);
+    background: var(--lc-bg-1);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    white-space: nowrap;
+  }
+
+  .h:first-child { padding-left: calc(var(--lc-space-4) + 36px); }
+  .h:last-child { padding-right: var(--lc-space-4); }
+
+  .c {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    min-height: 64px;
+    padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-2) 0;
+    border-bottom: 1px solid var(--lc-border);
+    background: var(--lc-surface);
+  }
+
+  .c--first { padding-left: var(--lc-space-4); }
+
+  .c--menu {
+    align-items: flex-end;
+    padding-right: var(--lc-space-4);
+  }
+
+  /* Нижняя рамка последнего ряда лишняя: снизу уже рамка контейнера. */
+  .list > .c:nth-last-child(-n + 6) { border-bottom: none; }
+
+  /*
+   * Требует переподключения — полоса слева, а не заливка: сверху и снизу у
+   * строки идут разделители соседей, и цветной остаётся ровно левый край.
+   * Полоса нарисована внутренней тенью, поэтому ширину ячейки она не трогает
+   * и колонки этой строки стоят там же, где у всех.
+   */
+  .c--alarm { box-shadow: inset 3px 0 0 var(--lc-danger); }
+
+  /* Выключенный канал — своя подложка и приглушённый текст. Прозрачностью
+     этого не делаем: она гасит и подложку, и разделители. */
+  .c--off { background: var(--lc-bg-1); }
+
+  /* ── колонка 1: канал ── */
+
+  .ch { display: flex; align-items: center; gap: var(--lc-space-2); min-width: 0; }
+
+  .ch__chev {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-left: -6px;
+    border: 0;
+    border-radius: var(--lc-radius-sm);
+    background: none;
+    color: var(--lc-text-3);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* Точка состояния стоит между треугольником и именем — у всех строк на
+     одном и том же иксе. Так тридцать пять состояний читаются одной
+     вертикалью, а не поиском по концам разной длины имён. */
+  .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .dot--online { background: var(--lc-presence-online); }
+  .dot--danger { background: var(--lc-danger); }
+  .dot--muted { background: var(--lc-text-disabled); }
+
+  .ch__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+    cursor: text;
+  }
+
+  .c--off .ch__name { color: var(--lc-text-3); }
+
+  .ch__id {
+    padding-left: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ── колонка 2: неделя ── */
+
+  .wk { display: flex; align-items: center; gap: var(--lc-space-2); min-width: 0; }
+
+  .wk__chart {
+    flex: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+  }
+
+  .wk__bar {
+    display: flex;
+    align-items: flex-end;
+    width: 6px;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--lc-surface-hover);
+  }
+
+  .c--off .wk__bar { background: #121815; }
+
+  .wk__fill { width: 100%; border-radius: 2px; background: var(--lc-primary); }
+
+  /* День без обращений — серая риска: цвет данных означает данные. */
+  .wk__bar[data-empty] .wk__fill { background: var(--lc-border); }
+
+  /* У неработающего канала столбики гаснут: семь зелёных полос читаются как
+     «канал работает» громче, чем серая точка состояния. */
+  .wk--off .wk__fill { background: var(--lc-text-4); }
+
+  .wk__nums { min-width: 0; }
+
+  /* Первая линия чисел не имеет права переноситься: перенос поднимает высоту
+     ряда, и список снова идёт волной. Не влезло — многоточие, полная фраза
+     остаётся подсказкой. */
+  .wk__line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .wk__total {
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .wk__cap { font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  .wk__missed {
+    display: block;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* Единичные пропуски неизбежны и тревоги не стоят. Красным — с десятой
+     части: это уже система, а не случай. */
+  .wk__missed[data-alarming] {
+    color: var(--lc-danger-text);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .wk__empty {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── колонка 3: операторы ── */
+
+  /*
+   * СОСТАВ КАНАЛА ПРАВИТСЯ НАЖАТИЕМ НА САМ СОСТАВ, как имя канала — нажатием
+   * на имя. Кнопка «Назначить» рядом со значением это то же самое, от чего
+   * отказались у переименования: подпись действия в каждой из тридцати пяти
+   * строк ради работы, которую делают раз в месяц. Целью нажатия служат счёт
+   * и лица — то есть ровно то, что действие меняет.
+   */
+  .op {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    gap: var(--lc-space-2);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .op__label { flex: none; font-size: var(--lc-fz-body); color: var(--lc-text-2); }
+  .op__label b { font-weight: var(--lc-fw-semibold); font-variant-numeric: var(--lc-num); }
+
+  .op__faces { display: flex; gap: var(--lc-space-1); min-width: 0; }
+
+  .avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: var(--lc-fw-semibold);
+    user-select: none;
+  }
+
+  .op__more {
+    flex: none;
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ── колонки 4 и 5: состояние токена и приёма событий ── */
+
+  .hl { display: flex; align-items: center; gap: var(--lc-space-2); min-width: 0; }
+
+  .hl__line {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    min-width: 0;
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-2);
+  }
+
+  .hl__line svg { flex: none; }
+
+  .hl__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Жёлтым и красным помечается ТОЛЬКО то, что требует действия человека.
+     Штатный суточный токен и тишина на редком канале — нейтральны. */
+  .hl--warn { color: var(--lc-warning-text); font-weight: var(--lc-fw-semibold); }
+  .hl--crit { color: var(--lc-danger-text); font-weight: var(--lc-fw-semibold); }
+
+  .c--off .hl__line { color: var(--lc-text-3); }
+
+  .btn-subtle {
+    flex: none;
+    height: 22px;
+    padding: 0 var(--lc-space-1);
+    border: 0;
+    border-radius: var(--lc-radius-md);
+    background: none;
+    color: var(--lc-primary-text);
+    font-family: inherit;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* Второстепенное действие второй линией ячейки: у всех строк оно на одном
+     иксе, поэтому отрицательный отступ снимает собственные поля кнопки и
+     ставит подпись ровно под содержимым первой линии. */
+  .btn-subtle--row {
+    align-self: flex-start;
+    margin-left: calc(var(--lc-space-1) * -1);
+  }
+
+  .note {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  /* ── колонка 6: обслуживание ── */
+
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--lc-btn-h-sm);
+    height: var(--lc-btn-h-sm);
+    border: 0;
+    border-radius: var(--lc-radius-md);
+    background: none;
+    color: var(--lc-text-2);
+    cursor: pointer;
+  }
+</style>
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-header__title">Аккаунты Авито</h1>
+      <p class="page-header__description">Каналы, обращения которых приходят в «Чаты»</p>
+    </div>
+    <button class="btn-primary" type="button">Подключить аккаунт</button>
+  </header>
+
+  <div class="list">
+    <!-- ═══════════════ подписи колонок ═══════════════ -->
+    <div class="h">Канал</div>
+    <div class="h">Неделя</div>
+    <div class="h">Операторы</div>
+    <div class="h">Токен</div>
+    <div class="h">Приём событий</div>
+    <div class="h"></div>
+
+    <!-- ═══════════════ 1. Александр · КП ═══════════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Александр">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Александр — нажмите, чтобы переименовать">Александр · КП</span>
+      </div>
+      <div class="ch__id">id 152739406</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 512">
+          <span class="wk__bar"><span class="wk__fill" style="height:92%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:74%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:56%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:82%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:88%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:42%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">512</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">6 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>5</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-0-bg);color:var(--lc-avatar-0-ink)" title="Тамара Белкина">ТБ</span>
+          <span class="avatar" style="background:var(--lc-avatar-4-bg);color:var(--lc-avatar-4-ink)" title="Степан Мелихов">СМ</span>
+          <span class="avatar" style="background:var(--lc-avatar-2-bg);color:var(--lc-avatar-2-ink)" title="Нина Сотникова">НС</span>
+          <span class="avatar" style="background:var(--lc-avatar-6-bg);color:var(--lc-avatar-6-ink)" title="Фёдор Кротов">ФК</span>
+        </span>
+        <span class="op__more">+1</span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:47</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Александр">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════════ 2. Анатолий · БТ ═══════════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Анатолий">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Анатолий — нажмите, чтобы переименовать">Анатолий · БТ</span>
+      </div>
+      <div class="ch__id">id 157204318</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 468">
+          <span class="wk__bar"><span class="wk__fill" style="height:91%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:81%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:73%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:95%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:86%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:51%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">468</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">3 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label" title="Никто не назначен — обращения канала видят все операторы">Операторы: <b>все</b></span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:44</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Анатолий">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 3. Валентина · МНЧ — тревога по приёму событий ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Валентина">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Валентина — нажмите, чтобы переименовать">Валентина · МНЧ</span>
+      </div>
+      <div class="ch__id">id 150468293</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 356">
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:92%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:82%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:74%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:23%"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">356</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">9 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>3</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-1-bg);color:var(--lc-avatar-1-ink)" title="Регина Пак">РП</span>
+          <span class="avatar" style="background:var(--lc-avatar-5-bg);color:var(--lc-avatar-5-ink)" title="Денис Ветров">ДВ</span>
+          <span class="avatar" style="background:var(--lc-avatar-3-bg);color:var(--lc-avatar-3-ink)" title="Оксана Тишкова">ОТ</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line hl--warn" role="status" title="Обычно на этом канале событие приходит раз в 40 минут, последнее было 6 часов назад. Сверка подписки на стороне Авито прошла в 21:30.">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <span class="hl__text">События нет заметно дольше обычного</span>
+        </span>
+        <button class="btn-subtle" type="button">Обновить подписку</button>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Валентина">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 4. Григорий · КП — каждый десятый без ответа ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Григорий">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Григорий — нажмите, чтобы переименовать">Григорий · КП</span>
+      </div>
+      <div class="ch__id">id 158821047</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 391">
+          <span class="wk__bar"><span class="wk__fill" style="height:92%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:81%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:68%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:85%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:76%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:42%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">391</span> <span class="wk__cap">обращение за неделю</span></div>
+          <span class="wk__missed" data-alarming title="Обращения, на которые никто ни разу не ответил">47 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>4</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-7-bg);color:var(--lc-avatar-7-ink)" title="Василий Шаров">ВШ</span>
+          <span class="avatar" style="background:var(--lc-avatar-2-bg);color:var(--lc-avatar-2-ink)" title="Яна Казакова">ЯК</span>
+          <span class="avatar" style="background:var(--lc-avatar-6-bg);color:var(--lc-avatar-6-ink)" title="Илья Фомичёв">ИФ</span>
+          <span class="avatar" style="background:var(--lc-avatar-4-bg);color:var(--lc-avatar-4-ink)" title="Нина Сотникова">НС</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:46</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Григорий">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 5. Дмитрий · БТ — требует переподключения ═══════════ -->
+    <div class="c c--first c--alarm">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Дмитрий">▸</button>
+        <span class="dot dot--danger" role="img" aria-label="Статус: требует переподключения"></span>
+        <span class="ch__name" title="Дмитрий — нажмите, чтобы переименовать">Дмитрий · БТ</span>
+      </div>
+      <div class="ch__id">id 154390726</div>
+    </div>
+    <div class="c">
+      <div class="wk wk--off">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 447">
+          <span class="wk__bar"><span class="wk__fill" style="height:92%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:82%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:69%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:86%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:75%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:29%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">447</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" data-alarming title="Обращения, на которые никто ни разу не ответил">61 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>4</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-4-bg);color:var(--lc-avatar-4-ink)" title="Степан Мелихов">СМ</span>
+          <span class="avatar" style="background:var(--lc-avatar-1-bg);color:var(--lc-avatar-1-ink)" title="Регина Пак">РП</span>
+          <span class="avatar" style="background:var(--lc-avatar-6-bg);color:var(--lc-avatar-6-ink)" title="Фёдор Кротов">ФК</span>
+          <span class="avatar" style="background:var(--lc-avatar-3-bg);color:var(--lc-avatar-3-ink)" title="Оксана Тишкова">ОТ</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line hl--crit" role="alert" title="Токен истёк: ответы клиентам сейчас не уходят. Автообновление не проходит вторые сутки — Авито отвечает «invalid_client».">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+          <span class="hl__text">Токен истёк</span>
+        </span>
+        <button class="btn-subtle" type="button">Обновить токен</button>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:39</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Дмитрий">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 6. Екатерина · МНЧ — редкий канал, тишина это норма ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Екатерина">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Екатерина — нажмите, чтобы переименовать">Екатерина · МНЧ</span>
+      </div>
+      <div class="ch__id">id 151957830</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 289">
+          <span class="wk__bar"><span class="wk__fill" style="height:91%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:77%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:68%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:85%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:79%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:45%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">289</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">4 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>2</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-5-bg);color:var(--lc-avatar-5-ink)" title="Денис Ветров">ДВ</span>
+          <span class="avatar" style="background:var(--lc-avatar-2-bg);color:var(--lc-avatar-2-ink)" title="Яна Казакова">ЯК</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="Обычно на этом канале событие приходит раз в 3 часа. Последнее было в 19:12, сверка подписки прошла в 21:30.">
+          <span class="hl__text">Сейчас тихо, для этого канала это обычно</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Екатерина">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 7. Игорь · КП ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Игорь">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Игорь — нажмите, чтобы переименовать">Игорь · КП</span>
+      </div>
+      <div class="ch__id" title="id 156103589 · номер партнёра для заявок не проставлен">id 156103589 · партнёр не задан</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 537">
+          <span class="wk__bar"><span class="wk__fill" style="height:91%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:73%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:67%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:85%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:78%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:37%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">537</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">8 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>6</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-0-bg);color:var(--lc-avatar-0-ink)" title="Тамара Белкина">ТБ</span>
+          <span class="avatar" style="background:var(--lc-avatar-7-bg);color:var(--lc-avatar-7-ink)" title="Василий Шаров">ВШ</span>
+          <span class="avatar" style="background:var(--lc-avatar-6-bg);color:var(--lc-avatar-6-ink)" title="Илья Фомичёв">ИФ</span>
+          <span class="avatar" style="background:var(--lc-avatar-2-bg);color:var(--lc-avatar-2-ink)" title="Нина Сотникова">НС</span>
+        </span>
+        <span class="op__more">+2</span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:48</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Игорь">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 8. Клавдия · БТ — отключён вручную ═══════════ -->
+    <div class="c c--first c--off">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Клавдия">▸</button>
+        <span class="dot dot--muted" role="img" aria-label="Статус: отключён"></span>
+        <span class="ch__name" title="Клавдия — нажмите, чтобы переименовать">Клавдия · БТ</span>
+      </div>
+      <div class="ch__id">id 153672914</div>
+    </div>
+    <div class="c c--off">
+      <div class="wk wk--off">
+        <div class="wk__chart" role="img" aria-label="Обращений за неделю нет">
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+          <span class="wk__bar" data-empty><span class="wk__fill" style="height:2px"></span></span>
+        </div>
+        <div class="wk__nums">
+          <span class="wk__empty" title="Сводка отстаёт до часа — самые свежие обращения сюда ещё не попали, их видно в «Чатах».">Обращений за неделю не видно</span>
+        </div>
+      </div>
+    </div>
+    <div class="c c--off">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>3</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-6-bg);color:var(--lc-avatar-6-ink)" title="Фёдор Кротов">ФК</span>
+          <span class="avatar" style="background:var(--lc-avatar-3-bg);color:var(--lc-avatar-3-ink)" title="Оксана Тишкова">ОТ</span>
+          <span class="avatar" style="background:var(--lc-avatar-1-bg);color:var(--lc-avatar-1-ink)" title="Регина Пак">РП</span>
+        </span>
+      </div>
+    </div>
+    <!-- У выключенного канала нет ни токена, ни приёма событий: объяснение
+         занимает место обеих строк состояния, а не первую свободную клетку. -->
+    <div class="c c--off" style="grid-column: 4 / span 2">
+      <div class="note" title="Отключён вручную, переписка удалена. Включить можно в любой момент — новые обращения снова начнут приходить.">
+        Отключён вручную, переписка удалена. Включить можно в любой момент — новые обращения снова начнут приходить.
+      </div>
+      <button class="btn-subtle btn-subtle--row" type="button">Включить</button>
+    </div>
+    <div class="c c--menu c--off">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Клавдия">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 9. Людмила — источник не задан ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Людмила">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Людмила — нажмите, чтобы переименовать">Людмила</span>
+      </div>
+      <div class="ch__id" title="id 159240657 · источник заявки не проставлен">id 159240657 · источник не задан</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 324">
+          <span class="wk__bar"><span class="wk__fill" style="height:90%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:77%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:64%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:85%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:72%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:43%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">324</span> <span class="wk__cap">обращения за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">5 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>2</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-4-bg);color:var(--lc-avatar-4-ink)" title="Степан Мелихов">СМ</span>
+          <span class="avatar" style="background:var(--lc-avatar-2-bg);color:var(--lc-avatar-2-ink)" title="Яна Казакова">ЯК</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:41</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Людмила">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- ═══════════ 10. Николай · КП ═══════════ -->
+    <div class="c c--first">
+      <div class="ch">
+        <button class="ch__chev" type="button" aria-label="Развернуть Николай">▸</button>
+        <span class="dot dot--online" role="img" aria-label="Статус: работает"></span>
+        <span class="ch__name" title="Николай — нажмите, чтобы переименовать">Николай · КП</span>
+      </div>
+      <div class="ch__id">id 155816402</div>
+    </div>
+    <div class="c">
+      <div class="wk">
+        <div class="wk__chart" role="img" aria-label="Обращения по дням недели, всего 495">
+          <span class="wk__bar"><span class="wk__fill" style="height:91%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:100%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:75%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:68%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:87%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:78%"></span></span>
+          <span class="wk__bar"><span class="wk__fill" style="height:32%"></span></span>
+        </div>
+        <div class="wk__nums">
+          <div class="wk__line"><span class="wk__total">495</span> <span class="wk__cap">обращений за неделю</span></div>
+          <span class="wk__missed" title="Обращения, на которые никто ни разу не ответил">7 без ответа</span>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="op" title="Нажмите, чтобы назначить операторов">
+        <span class="op__label">Операторы: <b>5</b></span>
+        <span class="op__faces">
+          <span class="avatar" style="background:var(--lc-avatar-0-bg);color:var(--lc-avatar-0-ink)" title="Илья Фомичёв">ИФ</span>
+          <span class="avatar" style="background:var(--lc-avatar-5-bg);color:var(--lc-avatar-5-ink)" title="Денис Ветров">ДВ</span>
+          <span class="avatar" style="background:var(--lc-avatar-3-bg);color:var(--lc-avatar-3-ink)" title="Тамара Белкина">ТБ</span>
+          <span class="avatar" style="background:var(--lc-avatar-7-bg);color:var(--lc-avatar-7-ink)" title="Василий Шаров">ВШ</span>
+        </span>
+        <span class="op__more">+1</span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line" title="client_id и client_secret постоянные, менять их не нужно. Авито выдаёт по ним access-токен на 24 часа, сервис перевыпускает его сам.">
+          <span class="hl__text">Токен активен, до 05.09.2026</span>
+        </span>
+      </div>
+    </div>
+    <div class="c">
+      <div class="hl">
+        <span class="hl__line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="hl__text">События приходят, последнее в 21:46</span>
+        </span>
+      </div>
+    </div>
+    <div class="c c--menu">
+      <button class="menu-btn" type="button" aria-label="Обслуживание канала Николай">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+# Override для развёртывания БЕЗ реестра образов.
+#
+# Прод-compose (docker-compose.prod.yml) рассчитан на образы из GHCR, которые
+# собирает CI. Пока реестра нет, образы собираются прямо на сервере:
+#
+#   docker build -f docker/Dockerfile.api -t local/leadchat-api:prod .
+#   docker build -f docker/Dockerfile.web -t local/leadchat-web:prod .
+#   docker build -t local/fake-avito:prod ./fake_avito
+#
+# Здесь же поднимается fake-avito — пока не выдан доступ к реальному
+# Messenger API Авито, прод работает на имитаторе (05 §4: переключение —
+# две переменные AVITO_API_BASE и AVITO_AUTH_URL).
+#
+# Файл лежит в репозитории намеренно: раньше он существовал только на сервере
+# и был снесён выкаткой через `rsync --delete`.
+services:
+  # ⚠ APP_VERSION — ЧТО ИМЕННО СЕЙЧАС ОТВЕЧАЕТ СНАРУЖИ (аудит 19.08, L-011).
+  # `/api/health` печатал `version: prod` — значение IMAGE_TAG из .env, одно и
+  # то же до и после выкатки. Проверка SM-1 сверяла его с ожидаемым и потому
+  # НИКОГДА не могла поймать «наружу смотрит старый контейнер»: выкатка
+  # объявляла успех, даже если новый образ не поднялся. Теперь `ship.sh`
+  # передаёт сюда коммит, который выкатывает, и сверка становится настоящей.
+  # Пусто (например при ручном `docker compose up`) — здоровье честно
+  # возвращается к IMAGE_TAG, как раньше.
+  api:
+    image: local/leadchat-api:prod
+    environment:
+      APP_VERSION: ${APP_VERSION:-}
+  worker:
+    image: local/leadchat-api:prod
+    environment:
+      APP_VERSION: ${APP_VERSION:-}
+  scheduler:
+    image: local/leadchat-api:prod
+    environment:
+      APP_VERSION: ${APP_VERSION:-}
+  nginx:
+    image: local/leadchat-web:prod
+
+  fake-avito:
+    image: local/fake-avito:prod
+    restart: unless-stopped
+    # Обе сети, а не только internal. `internal` — чтобы к имитатору ходили api,
+    # worker и scheduler. `edge` — чтобы nginx мог отдать его страницу согласия
+    # по адресу /fake-oauth: `AVITO_AUTH_URL` указывает туда, и без общей с
+    # nginx сети кнопка «Подключить аккаунт Авито» отвечала 502.
+    #
+    # Наружу это порт не открывает: у fake-avito нет `ports`, и попасть на него
+    # можно только через nginx и только по одному объявленному адресу.
+    networks: [internal, edge]
+    environment:
+      AVITO_REDIRECT_URI: ${AVITO_REDIRECT_URI}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8020/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

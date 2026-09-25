@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>LeadChat by Lead Partner</title>
+
+    <!--
+      Тема выставляется ДО первой отрисовки (docs/16 §2).
+
+      Без этого страница успевает нарисоваться в теме по умолчанию и только
+      потом, когда смонтируется React, переключается на выбранную. Для
+      сотрудника, работающего в светлой теме, это вспышка тёмного экрана при
+      каждой загрузке.
+
+      Скрипт синхронный и стоит до бандла намеренно: любая асинхронность здесь
+      возвращает ту же вспышку. Ключ хранилища — тот же, что читает и пишет сам
+      Mantine; продублировать его здесь пришлось потому, что у SPA нет
+      серверной отрисовки, куда Mantine кладёт свой ColorSchemeScript.
+
+      Умолчание — тёмная: при пустом хранилище первая отрисовка обязана
+      совпасть с тем, что через мгновение выставит приложение.
+
+      ⚠ ВСТРОЕННЫЙ СКРИПТ ЗДЕСЬ РОВНО ОДИН, И ЭТО УСЛОВИЕ, А НЕ СОВПАДЕНИЕ.
+      CSP пускает его по хешу содержимого (docker/nginx/snippets/security-headers.conf);
+      второй такой же был бы молча заблокирован браузером. Сторожат оба факта
+      `CspInlineHash0109` и `FirstPaint0709`.
+
+      ⚠ ВНУТРИ СКРИПТА КОММЕНТАРИЕВ НЕТ НАРОЧНО, И ВОТ ПОЧЕМУ ОНИ ЗДЕСЬ.
+      Скрипт разрешён ПО ХЕШУ, то есть уезжает в браузер байт в байт — вместе с
+      каждой строкой пояснения. Владелец открыл «просмотр кода» и увидел там
+      абзацы внутренней переписки. Комментарии разметки сборка снимает
+      (`src/build/безКомментариев`), а тронуть содержимое самого тега скрипта
+      она не может: любая правка ломает хеш, и браузер молча откажется его выполнять —
+      у всех вернётся вспышка чужой темы. Поэтому доводы вынесены СЮДА: этот
+      комментарий сборка уберёт, а сам скрипт останется нетронутым.
+
+      ЧТО ДЕЛАЕТ СКРИПТ, СВЕРХУ ВНИЗ:
+
+      1. ТЕМА И ПРЕСЕТ. Пресет цвета — вторая ось, независимая от светло/темно
+         (04.09); ставится здесь же и по той же причине, что и схема: выставь
+         его приложение — и первый кадр мигнул бы базовой палитрой. Незнакомое
+         значение игнорируется: пресет мог быть снят выкаткой, а атрибут в
+         чужом хранилище остаться. Ветка `catch` — приватный режим без
+         localStorage: остаёмся на тёмной базовой.
+
+      2. АДРЕС. Разметка одна на все адреса, а рабочего места нет ни на входе,
+         ни по ссылке-приглашению — там каркас обещал бы экран, которого не
+         будет. Селектора по адресу в CSS нет.
+         ⚠ Умолчание — «не показывать»: не выполнился скрипт (запрещён JS,
+         разошёлся хеш CSP) — не будет и каркаса, останется пустой экран, как
+         до этой правки. Обратное умолчание оставило бы на входе каркас,
+         который некому убрать.
+         Хвостовая косая режется: react-router считает «/login/» тем же
+         маршрутом, а простое сравнение — уже другим, и на входе с косой мигнул
+         бы каркас рабочего места.
+
+      3. ШИРИНА РЕЛЬСЫ. Тот же ответ, что даст `useRailExpanded`
+         (shared/stores/railStore.ts) — сохранённый выбор, суженный порогом 767
+         (shared/lib/breakpoints.ts). Разойдись числа — и первый кадр React
+         сдвинул бы работу на 146 пикселей вбок; ровно это чинили 05.09 внутри
+         самого скелета. Сверяет `FirstPaint0709`. Имя своё, а не `--lc-rail-w`:
+         тот на корне перебил бы запасное значение lc-vars.css всему
+         приложению, а не одному каркасу.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("mantine-color-scheme-value");
+          var scheme =
+            stored === "light" || stored === "dark"
+              ? stored
+              : stored === "auto"
+                ? window.matchMedia("(prefers-color-scheme: light)").matches
+                  ? "light"
+                  : "dark"
+                : "dark";
+          document.documentElement.setAttribute("data-mantine-color-scheme", scheme);
+          var preset = localStorage.getItem("lc-preset");
+          if (preset === "indigo" || preset === "amethyst" || preset === "copper") {
+            document.documentElement.setAttribute("data-lc-preset", preset);
+          }
+        } catch (e) {
+          document.documentElement.setAttribute("data-mantine-color-scheme", "dark");
+        }
+
+        var path = location.pathname.replace(/\/+$/, "") || "/";
+        if (path !== "/login" && path.indexOf("/invite/") !== 0) {
+          document.documentElement.setAttribute("data-lc-boot", "");
+        }
+        var expanded = !window.matchMedia("(max-width: 767px)").matches;
+        var rail = null;
+        try {
+          rail = JSON.parse(localStorage.getItem("leadchat-rail") || "null");
+        } catch (e) {
+          rail = null;
+        }
+        if (rail && rail.state && rail.state.expanded === false) expanded = false;
+        document.documentElement.style.setProperty(
+          "--lc-preboot-rail",
+          expanded ? "218px" : "72px",
+        );
+      })();
+    </script>
+
+    <!--
+      КАРКАС ДО БАНДЛА (замер 06.09: холодный экран пуст ≥1,08 с).
+
+      Скелет рабочего места (`.lc-boot*` в app-layout.css) рисовал React, то
+      есть после разбора 898 КБ JS. Та же разметка статикой рисуется сразу
+      после обязательного CSS (42 КБ сжатых) — раньше на порядок.
+
+      ⚠ ВНУТРИ #root, А НЕ РЯДОМ: `createRoot(...).render()` очищает свой
+      контейнер в том же коммите, в котором вставляет первый кадр, — подмена
+      без промежуточного пустого кадра и без кода, который надо не забыть
+      позвать. Каркас-сосед пришлось бы убирать руками из main.tsx, кадром позже.
+
+      ⚠ КЛАССЫ ТЕ ЖЕ, потому что геометрию задаёт app-layout.css, а не эта
+      страница: обязательный CSS всё равно приходит раньше отрисовки. Каркас и
+      первый кадр React считаются ОДНИМИ правилами, включая ступени
+      медиазапросов, — совпадение не поддерживается, а следует из устройства.
+      Стили ниже — запасные, на случай если CSS не доехал вовсе.
+    -->
+    <style>
+      /* Гейт по адресу (см. скрипт выше). Селектор нарочно длиннее, чем
+         `.lc-boot` из app-layout.css: тот идёт следующим файлом и при равной
+         силе перебил бы «спрятать». */
+      html:not([data-lc-boot]) .lc-preboot {
+        display: none;
+      }
+
+      /* Запасные цвета живут отдельными именами и только на каркасе: так они
+         не спорят с токенами и не достаются скелету React. */
+      .lc-preboot {
+        --lc-rail-w: var(--lc-preboot-rail, 72px);
+        --lc-fb-1: #0b0e0d;
+        --lc-fb-2: #1a221e;
+        --lc-fb-line: #333c37;
+      }
+
+      html[data-mantine-color-scheme="light"] .lc-preboot {
+        --lc-fb-1: #eef1f5;
+        --lc-fb-2: #eef1f5;
+        --lc-fb-line: #d3dbe4;
+      }
+
+      /* Копия базовых правил app-layout.css — без медиазапросов: ступени
+         приезжают с обязательным CSS, а он приходит раньше отрисовки.
+         Расхождение с оригиналом ловит `FirstPaint0709`. */
+      .lc-boot {
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        background: var(--lc-bg-1, var(--lc-fb-1, #0b0e0d));
+      }
+
+      .lc-boot__body {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .lc-boot__rail {
+        flex: none;
+        width: var(--lc-rail-w);
+        border-right: 1px solid var(--lc-border, var(--lc-fb-line, #333c37));
+      }
+
+      .lc-boot__panes {
+        display: flex;
+        flex: 1;
+        gap: var(--lc-gutter, 24px);
+        min-width: 0;
+        padding: var(--lc-gutter, 24px);
+      }
+
+      .lc-boot__pane {
+        border-radius: var(--lc-radius-lg, 16px);
+        background: var(--lc-bg-2, var(--lc-fb-2, #1a221e));
+      }
+
+      .lc-boot__pane--list {
+        flex: none;
+        width: var(--lc-col-list, 340px);
+      }
+
+      .lc-boot__pane--thread {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .lc-boot__pane--card {
+        flex: none;
+        width: var(--lc-col-card, 380px);
+      }
+
+      /*
+        ⚠ КАРКАС НЕ ИМЕЕТ ПРАВА ОСТАТЬСЯ НАВСЕГДА: не доехал бандл (упал чанк
+        после выкатки, оборвалась связь) — и человек смотрит на дышащие панели,
+        которые никогда не наполнятся, ничего об этом не зная.
+
+        Сроком заведует CSS, а не таймер: подмена React сносит поддерево вместе
+        с незапущенной анимацией, поэтому мигнуть эта строка не может по
+        построению — либо появится через 20 секунд, либо не будет существовать.
+        Двадцать — с запасом над холодным стартом (замер 06.09: 1,08 с).
+
+        Под `prefers-reduced-motion` намеренно не спрятана: это не украшение, а
+        единственный выход из тупика.
+
+        ⚠ ПРЯЧЕТ `visibility`, А НЕ ОДНА ПРОЗРАЧНОСТЬ. `opacity: 0` убирает
+        строку с глаз, но НЕ из дерева доступности — по правилу ARIA прячут
+        `display`, `visibility` или `aria-hidden`. А лежит она внутри
+        `role="status"`, то есть человеку со скринридером «Рабочее место не
+        загрузилось» доставалось бы при каждой ЗДОРОВОЙ загрузке. `aria-hidden`
+        не годится: он отнял бы у него выход из тупика насовсем. Видимость
+        возвращает конечный кадр анимации.
+      */
+      .lc-preboot__stall {
+        position: fixed;
+        inset: auto 0 var(--lc-gutter, 24px);
+        margin: 0;
+        text-align: center;
+        font: 500 13px/1.4 system-ui, sans-serif;
+        color: var(--lc-text-2, #9aa5a0);
+        visibility: hidden;
+        opacity: 0;
+        animation: lc-preboot-stall 0.4s ease 20s forwards;
+      }
+
+      @keyframes lc-preboot-stall {
+        to {
+          visibility: visible;
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div
+        class="lc-boot lc-preboot"
+        role="status"
+        aria-busy="true"
+        aria-label="Загружаем рабочее место"
+      >
+        <div class="lc-boot__body">
+          <div class="lc-boot__rail"></div>
+          <div class="lc-boot__panes">
+            <div class="lc-boot__pane lc-boot__pane--list"></div>
+            <div class="lc-boot__pane lc-boot__pane--thread"></div>
+            <div class="lc-boot__pane lc-boot__pane--card"></div>
+          </div>
+        </div>
+        <p class="lc-preboot__stall">Рабочее место не загрузилось. Обновите страницу.</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

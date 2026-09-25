@@ -1,0 +1,912 @@
+@import "./lc-table-cards.css";
+/*
+ * БАЗОВЫЙ СЛОЙ КОМПОНЕНТОВ — редизайн 2026 (docs/16-DESIGN-SYSTEM-2026.md §4).
+ *
+ * Всё, что здесь есть, — это доводка готовых компонентов Mantine до системы:
+ * состояния, движение, «стекло» всплывающих поверхностей, прогресс тоста.
+ * Цвета берутся только из токенов; подключается один раз в main.tsx следом
+ * за lc-vars.css.
+ *
+ * Порядок важен: этот файл идёт ПОСЛЕ стилей Mantine, иначе специфичность
+ * библиотеки перебьёт правила ниже.
+ */
+
+/* ═══════════════════════════════════════ §1. КНОПКИ И ЗНАЧКИ-ДЕЙСТВИЯ ══ */
+/*
+ * Класс навешивается темой (theme.ts → classNames), поэтому распространяется
+ * на Button и ActionIcon разом, включая те, что внутри чужих компонентов.
+ */
+
+.lc-btn {
+  /*
+   * ШЕСТЬ РАЗМЕРОВ MANTINE СВОДЯТСЯ К ТРЁМ ЗДЕСЬ, А НЕ В 180 МЕСТАХ ВЫЗОВА.
+   *
+   * Разбор в lc-vars.css у пары `--lc-btn-h-*`. Коротко: у библиотеки шесть
+   * размеров плюс шесть «компактных», и любой ставится одним словом — отсюда
+   * десять высот на экранах. Переопределяем её собственные переменные, и
+   * каждое `size="xs"`, `size="compact-sm"` и прочее приземляется на нашу
+   * шкалу само, не меняя ни строчки разметки.
+   *
+   * Отображение: всё компактное и `xs` — плотный ряд (sm); `sm` — форма (md);
+   * `md` и выше — единственное действие на экране (lg).
+   */
+  --button-height-compact-xs: var(--lc-btn-h-sm);
+  --button-height-compact-sm: var(--lc-btn-h-sm);
+  --button-height-compact-md: var(--lc-btn-h-sm);
+  --button-height-compact-lg: var(--lc-btn-h-sm);
+  --button-height-compact-xl: var(--lc-btn-h-md);
+  --button-height-xs: var(--lc-btn-h-sm);
+  --button-height-sm: var(--lc-btn-h-md);
+  --button-height-md: var(--lc-btn-h-lg);
+  --button-height-lg: var(--lc-btn-h-lg);
+  --button-padding-x-compact-xs: var(--lc-btn-px-sm);
+  --button-padding-x-compact-sm: var(--lc-btn-px-sm);
+  --button-padding-x-compact-md: var(--lc-btn-px-sm);
+  --button-padding-x-compact-lg: var(--lc-btn-px-sm);
+  --button-padding-x-xs: var(--lc-btn-px-sm);
+  --button-padding-x-sm: var(--lc-btn-px-md);
+  --button-padding-x-md: var(--lc-btn-px-lg);
+  --button-padding-x-lg: var(--lc-btn-px-lg);
+
+  /*
+   * Значки-действия — квадрат той же шкалы. `--ai-size-sm` было 22: ниже
+   * нормы мишени 24×24, и промахнуться по такому на тачпаде легко.
+   * `--ai-size-input-*` НЕ трогаем: это значок ВНУТРИ поля ввода, и его
+   * размер обязан совпадать с высотой поля, а не с высотой кнопки.
+   */
+  --ai-size-xs: var(--lc-btn-h-sm);
+  --ai-size-sm: var(--lc-btn-h-sm);
+  --ai-size-md: var(--lc-btn-h-sm);
+  --ai-size-lg: var(--lc-btn-h-md);
+
+  border-radius: var(--lc-btn-radius);
+  font-size: var(--lc-fz-body);
+  font-weight: var(--lc-fw-medium);
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    border-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease),
+    box-shadow var(--lc-dur-fast) var(--lc-ease),
+    transform var(--lc-dur-fast) var(--lc-ease);
+}
+
+/* Нажатие — 0.98 по брифу. Отклик на палец важнее, чем красота: без него
+   при задержке сети кажется, что клик не прошёл, и человек жмёт второй раз. */
+.lc-btn:active:not(:disabled):not([data-disabled]) {
+  transform: scale(0.98);
+}
+
+/*
+ * Оговорка `:not([data-loading])` обязательна. У Mantine своя такая есть, у
+ * нас не было: кнопка в состоянии загрузки помечается `data-disabled`, и без
+ * оговорки «Отправляю…» теряла цвет варианта ровно в тот момент, когда должна
+ * показывать, что работает.
+ *
+ * `--lc-opacity-disabled` здесь БОЛЬШЕ НЕТ — разбор в lc-vars.css у пары
+ * `--lc-disabled-*`. Сам токен жив: его читают рельса и карточка клиента, где
+ * гасится целый блок, а не подпись на плашке.
+ */
+.lc-btn:disabled:not([data-loading]),
+.lc-btn[data-disabled]:not([data-loading]) {
+  background: var(--lc-disabled-bg);
+  color: var(--lc-disabled-text);
+  /* Рамка, а не `transparent`: без неё оставалась подпись без предмета — заливка
+     против полотна давала 1.22 в тёмной теме и 1.03 в светлой. Довод и числа —
+     у `--lc-disabled-edge` в lc-vars.css. */
+  border-color: var(--lc-disabled-edge);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Кнопка в состоянии загрузки не должна дёргаться под курсором. */
+.lc-btn[data-loading] {
+  transform: none;
+  cursor: progress;
+}
+
+/* Селектор ОБЯЗАН повторять отменяемое правило один в один: медиазапрос
+   специфичности не добавляет, и укороченный вариант (без :not([data-disabled]))
+   проигрывал по весу — отмена не работала вовсе. */
+@media (prefers-reduced-motion: reduce) {
+  .lc-btn:active:not(:disabled):not([data-disabled]) {
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════ §2. ВСПЛЫВАЮЩИЕ ПОВЕРХНОСТИ ══════════ */
+/*
+ * Меню, поповеры, автодополнения. «Стеклянная карточка» из брифа: заметная
+ * тень и волосяная рамка — на тёмной теме без рамки край панели теряется в
+ * фоне.
+ *
+ * ⚠ РАЗМЫТИЕ ПОДЛОЖКИ СНЯТО, И ЭТО НЕ ОТКАЗ ОТ БРИФА. `--lc-surface` — это
+ * `#1a221e` в тёмной теме и `#ffffff` в светлой: фон НЕПРОЗРАЧЕН, и размывать
+ * за ним нечего — увидеть эффект нельзя ни в одной теме. Платили за него
+ * по-настоящему: `backdrop-filter` заводит отдельный слой композитора и
+ * заставляет браузер размывать задник на каждой перерисовке меню.
+ *
+ * Захочется вернуть «стекло» — начинать надо с полупрозрачного фона
+ * (`color-mix` с альфой), иначе строка снова будет стоить, но не работать.
+ */
+
+.lc-pop {
+  border: 1px solid var(--lc-border);
+  background: var(--lc-surface);
+  box-shadow: var(--lc-shadow-2);
+  padding: var(--lc-space-1);
+}
+
+/* Строка меню — 40px по брифу. */
+.lc-pop .mantine-Menu-item {
+  min-height: 40px;
+  border-radius: var(--lc-radius-sm);
+  font-size: var(--lc-fz-body);
+  color: var(--lc-text-1);
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.lc-pop .mantine-Menu-item[data-hovered],
+.lc-pop .mantine-Menu-item:hover {
+  background: var(--lc-surface-hover);
+}
+
+/* Выбранный пункт — заливка И галочка. Одного цвета мало: при подсветке
+   наведением выбранный и просто «под курсором» становятся неразличимы. */
+.lc-pop .mantine-Menu-item[aria-checked="true"],
+.lc-pop .mantine-Menu-item[data-selected] {
+  background: var(--lc-selected);
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-medium);
+}
+
+.lc-pop .mantine-Menu-divider {
+  border-color: var(--lc-border);
+  margin: var(--lc-space-1) 0;
+}
+
+.lc-pop .mantine-Menu-label {
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-caption);
+  padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-1);
+}
+
+/* Опасный пункт («Удалить», «Заблокировать») — красный, но подложка
+   появляется только под курсором: постоянная красная строка в меню
+   притягивает внимание к тому, что нажимать как раз не надо. */
+.lc-pop .mantine-Menu-item[data-danger] {
+  color: var(--lc-danger-text);
+}
+
+.lc-pop .mantine-Menu-item[data-danger]:hover {
+  background: var(--lc-danger-subtle);
+}
+
+/* ══════════════════════════════════════════ §3. ПОЛЯ ВВОДА ════════════ */
+
+.mantine-Input-input,
+.mantine-InputWrapper-root .mantine-Input-input {
+  background: var(--lc-bg-0);
+  border-color: var(--lc-border);
+  color: var(--lc-text-1);
+  transition:
+    border-color var(--lc-dur-fast) var(--lc-ease),
+    box-shadow var(--lc-dur-fast) var(--lc-ease),
+    background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.mantine-Input-input::placeholder {
+  color: var(--lc-text-3);
+}
+
+.mantine-Input-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--lc-border-strong);
+}
+
+.mantine-Input-input:focus,
+.mantine-Input-input:focus-within {
+  border-color: var(--lc-focus-border);
+  box-shadow: 0 0 0 3px var(--lc-focus-ring);
+}
+
+.mantine-Input-input[data-error] {
+  border-color: var(--lc-danger);
+}
+
+.mantine-Input-input[data-error]:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.28);
+}
+
+.mantine-Input-input:disabled {
+  background: var(--lc-bg-2);
+  color: var(--lc-text-disabled);
+  opacity: 1; /* прозрачность съедала бы и рамку, поле теряло бы границу */
+}
+
+/*
+ * Шеврон выпадающих списков — наш значок (сетка 24, обводка 2, скруглённые
+ * концы), нарисованный маской поверх штатного. Подменять правую секцию нельзя:
+ * на её месте Mantine рисует крестик очистки (разбор — у `Select` в theme.tsx).
+ */
+[data-combobox-chevron] {
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+[data-combobox-chevron] > path {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════ §4. МОДАЛЬНЫЕ ОКНА ═══════ */
+
+.mantine-Modal-content {
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  box-shadow: var(--lc-shadow-3);
+}
+
+.mantine-Modal-header {
+  background: var(--lc-surface);
+  border-bottom: 1px solid var(--lc-border);
+  padding: var(--lc-space-4) var(--lc-space-5);
+}
+
+.mantine-Modal-title {
+  font-size: var(--lc-fz-section);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.mantine-Modal-body {
+  padding: var(--lc-space-5);
+}
+
+.mantine-Modal-overlay {
+  background: var(--lc-overlay-scrim);
+}
+
+/* ══════════════════════════════════════════════ §5. ТОСТЫ ═════════════ */
+/*
+ * Правый верхний угол, иконка, полоса прогресса, автозакрытие 4 с (бриф).
+ *
+ * Полосу рисуем ТОЛЬКО у тех, что закрываются сами: атрибут ставит хелпер
+ * `shared/ui/toast.ts`. Полоса на несамозакрывающемся тосте (а это как раз
+ * ошибки, которые обязаны дождаться человека) обещала бы, что он исчезнет
+ * сам, — и человек бы её досмотрел и отвернулся.
+ */
+
+.mantine-Notification-root {
+  position: relative;
+  overflow: hidden;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+  box-shadow: var(--lc-shadow-2);
+}
+
+.mantine-Notification-title {
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-semibold);
+  font-size: var(--lc-fz-body);
+}
+
+.mantine-Notification-description {
+  color: var(--lc-text-2);
+  font-size: var(--lc-fz-caption);
+  line-height: var(--lc-lh-body);
+}
+
+.lc-toast[data-autoclose]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--lc-toast-accent);
+  transform-origin: left center;
+  animation: lc-toast-progress var(--lc-toast-duration) linear forwards;
+}
+
+@keyframes lc-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.lc-toast[data-tone="success"] {
+  --lc-toast-accent: var(--lc-success);
+}
+
+.lc-toast[data-tone="danger"] {
+  --lc-toast-accent: var(--lc-danger);
+}
+
+.lc-toast[data-tone="warning"] {
+  --lc-toast-accent: var(--lc-warning);
+}
+
+/*
+ * Информационный тон — СИНИЙ, и правило обязано быть явным.
+ *
+ * Его здесь не было, и полоса отсчёта падала на общий акцент. Пока акцент был
+ * синим, разницы никто не замечал; как только он позеленел, «Отменить» и
+ * «Выгрузка готовится» стали неотличимы от «Сохранено» — то есть ровно то,
+ * ради чего заводился отдельный информационный цвет, и потерялось.
+ */
+.lc-toast[data-tone="info"] {
+  --lc-toast-accent: var(--lc-info);
+}
+
+/* Полоса — единственный носитель «сколько осталось», и при отключённой
+   анимации она замирает полной. Это честнее, чем мигание. */
+@media (prefers-reduced-motion: reduce) {
+  .lc-toast[data-autoclose]::after {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════ §6. ПОДСКАЗКИ И БЕЙДЖИ ═══════ */
+
+/* Тултип тёмный в ОБЕИХ темах намеренно, поэтому берёт не токен темы, а
+   поверхность напрямую. Раньше это был последний живой читатель синей шкалы
+   --lc-ink-*, из-за которого подсказки оставались сине-серыми на зелёно-чёрном
+   интерфейсе. */
+.mantine-Tooltip-tooltip {
+  background: var(--lc-bg-raise);
+  color: var(--lc-slate-50);
+  border: 1px solid var(--lc-border);
+  box-shadow: var(--lc-shadow-1);
+  font-size: var(--lc-fz-caption);
+  padding: var(--lc-space-1) var(--lc-space-2);
+}
+
+/* ══════════════════════════════════ §7. ПЕРЕКЛЮЧАТЕЛИ И ФЛАЖКИ ════════ */
+
+.mantine-Checkbox-input,
+.mantine-Radio-radio {
+  border-color: var(--lc-border-strong);
+  background: var(--lc-bg-0);
+  cursor: pointer;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    border-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.mantine-Checkbox-input:hover:not(:disabled),
+.mantine-Radio-radio:hover:not(:disabled) {
+  border-color: var(--lc-primary);
+}
+
+.mantine-Checkbox-label,
+.mantine-Radio-label,
+.mantine-Switch-label {
+  color: var(--lc-text-1);
+  font-size: var(--lc-fz-body);
+}
+
+.mantine-Switch-track {
+  cursor: pointer;
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+/* ════════════════════════════════════════════ §8. ТАБЛИЦЫ ═════════════ */
+
+.mantine-Table-table {
+  font-size: var(--lc-fz-body);
+}
+
+.mantine-Table-th {
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-semibold);
+  text-transform: none;
+  border-bottom-color: var(--lc-border);
+}
+
+.mantine-Table-td {
+  color: var(--lc-text-1);
+  border-bottom-color: var(--lc-border);
+}
+
+/*
+ * СЫРАЯ `<table>` ПОЛУЧАЕТ ТУ ЖЕ ШАПКУ, ЧТО И MANTINE (аудит 06.09).
+ *
+ * Таблиц в продукте двенадцать: пять через `<Table>`, семь сырых, и у сырых
+ * шапка была своя у каждой — вес 400 в «Диалогах бота», 500 в журнале, у
+ * менеджеров и быстрых ответов, 600 здесь. Переход между вкладками одного
+ * раздела выглядел как переход в другой продукт.
+ *
+ * Значения ниже обязаны совпадать с `.mantine-Table-th` — это стережёт
+ * DesignCoherence0609.test.ts. Кегль ТЕЛА таблица задаёт сама: плотные
+ * таблицы стоят на `--lc-fz-note`, и возвращать их к 14 нельзя (строки уедут
+ * в горизонтальную прокрутку).
+ *
+ * ⚠ У `td` — только раскладка, без цвета и выравнивания: ячейки носят свои
+ * классы (`.audit__time`, `.lc-journal__actions`, `.bot-row__num`), и правило
+ * `.lc-table td` весом (0,1,1) перебило бы их (0,1,0).
+ */
+.lc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lc-table th {
+  padding: var(--lc-space-2);
+  text-align: left;
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-semibold);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.lc-table td {
+  padding: var(--lc-space-2);
+  border-bottom: 1px solid var(--lc-border);
+  vertical-align: top;
+}
+
+/* ════════════════════════════════ §9. УТИЛИТЫ ОБЩЕГО НАЗНАЧЕНИЯ ═══════ */
+
+/* Числа, которые меняются на месте: счётчики, время, метрики. Без tabular
+   соседние элементы дёргаются при каждом обновлении. */
+.lc-num {
+  font-variant-numeric: var(--lc-num);
+}
+
+/*
+ * ОБВЯЗКА СТРАНИЦЫ. Разбор и числа — у пары `--lc-page-pad-*` в lc-vars.css.
+ * Класс надевают корни разделов (статистика, каналы, лента, журнал, «что
+ * нового», диалоги бота); `.settings-section` читает те же токены своим
+ * правилом, потому что его носят восемь файлов и один из них правится
+ * параллельно. Прокрутку и `flex` класс не задаёт нарочно: лента и команда
+ * управляют прокруткой сами, общее здесь только поле.
+ */
+.lc-page {
+  padding: var(--lc-page-pad-y) var(--lc-page-pad-x);
+}
+
+/*
+ * КАРТОЧКА — ОДИН РЕЦЕПТ (аудит 06.09).
+ *
+ * `.lc-card` уже жила здесь и была удалена 11 августа с доводом «одной формы у
+ * карточек нет, а держать про запас хуже, чем удалить» — довод был верен:
+ * правило лежало без единого носителя. Сегодня она возвращается с шестью
+ * носителями сразу (профиль, лид-бот, роли команды, карточка клиента, панели
+ * статистики, релизы «что нового»), и вот что изменилось.
+ *
+ * Форм у крупной поверхности к 06.09 оказалось ДВЕ, и вторая держалась на
+ * исключении: `.prof-card` и `.dist__cap` стояли на `--lc-bg-1` без тени,
+ * потому что поле ввода на `--lc-surface` сливалось с карточкой. Остальные —
+ * на `--lc-surface`, причём `.stat-card`, `.stats-panel` и `.card-section` с
+ * `--lc-shadow-1`, прочие плоские. Причина исключения снимается ниже, у
+ * `.lc-card .mantine-Input-input`, и второй форме держаться не на чем.
+ *
+ * ⚠ ТЕНИ НЕТ, И ЭТО РЕШЕНИЕ, А НЕ ЗАБЫТАЯ СТРОКА. Три довода:
+ *   1. Высоту карточки задаёт лестница поверхностей (`--lc-bg-raise` светлее
+ *      панели в 1.19, посчитано в tokenContrast), а край в тёмной теме держит
+ *      рамка — так записано у `--lc-shadow-*` в lc-vars.css. Тень ничего к
+ *      этому не добавляла.
+ *   2. `--lc-shadow-1` — чёрный на почти чёрном: в тёмной теме его не видно
+ *      вовсе, в светлой видно. То есть у карточки было два вида в двух темах,
+ *      и разработка в тёмной этого не замечала.
+ *   3. Тень остаётся признаком ВСПЛЫВАЮЩЕГО слоя — меню, окно, подсказка,
+ *      карточка-оверлей на телефоне. Карточка в потоке страницы не всплывает.
+ *
+ * Радиус `lg` (16), а не `md` (12): двенадцатый — радиус контрола, и пока
+ * карточка рисовалась им, она не отличалась от кнопки внутри себя.
+ *
+ * Кликабельного варианта по-прежнему нет: ни одна карточка продукта не
+ * нажимается целиком (проверено по разметке 11 августа, с тех пор не
+ * изменилось).
+ */
+.lc-card {
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+}
+
+/*
+ * ПОЛЕ ВВОДА НА КАРТОЧКЕ — НА СТУПЕНЬ НИЖЕ КАРТОЧКИ, В ОБЕИХ ТЕМАХ.
+ *
+ * Умолчание поля — `--lc-bg-0` (§3): на панели это углубление, а на карточке
+ * в светлой теме — белое на белом, 1.00. В тёмной другая половина той же мины:
+ * выключенное поле берёт `--lc-bg-2`, а это `--lc-bg-raise`, то есть сама
+ * карточка, — 1.00 снова. Ровно об этом были исключения профиля и потолка
+ * раздачи.
+ *
+ * Посчитано по всем четырём темам (скрипт в разборе 06.09):
+ *   включённое `--lc-bg-1` к карточке — 1.18–1.20 в тёмных, 1.13–1.20 в светлых;
+ *   выключенное `--lc-surface-hover` — 1.08–1.11 в тёмных, 1.16–1.24 в светлых.
+ * Ступень «наведение» взята не за смысл, а за высоту: это единственный токен,
+ * который в обеих темах лежит между панелью и карточкой. В тёмной выключенное
+ * поле получается мельче включённого — «плоское», как и должно; в светлой они
+ * почти равны (1.03), и разницу несёт цвет текста `--lc-text-disabled`.
+ */
+.lc-card .mantine-Input-input {
+  background: var(--lc-bg-1);
+}
+
+.lc-card .mantine-Input-input:disabled {
+  background: var(--lc-surface-hover);
+}
+
+/* Одна строка с многоточием — повторяется в списках десятки раз. */
+.lc-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ═══════════════════════════════════════════ §10. ПУСТЫЕ СОСТОЯНИЯ ════ */
+
+.lc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lc-space-3);
+  padding: var(--lc-space-8) var(--lc-space-5);
+  text-align: center;
+}
+
+.lc-empty__title {
+  margin: 0;
+  font-size: var(--lc-fz-card);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.lc-empty__text {
+  margin: 0;
+  max-width: 380px;
+  font-size: var(--lc-fz-body);
+  line-height: var(--lc-lh-body);
+  color: var(--lc-text-2);
+}
+
+/* ═══════════════════════════════ §11. ИКОНКИ ВНУТРИ СТРОКИ ТЕКСТА ═════ */
+/*
+ * SVG — инлайн-элемент и по умолчанию садится на базовую линию, из-за чего
+ * значок рядом со словом «уезжает» вниз на пару пикселей. Заметно это только
+ * когда рядом стоит второй такой же значок, но выглядит как небрежность.
+ */
+/* Строки состояния карточки канала отсюда ушли: они выкладываются флексом
+   (`.account-card__health-line`), а на флекс-элемент `vertical-align` не
+   действует вовсе — правило было мёртвым ещё до переименования класса. */
+.inbox-decision__hint svg,
+.thread-bot-banner svg,
+.card-section__title svg,
+.composer__mode svg,
+.msg__author svg,
+.msg__file svg {
+  vertical-align: -0.15em;
+}
+
+/* Тост с действием — «сделано · отменить» (docs/17 §Т7). */
+.lc-toast__undo {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  flex-wrap: wrap;
+}
+
+.lc-toast__undo-btn {
+  border: 1px solid var(--lc-primary);
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  color: var(--lc-primary-text);
+  font: inherit;
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-medium);
+  padding: 2px var(--lc-space-2);
+  cursor: pointer;
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.lc-toast__undo-btn:hover {
+  background: var(--lc-primary-subtle);
+}
+
+/* Капсула клавиши — общая для шпаргалки и подсказки под полем ввода. */
+.lc-kbd {
+  display: inline-block;
+  font-family: inherit;
+  font-size: var(--lc-fz-caption);
+  background: var(--lc-bg-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: 2px var(--lc-space-2);
+  color: var(--lc-text-1);
+  white-space: nowrap;
+}
+
+
+/* ─────────────────────────── аватар-кружок с инициалами ────────────────── */
+
+/*
+ * Форма одна на всех: аватар сотрудника (шапка, команда, профиль) и аватар
+ * клиента (список диалогов) — это один и тот же кружок. Цвет каждый берёт
+ * из палитры `--lc-avatar-N-*`, где пара «фон/чернила» подобрана по контрасту.
+ *
+ * У аватара сотрудника цвет раньше брался у Mantine (`color="lp"
+ * variant="light"`) — светло-голубой на синем, 2.08:1. Инициалы читались хуже,
+ * чем фон, на котором они лежат, а на экране «Команда» их тринадцать подряд.
+ */
+.lc-avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lc-radius-circle);
+  font-weight: var(--lc-fw-semibold);
+  user-select: none;
+}
+
+
+/* ────────────────────────── пульс скелетонов ───────────────────────────── */
+
+/*
+ * ОДНА анимация на весь продукт. Было пять почти одинаковых, три из них —
+ * побайтовые копии четвёртой, с разной длительностью (1.2 против 1.4 с) в
+ * соседних блоках одного экрана. Пульсация вразнобой читается не как загрузка,
+ * а как дёрганье интерфейса.
+ *
+ * Гасить её при `prefers-reduced-motion` отдельно не нужно: глобальное правило
+ * в lc-vars.css останавливает все анимации разом.
+ */
+@keyframes lc-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: var(--lc-skeleton-dim);
+  }
+}
+
+
+/* ───────────────────────────────── вкладки ─────────────────────────────── */
+
+/*
+ * Одна полоса вкладок на продукт. Стиль жил в team.css и был бы скопирован в
+ * профиль — а две копии одного элемента расходятся на первой же правке.
+ *
+ * Кнопки, а не ссылки: вкладка не меняет адрес. Активная отмечена и цветом,
+ * и весом, и подчёркиванием — одного цвета мало тем, кто его различает хуже.
+ */
+.lc-tabs {
+  display: flex;
+  /*
+   * `flex: none` ОБЯЗАТЕЛЕН, и это неочевидно.
+   *
+   * Полоса — элемент колонки-флекса (`.settings-section`), а прокрутка вбок
+   * ниже снимает у неё автоматический минимальный размер. Вдвоём это даёт
+   * схлопывание: полоса ужималась до одного пикселя — визуально вкладки
+   * просто исчезали, хотя кнопки внутри были нормальной высоты.
+   */
+  flex: none;
+  gap: var(--lc-space-1);
+  margin-bottom: var(--lc-space-4);
+  border-bottom: 1px solid var(--lc-border);
+  /* На узком экране вкладки прокручиваются вбок, а не переносятся: перенос
+     растит шапку и отъедает список. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lc-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Вкладка-подчёркивание. Радиуса нет и не должно быть: она не кнопка, а
+ * закладка в ряду, и низ у неё — линия. Высоту задают поля; берём их из
+ * шкалы, чтобы ряд вкладок не расходился с рядом кнопок над ним.
+ */
+/* ⚠ ОБВОДКУ — ВНУТРЬ (разбор дизайна 28.08). У полосы вкладок своя
+   горизонтальная прокрутка, и кольцо фокуса снаружи элемента она срезала: с
+   клавиатуры не было видно, на какой вкладке стоишь. */
+.lc-tabs__tab:focus-visible {
+  outline-offset: -2px;
+}
+
+.lc-tabs__tab {
+  flex: none;
+  padding: 8px var(--lc-btn-px-sm);
+  min-height: var(--lc-btn-h-sm);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--lc-text-2);
+  font-size: var(--lc-fz-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--lc-motion-fast),
+    border-color var(--lc-motion-fast);
+}
+
+.lc-tabs__tab:hover {
+  color: var(--lc-text-1);
+}
+
+.lc-tabs__tab[data-active] {
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-semibold);
+  border-bottom-color: var(--lc-primary);
+}
+
+/*
+ * ЦВЕТА СТАТУСА ДИАЛОГА — ОДНО МЕСТО НА ТРИ ЭКРАНА (docs/38 §1).
+ *
+ * До этой правки цветов было три копии: `.dt__status` в «Разборе диалогов»,
+ * `.thread-status` в шапке ленты (МЁРТВЫЙ код — остаток убранного селекта, ни
+ * одного TSX на него не ссылалось) и токены. Пока копий три, четвёртая
+ * пишется сама собой при первом же новом значении — и одно из мест остаётся
+ * с прежним набором веток.
+ *
+ * Здесь только ЦВЕТ. Форма чипа (высота, отступы, скругление) остаётся у
+ * каждого экрана своей: в строке списка это 18px рядом с превью, в таблице —
+ * 20px в ячейке, и сводить их к одному размеру значило бы испортить оба.
+ */
+.lc-status-chip[data-status="new"] {
+  background: var(--lc-status-new-bg);
+  color: var(--lc-status-new-text);
+}
+
+.lc-status-chip[data-status="in_progress"] {
+  background: var(--lc-status-inprogress-bg);
+  color: var(--lc-status-inprogress-text);
+}
+
+.lc-status-chip[data-status="waiting_client"] {
+  background: var(--lc-status-waiting-bg);
+  color: var(--lc-status-waiting-text);
+}
+
+.lc-status-chip[data-status="closed"] {
+  background: var(--lc-status-closed-bg);
+  color: var(--lc-status-closed-text);
+}
+
+/* ─────────────────────────────────── прокрутка вбок, которую видно ────── */
+
+/*
+ * ПРОКРУТКА, О КОТОРОЙ НИКТО НЕ ЗНАЕТ, — ЭТО НЕ ПРОКРУТКА.
+ *
+ * НАЙДЕНО ЗАМЕРОМ 12 августа на «Разборе диалогов»: контейнер 1172 пикселя,
+ * таблица 1274 — колонка «Последнее (МСК)» обрезана краем блока. Прокрутка
+ * работает и колонку показывает, но на macOS полоса прокрутки — накладная:
+ * пока не начнёшь крутить, её нет. То есть единственный признак того, что
+ * справа что-то есть, появляется ПОСЛЕ действия, которое человек совершает,
+ * только если уже знает, что оно нужно. Со стороны это читается как «колонку
+ * обрезало», а не «её надо докрутить», — так этот дефект нам и описали.
+ *
+ * КАК ЭТО РАБОТАЕТ БЕЗ JS. Четыре фоновых слоя парами. Тень (`scroll`) прибита
+ * к краю блока и видна всегда; заслонка цветом фона (`local`) едет ВМЕСТЕ с
+ * содержимым и закрывает тень, когда содержимое упёрлось в этот край. Итог:
+ * тень слева означает «прокручено», справа — «есть ещё». Обработчика
+ * прокрутки не нужно, а значит нечему отстать от реальности.
+ *
+ * Цвет заслонки — переменная: у блоков разный фон, и общая заслонка одного
+ * оттенка оставила бы светлую полосу на тёмной карточке.
+ */
+.lc-scroll-x {
+  /*
+   * ⚠ УМОЛЧАНИЕ БЫЛО НЕ ТЕМ ФОНОМ, И ПРИЗНАК РАБОТАЛ НАОБОРОТ (28.08).
+   *
+   * Заслонка обязана СОВПАДАТЬ с фоном блока — об этом сказано абзацем выше.
+   * Стояло `--lc-bg-0`, а все три нынешних потребителя (`.audit__scroll` в
+   * «Сотрудниках» и в журнале, `.dt__scroll` в «Разборе диалогов») покрашены
+   * `--lc-surface`, и переменную не переопределял НИ ОДИН из них: грепом по
+   * фронту `--lc-scroll-shade` встречается только здесь.
+   *
+   * Из-за несовпадения заслонка не закрывала тень, а рисовала свою полосу:
+   * в тёмной теме растушёвка «здесь обрезано, докрутите» была видна там, где
+   * крутить некуда, и слабела там, где было куда. Признак не просто не помогал
+   * — он вёл в обратную сторону.
+   */
+  --lc-scroll-shade: var(--lc-surface);
+  overflow-x: auto;
+  background-image:
+    linear-gradient(to right, var(--lc-scroll-shade), transparent),
+    linear-gradient(to left, var(--lc-scroll-shade), transparent),
+    linear-gradient(to right, rgb(0 0 0 / 30%), transparent),
+    linear-gradient(to left, rgb(0 0 0 / 30%), transparent);
+  background-position:
+    left center,
+    right center,
+    left center,
+    right center;
+  background-size:
+    24px 100%,
+    24px 100%,
+    12px 100%,
+    12px 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/*
+ * ПОЛЕ ВВОДА — ТА ЖЕ ШКАЛА, ЧТО У КНОПКИ (разбор у пары `--lc-btn-h-*`).
+ *
+ * У Mantine шкала полей своя — 30/36/42/50/60, — и численно она совпадает со
+ * шкалой кнопок, но живёт в ДРУГИХ переменных. Пока их не свели, в одном ряду
+ * фильтров стояли поле 30, кнопка 22 и кнопка 36: три высоты на трёх соседях.
+ *
+ * Класс навешивает тема (theme.ts → Input.classNames.wrapper), поэтому
+ * правило достаёт и `TextInput`, и `Select`, и `NumberInput`, и `Autocomplete`
+ * — все они построены на `Input`.
+ *
+ * `--input-height-*` задаёт высоту, `--input-padding-y-*` — вертикальные
+ * поля. Второе без первого дало бы текст, прижатый к верху поля.
+ */
+.lc-field {
+  --input-height-xs: var(--lc-btn-h-sm);
+  --input-height-sm: var(--lc-btn-h-md);
+  --input-height-md: var(--lc-btn-h-lg);
+  --input-height-lg: var(--lc-btn-h-lg);
+  --input-padding-y-xs: 6px;
+  --input-padding-y-sm: 8px;
+  --input-padding-y-md: 10px;
+  --input-padding-y-lg: 10px;
+}
+
+/*
+ * ОБРЕЗКА ОБЯЗАНА БЫТЬ ВИДНА (29.08).
+ *
+ * Значение, не влезшее в поле, по умолчанию режется на полуслове: браузер
+ * ставит `text-overflow: clip`. На «Автозаявках» это выглядело как «…по
+ * проблеме и объявлени» — читается как ЦЕЛАЯ фраза, просто с опечаткой, и
+ * повода нажать и посмотреть не даёт. Многоточие превращает молчаливую
+ * потерю в честный признак «здесь есть продолжение».
+ *
+ * Правило глобальное намеренно: класс навешивает тема на все поля, и нет
+ * ни одного, которому врать про своё значение было бы позволительно.
+ */
+.lc-field input,
+.lc-field .mantine-Input-input {
+  text-overflow: ellipsis;
+}
+
+/*
+ * СПРЯТАНО ОТ ГЛАЗ, НО НЕ ОТ СКРИНРИДЕРА.
+ *
+ * ⚠ КЛАСС ГЛОБАЛЬНЫЙ, А ЖИЛ ДВУМЯ КОПИЯМИ — в `features/stats/stats.css` и
+ * `features/settings/team/team.css`. Две копии одного глобального имени это не
+ * дубль строк, а две разных правды: починив одну, вторую не чинишь, и найти
+ * это можно только тем же обходом, каким нашли в первый раз.
+ *
+ * ⚠ И РЕЦЕПТ БЫЛ С МИНОЙ: `position: absolute` БЕЗ `top`/`left`. Позиционного
+ * предка над этим элементом нет ни одного (проверено по цепочке: .stats-page,
+ * .managers-scroll, .managers, .lc-main, AppShell.Main — ни у кого нет
+ * `position`), поэтому содержащий блок у него — сам документ, а элемент при
+ * этом лежит внутри ВНУТРЕННЕГО скроллера. Он растягивал прокрутку страницы
+ * поверх собственной прокрутки таблицы: на экране появлялась вторая полоса,
+ * которой там быть не должно.
+ *
+ * Поэтому не `absolute`, а `static` + `clip-path`. Элемент остаётся в потоке
+ * и потому не может выпасть за свой контейнер вовсе — а `1px` с отрицательным
+ * полем не даёт ему занять место. `clip` (устаревший) заменён на `clip-path`
+ * по той же причине: он работает и без позиционирования.
+ */
+.lc-visually-hidden {
+  position: static;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

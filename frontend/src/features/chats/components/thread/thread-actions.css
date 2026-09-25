@@ -1,0 +1,46 @@
+/*
+ * Кнопка «…» в шапке ленты — вход в меню вторичных действий.
+ *
+ * Здесь раньше лежали стили ряда из пяти иконок (закрепить, вернуть в
+ * очередь, позвать, передать, пометить). Ряд убран перекройкой от 12 августа:
+ * подписи у иконок появлялись только подсказкой через 400 мс наведения
+ * (SCEN-07), а перепутать «пометить нежелательным» с «закрыть» по картинке
+ * стоило дорого. Вместе с рядом ушёл и дефект DESIGN-54: у выключённой кнопки
+ * «Вернуть в очередь» не было правил `:disabled`, зато было правило `:hover`,
+ * и заблокированная кнопка подсвечивалась под курсором как живая. У пункта
+ * меню Mantine выключенное состояние своё и правильное.
+ */
+
+.thread-actions__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Не сжимается: в шапке при 768px место отбирают именно у кнопок, и
+     квадрат 30×30 превращался в полоску (та же история, что у «Закрыть» —
+     см. .thread-header__next в chat-thread.css). */
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--lc-radius-md);
+  background: transparent;
+  color: var(--lc-text-2);
+  cursor: pointer;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.thread-actions__more:hover {
+  background: var(--lc-surface-hover);
+  color: var(--lc-text-1);
+}
+
+/* Открытое меню — состояние кнопки, а не наведение: иначе после щелчка
+   кнопка выглядит незадействованной, и человек жмёт второй раз, закрывая
+   только что открытое меню. */
+.thread-actions__more[aria-expanded="true"] {
+  background: var(--lc-selected);
+  color: var(--lc-text-1);
+}

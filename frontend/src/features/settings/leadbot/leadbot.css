@@ -1,0 +1,655 @@
+/*
+ * Раздел «Лид-бот».
+ *
+ * ⚠ ЧТО ЗДЕСЬ ПОМЕНЯЛОСЬ 05.09 И ПОЧЕМУ. Раздел был вертикальной стопкой из
+ * пяти `.settings-block` — одинаковых серых блоков, разделённых волосяной
+ * линией. Все пять выглядели ровно одинаково, хотя отвечают на РАЗНЫЕ вопросы:
+ * «работает ли он», «как он работает», «чем он подключён», «что он ведёт»,
+ * «что он делал». Раскладка этой разницы не показывала никак, и человек
+ * листал сверху вниз, собирая состояние системы по кускам: бейдж «Работает»
+ * лежал в третьем блоке (~1400 px от верха при окне 900), число ведомых
+ * диалогов — в четвёртом, исходы — в пятом.
+ *
+ * Теперь у раздела три роли и три вида поверхности:
+ *   `.lb-state`  — шапка состояния, единственная на экране, с крупными числами;
+ *   `.lb-card`   — карточка по одному вопросу (рецепт общий: 16px + рамка +
+ *                  `--lc-surface`, как у `.stat-card` и `.updates__release`);
+ *   `.lb-part`   — часть внутри карточки, без своей поверхности: «Связь» и
+ *                  «Тестовый разговор» — один вопрос («чем подключён»), но два
+ *                  разных действия.
+ *
+ * Своих радиусов, кеглей и цветов здесь нет: шкала контролов приходит из
+ * `lc-base.css`, поля формы — из общего потолка `--lc-form-max`.
+ */
+
+/*
+ * ⚠ У `.lb-form` НЕ БЫЛО НИ ОДНОГО ПРАВИЛА. Класс стоял в разметке трижды и не значил
+ * ничего — поля тянулись на всю ширину раздела. Разбор интерфейса это и заметил:
+ * «самая длинная форма… поля во всю ширину». Поймать такую дыру нечем: сторож мёртвых
+ * классов идёт от CSS к разметке, а обратной проверки (класс есть, правила нет) в
+ * проекте нет вовсе.
+ */
+.lb-form {
+  max-width: var(--lc-form-max);
+}
+
+/* --- каркас раздела ------------------------------------------------------ */
+
+.lb-page {
+  gap: var(--lc-space-5);
+}
+
+/*
+ * ОДНА КОЛОНКА НА ТЕЛЕФОНЕ, ДВЕ НА НОУТБУКЕ, ТРИ НА 27 ДЮЙМАХ.
+ *
+ * Пороги выбраны замером в браузере, а не на глаз. Разделу достаётся ширина
+ * окна минус 220 px боковой навигации и 48 px полей:
+ *   1024 → 756 px: две колонки дали бы журналу 312 — строка «Клиент: …» рвётся
+ *          на каждом втором слове, поэтому здесь по-прежнему одна колонка;
+ *   1200 → 932 px: 420 управлению + 488 наблюдению — журнал читается;
+ *   1440 → 1172 px: 420 + 728;
+ *   1800 → 1532 px и больше: «что не взял» и журнал встают рядом, и на 27
+ *          дюймах весь раздел виден без прокрутки вовсе. Порог тот же, на
+ *          котором в `lc-vars.css` поднимается вся шкала кеглей: это граница
+ *          «большого монитора», и заводить рядом второе число незачем.
+ *
+ * Раскладка идёт областями, а не порядком в разметке: DOM-порядок
+ * (управление → что ведёт → журнал) одинаков на всех ширинах, поэтому обход
+ * с клавиатуры и порядок чтения на телефоне совпадают с тем, что видно
+ * глазами. Перестановка колонок средствами сетки этого свойства не ломает
+ * ровно потому, что колонки не меняются местами — меняется только число
+ * строк, на которые они ложатся.
+ */
+.lb-cols {
+  display: grid;
+  gap: var(--lc-gutter);
+  align-items: start;
+}
+
+.lb-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-gutter);
+  /* Без этого длинная строка журнала распирает не карточку, а всю сетку. */
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .lb-cols {
+    grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+    grid-template-areas:
+      "control watch"
+      "control log";
+  }
+
+  .lb-col--control {
+    grid-area: control;
+  }
+
+  .lb-col--watch {
+    grid-area: watch;
+  }
+
+  .lb-col--log {
+    grid-area: log;
+  }
+}
+
+@media (min-width: 1800px) {
+  .lb-cols {
+    grid-template-columns: minmax(340px, 420px) minmax(320px, 0.8fr) minmax(0, 1.2fr);
+    grid-template-areas: "control watch log";
+  }
+}
+
+/* --- карточка и её части ------------------------------------------------- */
+
+/*
+ * Поверхность, рамка и радиус — у `.lc-card` (lc-base.css): карточка носит
+ * его вместе с этим классом. Здесь только раскладка.
+ */
+.lb-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-3);
+  min-width: 0;
+  padding: var(--lc-space-4);
+}
+
+.lb-card__title {
+  margin: 0;
+  font-size: var(--lc-fz-section);
+  font-weight: var(--lc-fw-semibold);
+  line-height: var(--lc-lh-heading);
+  color: var(--lc-text-1);
+}
+
+/*
+ * Пояснение не тянется на всю ширину — то же правило, что у `.settings-block > p`
+ * («предупреждение набрано в одну строку на 1100 px, её физически трудно
+ * прочесть»). Карточка больше не `.settings-block`, поэтому потолок приходится
+ * назвать здесь; число одно и то же, и живёт оно токеном.
+ */
+.lb-card__lead,
+.lb-part__lead {
+  margin: 0;
+  max-width: var(--lc-prose-max);
+  font-size: var(--lc-fz-body);
+  line-height: var(--lc-lh-body);
+  color: var(--lc-text-2);
+}
+
+/*
+ * Часть внутри карточки. Своей поверхности у неё нет намеренно: вторая
+ * рамка внутри первой — это шестой вид карточки в продукте, у которого их и
+ * так было пять. Разделяет части шов, а не коробка.
+ */
+.lb-part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  padding-top: var(--lc-space-4);
+  border-top: 1px solid var(--lc-border);
+}
+
+.lb-part__title {
+  margin: 0;
+  font-size: var(--lc-fz-card);
+  font-weight: var(--lc-fw-medium);
+  line-height: var(--lc-lh-heading);
+  color: var(--lc-text-1);
+}
+
+/* --- шапка состояния ------------------------------------------------------ */
+
+/*
+ * «ЛИЦО» РАЗДЕЛА. Вопрос, с которым сюда приходят, — «работает ли он сейчас и
+ * как хорошо», и до 05.09 экран на него не отвечал ничем: состояние лежало
+ * бейджем `Работает` в середине третьего блока.
+ *
+ * Просвет крупнее, чем у обычной карточки (16 против 12): здесь три разнородных
+ * ряда — состояние, плитки, сноска об источнике чисел, — и на карточном
+ * просвете они читались одним слипшимся столбцом.
+ */
+.lb-state {
+  gap: var(--lc-space-4);
+}
+
+.lb-state__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lc-space-2) var(--lc-space-3);
+}
+
+.lb-state__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  /* Круг — это форма, а не скругление: шкала радиусов сюда не относится. */
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-text-4);
+}
+
+.lb-state__line[data-on] .lb-state__dot {
+  background: var(--lc-success);
+}
+
+.lb-state__word {
+  font-size: var(--lc-fz-metric);
+  font-weight: var(--lc-fw-semibold);
+  line-height: var(--lc-lh-heading);
+  color: var(--lc-text-2);
+}
+
+.lb-state__line[data-on] .lb-state__word {
+  color: var(--lc-text-1);
+}
+
+.lb-state__facts {
+  min-width: 0;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+/*
+ * Кнопка прижата к правому краю и не сжимается.
+ *
+ * Тот же дефект, что уже разбирали в трёх местах продукта: у Mantine-кнопки
+ * `flex: 0 1 auto`, а подпись внутри рисуется `nowrap` и режется БЕЗ
+ * многоточия. «Выключить лид-бота» на узком экране превращалось бы в
+ * «Выключить лид-», то есть в другое обещание.
+ */
+.lb-state__switch {
+  flex: none;
+  margin-left: auto;
+}
+
+/*
+ * На телефоне кнопка всё равно уходит на свою строку — замер 05.09: при окне
+ * 375 строке состояния достаётся 295 px, а значку, слову и кнопке нужен 321.
+ * Прижатая к правому краю пустой строки, она читается как обрывок предыдущей;
+ * прижатая к левому — как следующий шаг того же ряда. Порог — общий «телефон»
+ * продукта (`MOBILE_MAX`), тот же, что у полосы в «Распределении».
+ */
+@media (max-width: 767px) {
+  .lb-state__switch {
+    margin-left: 0;
+  }
+}
+
+.lb-state__hint {
+  margin: 0;
+  font-size: var(--lc-fz-body);
+  color: var(--lc-text-3);
+}
+
+.lb-state__alarm {
+  margin: 0;
+  font-size: var(--lc-fz-body);
+  color: var(--lc-warning-text);
+}
+
+/* --- крупные числа шапки -------------------------------------------------- */
+
+.lb-kpi {
+  display: grid;
+  /*
+   * 120 — минимум, на котором двузначное число ступени `metric` и подпись
+   * ступени `caption` стоят в одну строку каждое. Замер 05.09: 375 → два
+   * столбца по 141, 768 → четыре по 164, 1440 → четыре по 274.
+   *
+   * ⚠ ПОТОЛОК СТОИТ У ПОЛОСЫ, А НЕ У ДОРОЖКИ, И ЭТО НЕ ВКУСОВЩИНА. Без него
+   * на мониторе 2560 плитка растягивалась до 554 px — число в углу пустого
+   * прямоугольника перестаёт читаться как показатель. Но записать потолок
+   * вторым аргументом `minmax(120px, 280px)` нельзя: при определённой верхней
+   * границе браузер считает ЧИСЛО дорожек по ней, а не по минимуму, и полоса
+   * рассыпалась ровно там, где раньше стояла в строку (замер: 375 → четыре
+   * строки вместо двух, 768 и 1440 → две вместо одной).
+   *
+   * 1144 = четыре плитки по 280 плюс три просвета по 8. При 1440 колонка ýже
+   * потолка, и плитки честно растягиваются на всю ширину.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  max-width: 1144px;
+  gap: var(--lc-space-2);
+}
+
+/*
+ * Плитка — ВПАДИНА, а не карточка: она лежит НА карточке, и повтори здесь
+ * рецепт поверхности — на экране получилось бы две вложенных карточки одного
+ * ранга. Тот же приём и тот же вид, что у `.bot-tile` в «Диалогах бота»:
+ * подпись сверху мелко, число снизу крупно.
+ */
+.lb-kpi__cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-0);
+  padding: var(--lc-space-3);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-bg-1);
+  text-align: left;
+  min-width: 0;
+}
+
+.lb-kpi__cell--act {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lb-kpi__cell--act:hover {
+  border-color: var(--lc-border-strong);
+}
+
+/* Включённый отбор подсвечен тем же зелёным, каким подсвечен раздел в меню. */
+.lb-kpi__cell--act[data-active] {
+  background: var(--lc-primary-subtle);
+  border-color: var(--lc-primary);
+}
+
+.lb-kpi__cell--act[data-active] .lb-kpi__cap {
+  color: var(--lc-primary);
+}
+
+.lb-kpi__cap {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.lb-kpi__num {
+  font-size: var(--lc-fz-metric);
+  font-weight: var(--lc-fw-semibold);
+  line-height: var(--lc-lh-heading);
+  color: var(--lc-text-1);
+  font-variant-numeric: var(--lc-num);
+}
+
+/* Откуда числа — одной строкой: два из четырёх считаны по журналу, и молчать
+   об этом нельзя, иначе «Пошло не так: 7» читается как «за всё время». */
+.lb-kpi__source {
+  margin: 0;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.lb-kpi__source--bad {
+  color: var(--lc-danger-text);
+}
+
+/* --- каналы --------------------------------------------------------------- */
+
+/*
+ * ⚠ СПИСОК КАНАЛОВ ПРОКРУЧИВАЕТСЯ САМ. Каналов у мастерской два десятка, и
+ * стопка флажков выталкивала за нижний край всё, что стоит под ней. Полосы
+ * сверху и снизу нужны затем, чтобы обрезанный список читался как список с
+ * продолжением, а не как случайно кончившийся текст.
+ */
+.lb-channels {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: var(--lc-space-2) 0;
+  border-top: 1px solid var(--lc-border);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+/*
+ * ЦЕЛЬ НАЖАТИЯ НЕ МЕЛЬЧЕ 24. У метки Mantine своя высота 20 px, и на телефоне
+ * в неё приходится целиться ногтем. Тот же размер и тот же довод, что у
+ * тумблера «Без ограничения» в «Распределении».
+ */
+.lb-channels__item .mantine-Checkbox-labelWrapper,
+.lb-channels__item .mantine-Checkbox-label {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- что бот ведёт и чего не взял ---------------------------------------- */
+
+.lb-watch__warn {
+  margin: 0;
+  font-size: var(--lc-fz-body);
+  color: var(--lc-warning-text);
+}
+
+.lb-watch__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+/* Имя списка и его длина в одной строке: без числа два соседних списка
+   сливались в одну вереницу абзацев, и где кончается первый — не видно. */
+.lb-watch__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+  padding-bottom: var(--lc-space-1);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.lb-watch__name {
+  font-size: var(--lc-fz-body);
+  font-weight: var(--lc-fw-medium);
+  color: var(--lc-text-1);
+}
+
+.lb-watch__count {
+  font-size: var(--lc-fz-body);
+  color: var(--lc-text-2);
+  font-variant-numeric: var(--lc-num);
+}
+
+.lb-watch__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Своя прокрутка: сервер отдаёт по двадцать строк на список, и вдвоём они
+     уносили карточку вниз на два экрана. */
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.lb-watch__row {
+  display: flex;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-1) 0;
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.lb-watch__id {
+  flex: none;
+  font-family: var(--lc-font-mono);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.lb-watch__why {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lb-watch__row--none {
+  color: var(--lc-text-3);
+}
+
+/* --- проверка связи и ответ на тест ------------------------------------- */
+
+.lb-probe,
+.lb-answer {
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: var(--lc-space-3) var(--lc-space-4);
+  font-size: var(--lc-fz-body);
+  color: var(--lc-text-1);
+  /* Нейтральная рамка по умолчанию: и «связь есть», и «связи нет» — штатные
+     исходы проверки, которую человек запустил сам. Красным помечается только
+     то, что требует действия, — правило владельца от 12 августа. */
+}
+
+.lb-probe[data-ok],
+.lb-answer[data-ok] {
+  border-color: var(--lc-success-border);
+}
+
+.lb-probe__reply,
+.lb-answer__reply {
+  margin-top: 6px;
+  color: var(--lc-text-2);
+}
+
+.lb-answer__reply {
+  /* Ответ бота читают как сообщение клиенту, а не как подпись: тело текста. */
+  font-size: var(--lc-fz-body);
+  line-height: 1.5;
+  color: var(--lc-text-1);
+}
+
+.lb-answer__error {
+  color: var(--lc-danger-text);
+}
+
+.lb-answer__note,
+.lb-answer__warn {
+  margin-top: 6px;
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.lb-answer__warn {
+  color: var(--lc-warning-text);
+}
+
+/* Факты об ответе — сеткой, а не строкой: их четыре, и в строку они
+   складываются в кашу на узком экране. */
+.lb-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--lc-space-3) var(--lc-space-4);
+  margin: 12px 0 0;
+}
+
+.lb-facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lb-facts dt {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.lb-facts dd {
+  margin: 0;
+  font-size: var(--lc-fz-body);
+  color: var(--lc-text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- журнал -------------------------------------------------------------- */
+
+/*
+ * Отбор стоит НАД прокруткой, а не внутри неё: чтобы сменить канал, не должно
+ * приходиться гнать список обратно вверх — ровно эта беда и была, пока
+ * прокручивалась вся страница.
+ */
+.lb-filters {
+  flex-wrap: wrap;
+}
+
+/* Цель нажатия у флажка отбора — не мельче 24, тот же довод, что у каналов. */
+.lb-filters__flag .mantine-Checkbox-labelWrapper,
+.lb-filters__flag .mantine-Checkbox-label {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+/*
+ * ⚠ ПРОКРУТКА У СПИСКА, А НЕ У СТРАНИЦЫ. Сервер отдаёт до ста обращений, в
+ * каждом вопрос клиента и ответ бота целиком: лента вырастала на несколько
+ * тысяч пикселей и уносила вниз шапку состояния вместе с настройками.
+ *
+ * Потолок — меньшее из 560 px и 62% высоты окна: на ноутбуке 900 это 558, на
+ * телефоне 812 — 503, то есть список никогда не занимает экран целиком и под
+ * ним всегда видно, что страница продолжается.
+ */
+.lb-journal__scroll {
+  max-height: min(560px, 62vh);
+  overflow-y: auto;
+}
+
+.lb-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lb-log__item {
+  border: 1px solid var(--lc-border);
+  border-left: 3px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: var(--lc-space-3);
+  font-size: var(--lc-fz-body);
+}
+
+/* Цветом помечено только то, что требует человека: красным — клиент не получил
+   ничего, жёлтым — ответ был, но его выбросил порог уверенности. Штатная
+   работа остаётся нейтральной, иначе журнал станет разноцветным и перестанет
+   читаться. */
+.lb-log__item[data-tone="bad"] {
+  border-left-color: var(--lc-danger-text);
+}
+
+.lb-log__item[data-tone="warn"] {
+  border-left-color: var(--lc-warning-text);
+}
+
+.lb-log__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lc-space-3);
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-caption);
+}
+
+.lb-log__outcome {
+  color: var(--lc-text-1);
+  font-weight: 500;
+}
+
+/* Кто ответил — роутер или модель. Главный вопрос владельца к любой строке,
+   и до 05.09 он рисовался тем же серым, что и время. */
+.lb-log__layer {
+  color: var(--lc-text-2);
+}
+
+.lb-log__ms {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-log__q,
+.lb-log__a {
+  margin-top: 6px;
+  line-height: 1.45;
+  /* Строка журнала — текст, и на 27 дюймах колонка отдаёт ей больше 1500 px.
+     Потолок тот же, что у пояснений: читают их одними глазами. */
+  max-width: var(--lc-prose-max);
+}
+
+.lb-log__q {
+  color: var(--lc-text-2);
+}
+
+.lb-log__a {
+  color: var(--lc-text-1);
+}
+
+.lb-log__err {
+  margin-top: 6px;
+  color: var(--lc-danger-text);
+}
+
+.lb-log__note {
+  margin-top: 4px;
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.lb-log__link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: var(--lc-fz-note);
+}
+
+.lb-empty {
+  margin-top: 12px;
+}
+
+/*
+ * ⚠ ЧУЖОЙ ТЕКСТ РВЁМ ГДЕ УГОДНО (разбор дизайна 28.08).
+ *
+ * Здесь печатается то, что написал клиент, что ответил бот и что вернула
+ * ошибка: ссылки, адреса и артикулы приходят одним куском без пробелов. Без
+ * переноса такая строка не сжимается вовсе — вылезала из рамки и уводила весь
+ * раздел в горизонтальную прокрутку. Тот же приём и с тем же доводом уже стоит
+ * у пузыря песочницы в `bots.css`.
+ */
+.lb-log__q,
+.lb-log__a,
+.lb-log__err,
+.lb-log__note,
+.lb-answer__reply,
+.lb-probe__reply {
+  overflow-wrap: anywhere;
+}

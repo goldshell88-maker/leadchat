@@ -1,0 +1,253 @@
+/*
+ * Голосовое сообщение: свой проигрыватель вместо браузерной панели.
+ *
+ * Просьба владельца 05.09 со скриншотом: «сделай качественный визуал для
+ * аудио». За 60 дней боя пришло 597 голосовых — в них клиент обычно и
+ * рассказывает суть заказа.
+ *
+ * ⚠ ВСЁ КРАСИТСЯ `currentColor`, А НЕ ТОКЕНОМ ЦВЕТА, И ЭТО НЕ ЛЕНЬ. Плеер
+ * живёт ВНУТРИ пузыря, а пузырей четыре: входящий (#181f1c, светлые чернила),
+ * исходящий (заливка акцентом, белые чернила), заметка (янтарь) и бот
+ * (фиолетовая рамка). Возьми любой цвет из шкалы — и он окажется верным ровно
+ * на одном из них, а на исходящем зелёная кнопка на зелёной заливке
+ * растворится совсем (контраст #2c9c2b на #1b631a — 1.6). `currentColor`
+ * наследуется от пузыря, поэтому проигрыватель читается на всех четырёх и
+ * ничего не знает о том, в каком он лежит.
+ */
+
+/*
+ * ⚠ ШИРИНА ЗАДАЁТСЯ ЧИСЛОМ, А ПОТОЛОК ОТДЕЛЬНО — И ЭТО ЗАМЕР, А НЕ ВКУС.
+ *
+ * `.msg__bubble` — flex-элемент с shrink-to-fit: он сжимается до содержимого.
+ * Собственной ширины у колонки `1fr` нет, поэтому пузырь считает её по самой
+ * длинной подписи внутри — по строке времени «0:08 / 0:23».
+ *
+ * Здесь стояло `width: min(280px, 100%)` — приём, взятый у снимка
+ * (`.msg__image` в chat-thread.css). У снимка он работает, здесь НЕТ, и
+ * разница в том, что у `<img>` есть своя внутренняя ширина, а у нашей сетки
+ * её нет: процент внутри `min()` при расчёте вклада неразрешим, всё выражение
+ * считается `auto`, и число 280 не участвует вовсе. Замер на стенде (колонка
+ * 420px, пузырь `max-width: 70%`): пузырь 134px, проигрыватель 102px, полоса
+ * перемотки 58px — перемотать пальцем нечего.
+ *
+ * `width: 280px` вкладом становится, а процентный `max-width` при расчёте
+ * вклада отбрасывается и связывает только итог. Тот же замер после правки:
+ * пузырь 294px, проигрыватель 262px; в узкой колонке (340px) — 216 и 184, за
+ * скруглённый край не вылезает.
+ */
+.voice-player {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--lc-space-2);
+  align-items: center;
+  width: 280px;
+  max-width: 100%;
+  margin-top: var(--lc-space-1);
+}
+
+/* UA-стили прячут `<audio>` без `controls` сами, но полагаться на чужую
+   таблицу в раскладке нельзя: появись у элемента бокс — он займёт первую
+   ячейку сетки и сдвинет кнопку. */
+.voice-player > audio {
+  display: none;
+}
+
+/*
+ * Кнопка 36px при требовании «цель нажатия не меньше 24». Взято больше
+ * намеренно: это главное действие плеера, в него целятся мышью на ходу, и
+ * рядом нет второй кнопки, у которой можно отнять место.
+ */
+.voice-player__play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--lc-radius-circle);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--lc-motion-fast);
+}
+
+.voice-player__play:hover {
+  background: color-mix(in srgb, currentColor 24%, transparent);
+}
+
+/* Ждём свежую ссылку у сервера (06.09): между нажатием и звуком проходит
+   запрос, и молчащая кнопка в это время читается как «не сработало» — ровно
+   тот случай, когда человек жмёт второй раз. Курсор говорит «идёт». */
+.voice-player__play[aria-busy="true"] {
+  cursor: progress;
+  opacity: var(--lc-opacity-muted);
+}
+
+.voice-player__play:focus-visible,
+.voice-player__track:focus-visible {
+  outline: 2px solid var(--lc-focus-border);
+  outline-offset: 2px;
+}
+
+.voice-player__meter {
+  /* Без этого длинная подпись времени не даёт колонке сжиматься в узком
+     пузыре, и полоса вылезает за скруглённый край. */
+  min-width: 0;
+}
+
+/*
+ * Полоса — 24px высоты при видимой линии в 6px. Разница не пустая: цель
+ * нажатия обязана быть не меньше 24×24, а линию толщиной 24 нельзя ни
+ * прочитать как шкалу, ни перетащить точно.
+ */
+.voice-player__track {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  cursor: pointer;
+  /* Иначе на сенсорном экране перетаскивание полосы прокручивает ленту
+     переписки: браузер отдаёт жест прокрутке раньше, чем нам. */
+  touch-action: none;
+}
+
+.voice-player__track[aria-disabled="true"] {
+  cursor: default;
+  opacity: var(--lc-opacity-muted);
+}
+
+.voice-player__bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: var(--lc-radius-pill);
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+/*
+ * ⚠ ДВИЖЕНИЕ ЗДЕСЬ — НЕ УКРАШЕНИЕ. Браузер шлёт `timeupdate` примерно четыре
+ * раза в секунду, поэтому без перехода полоса дёргается заметными скачками —
+ * ровно тем «чужим» видом, от которого уходили. Длительность равна шагу
+ * событий (--lc-dur-base, 250ms), кривая линейная: любое ускорение или
+ * торможение означало бы, что запись играет неравномерно.
+ */
+.voice-player__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--voice-pos);
+  border-radius: var(--lc-radius-pill);
+  background: currentColor;
+  transition: width var(--lc-dur-base) linear;
+}
+
+/* Ползунок вдвое толще полосы и смещён на свой полурадиус: только так его
+   середина стоит РОВНО на отметке, а не левым краем от неё. */
+.voice-player__knob {
+  position: absolute;
+  top: 50%;
+  left: var(--voice-pos);
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  margin-left: -6px;
+  border-radius: var(--lc-radius-circle);
+  background: currentColor;
+  transition: left var(--lc-dur-base) linear;
+}
+
+/* Пока тянут — за временем ведёт палец, и сглаживание превращается в
+   отставание ползунка от курсора. */
+.voice-player[data-dragging="true"] .voice-player__fill,
+.voice-player[data-dragging="true"] .voice-player__knob {
+  transition: none;
+}
+
+/*
+ * «Уменьшить движение»: гасим ПЕРЕХОД ПОЛОЖЕНИЯ, а переход цвета у кнопки
+ * оставляем — общее правило проекта (lc-vars.css) снимает анимации, но не
+ * заливки состояний: без них кнопки начинают мигать.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .voice-player__fill,
+  .voice-player__knob {
+    transition: none;
+  }
+}
+
+.voice-player__time {
+  margin: var(--lc-space-0) 0 0;
+  font-size: var(--lc-fz-micro);
+  /* Цифры моноширинные: иначе секунды скачут по ширине на каждом кадре, и
+     подпись «дрожит» рядом с ползунком. */
+  font-variant-numeric: var(--lc-num);
+  opacity: var(--lc-opacity-muted);
+}
+
+.voice-player__error {
+  grid-column: 2;
+  margin: var(--lc-space-1) 0 0;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-danger-text);
+}
+
+/*
+ * МАШИННАЯ РАСШИФРОВКА ПОД ЗАПИСЬЮ.
+ *
+ * Владелец попросил расшифровку своим Whisper; замер боя — 597 голосовых за
+ * 60 дней, и в голосовом клиент обычно и рассказывает суть заказа. Текст
+ * стоит ПОД проигрывателем, а не вместо него: распознавание врёт на шуме и на
+ * именах, и спорное место обязано быть можно переслушать.
+ *
+ * ⚠ ЦВЕТА ПО-ПРЕЖНЕМУ ТОЛЬКО `currentColor` — по той же причине, что и у всего
+ * остального в этом файле (разбор в шапке): пузырей четыре, и любой цвет из
+ * шкалы окажется верным ровно на одном из них. На исходящем (заливка акцентом,
+ * белые чернила) `--lc-text-3` слился бы с фоном совсем.
+ *
+ * ⚠ ОБЕ СТРОКИ ЗАНИМАЮТ ВСЮ ШИРИНУ СЕТКИ. Проигрыватель — сетка `auto 1fr`
+ * (кнопка и полоса). Без `grid-column: 1 / -1` расшифровка встала бы во вторую
+ * колонку, то есть с отступом под кнопку, и первая строка текста оказалась бы
+ * уже остальных.
+ */
+.voice-player__transcript,
+.voice-player__transcript-note {
+  grid-column: 1 / -1;
+  margin: var(--lc-space-2) 0 0;
+}
+
+/* Черта отделяет чужие слова от машинных: без неё текст читается как
+   продолжение подписи времени. */
+.voice-player__transcript {
+  padding-top: var(--lc-space-2);
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.voice-player__transcript-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  margin: 0 0 var(--lc-space-1);
+  font-size: var(--lc-fz-micro);
+  opacity: var(--lc-opacity-muted);
+}
+
+.voice-player__transcript-text {
+  margin: 0;
+  font-size: var(--lc-fz-caption);
+  line-height: var(--lc-lh-body);
+  /* Распознавание иногда склеивает слова в одно длинное («ремонтакогда»), а
+     ширина пузыря фиксирована: без переноса такая строка вылезла бы за
+     скруглённый край. */
+  overflow-wrap: anywhere;
+}
+
+/* «Не разобрано ни слова» — это состояние, а не слова клиента: гасим так же,
+   как служебные строки, чтобы его нельзя было прочитать как расшифровку. */
+.voice-player__transcript-text[data-empty="true"],
+.voice-player__transcript-note {
+  font-size: var(--lc-fz-micro);
+  font-style: italic;
+  opacity: var(--lc-opacity-muted);
+}

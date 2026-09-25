@@ -1,0 +1,81 @@
+[package]
+name = "leadchat-desktop"
+version = "1.0.0"                 # источник истины версии — tauri.conf.json (CI сверяет с тегом, 04 §7)
+edition = "2021"
+rust-version = "1.82"
+description = "LeadChat — десктоп-клиент для Windows (обёртка над общим React-бандлом)"
+publish = false
+
+[lib]
+name = "leadchat_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+default = []
+# Вторая итерация тостов (04 §4.2): COM-активатор `INotificationActivationCallback`
+# — кнопка «Ответить» с инлайн-полем. По умолчанию выключен, работает
+# protocol-фолбэк («Ответить» открывает диалог с фокусом в композере).
+# Включать только вместе со сборкой и проверкой на Windows.
+toast-com-activator = []
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# --- ядро и плагины Tauri 2 (04 §1.2, §2) ---
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-deep-link = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+# openExternal из PlatformBridge (03 §7): «ссылка на Авито ↗» открывается
+# в системном браузере, а не внутри WebView2.
+tauri-plugin-opener = "2"
+
+# --- общие зависимости ---
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+thiserror = "2"
+anyhow = "1"
+log = "0.4"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# --- кэш, шифрование, outbox (04 §5; реализация — модули src/cache/*) ---
+# ВНИМАНИЕ: rusqlite и sqlx (внутри tauri-plugin-sql) линкуют один и тот же
+# нативный sqlite3. Cargo запрещает две разные версии `links = "sqlite3"`,
+# поэтому rusqlite прибит к 0.32 — той же ветке libsqlite3-sys 0.30, что тянет
+# sqlx 0.8. Поднимать rusqlite можно только вместе с tauri-plugin-sql.
+aes-gcm = "0.10"
+rand = "0.8"
+rusqlite = { version = "0.32", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# --- Windows-специфика: DPAPI (04 §5.5) и WinRT-тосты (04 §4.2) ---
+# Секция компилируется ТОЛЬКО под Windows: на macOS/Linux `cargo check` её не трогает,
+# поэтому весь код, который её использует, обязан быть под #[cfg(target_os = "windows")].
+# Версия windows = 0.61 выбрана в тон tauri 2.11 (у неё та же ветка) — не расходимся
+# в двух копиях крейта в одном бинарнике.
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Security_Cryptography",   # DPAPI: CryptProtectData / CryptUnprotectData
+  "Win32_System_Com",              # COM-активатор тостов (04 §4.2)
+  "Win32_System_Registry",         # регистрация CLSID активатора в HKCU
+  "Data_Xml_Dom",                  # XML тоста
+  "UI_Notifications",              # ToastNotificationManager
+] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation"] }
+
+[profile.release]
+# Инсталлятор целимся уложить в ≤ 10 МБ (критерий приёмки 04 §10).
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

@@ -1,0 +1,36 @@
+/* Очередь «Входящие» (7.1). Токены — 10 §1; хардкод цветов запрещён. */
+
+/* Панель решения вместо композера: та же высота и та же граница, что у поля
+   ввода, — переключение между «принять» и «писать» не должно дёргать ленту. */
+.inbox-decision {
+  flex: none; /* низ панели не сжимается лентой, как и композер */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-3);
+  flex-wrap: wrap;
+  padding: var(--lc-space-3) var(--lc-space-4) calc(var(--lc-space-3) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-bg-1);
+}
+
+.inbox-decision__hint {
+  min-width: 0;
+  flex: 1;
+}
+
+.inbox-decision__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+}
+
+/* «Диалог принял …» — состояние, а не ошибка: спокойный информационный фон. */
+.inbox-decision--claimed {
+  background: var(--lc-info-subtle);
+  color: var(--lc-info-text);
+}
+
+
+/* Стилей разгрузки очереди (`.unload-preview*`) здесь больше нет — возможность
+   убрана целиком по требованию владельца от 11 августа (№8). */

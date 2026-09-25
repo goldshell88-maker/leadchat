@@ -1,0 +1,1799 @@
+<!-- @dsCard group="Экраны" -->
+<meta charset="utf-8">
+<title>Экран «Чаты»</title>
+<style>
+  /* ══════════════════════════════════════════════════════════════════════
+     ТОКЕНЫ — ДОСЛОВНО ИЗ frontend/src/app/lc-vars.css (§1 примитивы,
+     §2 сетка/форма/шрифт, §3 тёмная тема, §5 аватары).
+     Своих цветов в этом файле нет ни одного.
+     ══════════════════════════════════════════════════════════════════════ */
+  :root {
+    /* §1.2 синий — одна роль: info */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-600: #2563eb;
+    --lc-blue-950: #0d1b33;
+
+    /* §1.3 красный */
+    --lc-red-300: #fca5a5;
+    --lc-red-400: #f87171;
+    --lc-red-500: #ef4444;
+    --lc-red-600: #dc2626;
+    --lc-red-700: #b91c1c;
+    --lc-red-950: #2c1113;
+
+    /* §1.4 единый акцент, якорь — фирменный #3cc13b */
+    --lc-a-50: #eefaee;
+    --lc-a-100: #d6f4d5;
+    --lc-a-200: #ade7ac;
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-a-900: #123f12;
+    --lc-a-950: #0b2a0c;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.5 янтарь */
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+    --lc-amber-600: #d97706;
+    --lc-amber-700: #b45309;
+    --lc-amber-800: #92400e;
+    --lc-amber-950: #2b1e05;
+
+    /* §1.6 фиолетовый — бот, AI, автоматика */
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-400: #a78bfa;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+
+    /* §2.1 сетка 8pt */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+    --lc-space-9: 64px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-xl: 20px;
+    --lc-radius-pill: 999px;
+
+    /* §2.3 колонки рабочего места */
+    --lc-col-list: 340px;
+    --lc-col-card: 380px;
+    --lc-gutter: 24px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-font-mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+
+    /* шкала контролов: три высоты, один радиус */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-h-lg: 48px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* §2.5 движение */
+    --lc-dur-fast: 150ms;
+    --lc-dur-base: 250ms;
+    --lc-dur-slow: 300ms;
+    --lc-ease: cubic-bezier(0.2, 0, 0, 1);
+
+    /* ─────────────────────────── §3 ТЁМНАЯ ТЕМА (основная) ───────────── */
+    color-scheme: dark;
+
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-empty-art: #6f7a73;
+
+    --lc-brand: var(--lc-a-500);
+    --lc-on-brand: var(--lc-ink-on-accent);
+
+    --lc-warn: var(--lc-amber-500);
+    --lc-on-warn: #1a1204;
+    --lc-warn-soft: color-mix(in srgb, var(--lc-warn) 20%, transparent);
+    --lc-warn-text: #d9a94e;
+
+    --lc-danger: #e5484d;
+    --lc-danger-solid: #dc2626;
+    --lc-on-danger: #ffffff;
+    --lc-danger-text: #ff9ea1;
+
+    --lc-bubble-in: #181f1c;
+    --lc-bubble-in-line: #313a35;
+    --lc-row-time-w: 48px;
+
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+    --lc-selected: #1e2c24;
+
+    --lc-text-disabled: var(--lc-text-5);
+    --lc-disabled-bg: var(--lc-bg-raise);
+    --lc-disabled-text: var(--lc-text-4);
+    --lc-disabled-edge: #505a55;
+
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-link: var(--lc-blue-400);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+    --lc-focus-border: var(--lc-a-500);
+
+    --lc-success: var(--lc-a-500);
+    --lc-success-text: var(--lc-a-300);
+    --lc-danger-subtle: var(--lc-red-950);
+
+    --lc-warning: var(--lc-warn);
+    --lc-warning-solid: var(--lc-warn);
+    --lc-on-warning: var(--lc-on-warn);
+    --lc-warning-subtle: #241a05;
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-note-placeholder: var(--lc-amber-400);
+
+    --lc-info: var(--lc-blue-500);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+
+    --lc-accent: var(--lc-purple-500);
+    --lc-accent-solid: var(--lc-purple-600);
+    --lc-on-accent: #ffffff;
+    --lc-accent-subtle: var(--lc-purple-950);
+    --lc-accent-text: var(--lc-purple-300);
+
+    --lc-shadow-0: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+    --lc-shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --lc-shadow-glow: 0 0 0 1px rgb(var(--lc-a-500-rgb) / 0.45),
+      0 4px 20px rgb(var(--lc-a-500-rgb) / 0.18);
+
+    --lc-bubble-out: var(--lc-a-800);
+    --lc-bubble-out-text: #ffffff;
+    --lc-bubble-out-meta: rgba(255, 255, 255, 0.88);
+    --lc-bubble-in-text: var(--lc-text-1);
+    --lc-bubble-bot: var(--lc-purple-950);
+    --lc-bubble-bot-text: var(--lc-text-1);
+    --lc-bubble-bot-border: var(--lc-purple-600);
+    --lc-bubble-note: var(--lc-amber-950);
+    --lc-bubble-note-text: var(--lc-amber-300);
+    --lc-bubble-note-accent: var(--lc-warn);
+    --lc-bubble-system-text: var(--lc-text-3);
+
+    --lc-status-new-bg: var(--lc-blue-950);
+    --lc-status-new-text: var(--lc-blue-300);
+    --lc-status-inprogress-bg: #10240f;
+    --lc-status-inprogress-text: var(--lc-a-300);
+    --lc-status-waiting-bg: var(--lc-purple-950);
+    --lc-status-waiting-text: var(--lc-purple-300);
+    --lc-status-closed-bg: #1f2522;
+    --lc-status-closed-text: var(--lc-text-2);
+
+    --lc-unread-bg: var(--lc-a-600);
+    --lc-unread-text: var(--lc-ink-on-accent);
+
+    /* §5 палитра аватаров (тёмный набор) */
+    --lc-avatar-0-bg: #14343f; --lc-avatar-0-ink: #7dd3fc;
+    --lc-avatar-1-bg: #14312a; --lc-avatar-1-ink: #6ee7b7;
+    --lc-avatar-2-bg: #38300f; --lc-avatar-2-ink: #fcd34d;
+    --lc-avatar-3-bg: #3b1d20; --lc-avatar-3-ink: #fca5a5;
+    --lc-avatar-4-bg: #2a1f45; --lc-avatar-4-ink: #c4b5fd;
+    --lc-avatar-5-bg: #3a2417; --lc-avatar-5-ink: #fdba74;
+    --lc-avatar-6-bg: #17274a; --lc-avatar-6-ink: #93c5fd;
+    --lc-avatar-7-bg: #2f2440; --lc-avatar-7-ink: #f0abfc;
+  }
+
+  /* ═══════════════════════════════════════════ ОБВЯЗКА КАРТОЧКИ ═══════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: 1600px;
+    padding: var(--lc-space-5) var(--lc-space-6) var(--lc-space-6);
+  }
+
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--lc-space-5);
+    padding-bottom: var(--lc-space-4);
+    border-bottom: 1px solid var(--lc-border);
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .head__title {
+    margin: 0;
+    font-size: var(--lc-fz-section);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+  }
+
+  .head__sub {
+    margin: var(--lc-space-1) 0 0;
+    max-width: 68ch;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  .head__meta { display: flex; gap: var(--lc-space-2); flex: none; }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 var(--lc-space-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-surface);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-micro);
+    font-family: var(--lc-font-mono);
+  }
+
+  .legend {
+    margin: var(--lc-space-4) 0 0;
+    max-width: 118ch;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+  }
+
+  .legend b { color: var(--lc-text-3); font-weight: var(--lc-fw-semibold); }
+
+  .lc-truncate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lc-num { font-variant-numeric: var(--lc-num); }
+
+  /* ═════════════════════════════════════ РАБОЧЕЕ МЕСТО: ТРИ КОЛОНКИ ═══ */
+  /* chats-page.css: список 340 │ лента flex │ карточка 380, зазор 24 */
+
+  .chats-page {
+    display: flex;
+    gap: var(--lc-gutter);
+    height: 978px;
+    padding: var(--lc-gutter) var(--lc-space-6);
+    background: var(--lc-bg-1);
+  }
+
+  .chats-page > .chat-list-pane { width: var(--lc-col-list); flex: none; }
+  .chats-page > .client-card { width: var(--lc-col-card); flex: none; }
+
+  /* ══════════════════════════════════════ ЛЕВАЯ КОЛОНКА: СПИСОК ═══════ */
+
+  .chat-list-pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    background: var(--lc-bg-0);
+    border-radius: var(--lc-radius-lg);
+    border: 1px solid var(--lc-border);
+    overflow: hidden;
+  }
+
+  .chat-list-pane__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-4) var(--lc-space-3) var(--lc-space-3);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  .chat-list-pane__title h1 {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+    color: var(--lc-text-1);
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-space-2) 0 var(--lc-space-3);
+    background: var(--lc-bg-0);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-body);
+  }
+
+  .search__ph { flex: 1; min-width: 0; }
+
+  .chat-list-pane__kbd {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-xs);
+    padding: 2px 6px;
+    white-space: nowrap;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ⚠ ОДИН РЯД: вкладки + долг + значок сужений (просьба владельца 04.09) */
+  .chat-list-pane__toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+  }
+
+  .chat-tabs { display: flex; gap: var(--lc-space-1); }
+
+  .chat-tabs__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid transparent;
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+  }
+
+  .chat-tabs__tab[data-active] {
+    background: var(--lc-selected);
+    border-color: var(--lc-primary);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .chat-tabs__count {
+    min-width: 18px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: var(--lc-radius-pill);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lc-unread-bg);
+    color: var(--lc-unread-text);
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-semibold);
+    line-height: 1;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* очередь и непрочитанное — разные вопросы, различаем цветом */
+  .chat-tabs__count--queue { background: var(--lc-danger-solid); color: var(--lc-on-danger); }
+
+  .chat-tabs__count--quiet {
+    background: var(--lc-bg-2);
+    color: var(--lc-text-3);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  /* чип долга: индикатор, а не подпись — тот же янтарь, что у полос ждущих */
+  .chat-debt {
+    display: inline-flex;
+    align-items: center;
+    height: var(--lc-btn-h-sm);
+    padding: 0 8px;
+    border: 1px solid color-mix(in srgb, var(--lc-warning) 45%, transparent);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-warning-subtle);
+    color: var(--lc-warning-text);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-semibold);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .chat-filters-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: var(--lc-btn-h-sm);
+    padding: 0 6px;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+    color: var(--lc-text-2);
+    flex: none;
+  }
+
+  .chat-list-pane__scroll {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    padding-top: var(--lc-space-2);
+  }
+
+  /* ── строка диалога (78px, виртуализация) ─────────────────────────── */
+
+  .conv-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    height: 78px;
+    margin: 0 var(--lc-space-2);
+    border-radius: var(--lc-radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+  }
+
+  /* полоса срочности слева: ОДНА, берётся первый подходящий повод */
+  .conv-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+  }
+
+  .conv-card[data-urgency="escalated"]::before,
+  .conv-card[data-urgency="negative"]::before,
+  .conv-card[data-urgency="undelivered"]::before {
+    background: var(--lc-danger);
+    top: 8px;
+    bottom: 8px;
+  }
+
+  .conv-card[data-urgency="waiting"]::before,
+  .conv-card[data-awaiting][data-urgency="none"]::before { background: var(--lc-warning); }
+
+  .conv-card[data-hover] { background: var(--lc-surface-hover); }
+
+  .conv-card[data-active] {
+    background: var(--lc-selected);
+    border-color: var(--lc-primary);
+    box-shadow: var(--lc-shadow-glow);
+  }
+
+  .conv-card__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    padding: 0 var(--lc-space-3);
+    text-align: left;
+  }
+
+  .conv-card__avatar { position: relative; flex: none; display: inline-flex; }
+
+  .client-avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .client-avatar--44 { width: 44px; height: 44px; font-size: var(--lc-fz-body); }
+  .client-avatar--40 { width: 40px; height: 40px; font-size: var(--lc-fz-body); }
+  .client-avatar--32 { width: 32px; height: 32px; font-size: var(--lc-fz-caption); }
+
+  .av0 { background: var(--lc-avatar-0-bg); color: var(--lc-avatar-0-ink); }
+  .av1 { background: var(--lc-avatar-1-bg); color: var(--lc-avatar-1-ink); }
+  .av2 { background: var(--lc-avatar-2-bg); color: var(--lc-avatar-2-ink); }
+  .av3 { background: var(--lc-avatar-3-bg); color: var(--lc-avatar-3-ink); }
+  .av4 { background: var(--lc-avatar-4-bg); color: var(--lc-avatar-4-ink); }
+  .av5 { background: var(--lc-avatar-5-bg); color: var(--lc-avatar-5-ink); }
+  .av6 { background: var(--lc-avatar-6-bg); color: var(--lc-avatar-6-ink); }
+  .av7 { background: var(--lc-avatar-7-bg); color: var(--lc-avatar-7-ink); }
+
+  .conv-card__bot {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--lc-accent-solid);
+    color: var(--lc-on-accent);
+    box-shadow: 0 0 0 2px var(--lc-bg-0);
+  }
+
+  .conv-card__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .conv-card__line1 { display: flex; align-items: center; gap: var(--lc-space-2); min-width: 0; }
+
+  .conv-card__pin { flex: none; color: var(--lc-text-4); display: inline-flex; }
+  /* передан вам — синий: янтарь в этой строке занят ожиданием клиента */
+  .conv-card__flag { flex: none; color: var(--lc-info); display: inline-flex; }
+
+  .conv-card__name {
+    flex: 1;
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-1);
+  }
+
+  .conv-card[data-unread] .conv-card__name,
+  .conv-card[data-awaiting] .conv-card__name { font-weight: var(--lc-fw-semibold); }
+
+  .conv-card__line2 { font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  .conv-card__line3 { display: flex; align-items: center; gap: var(--lc-space-2); min-width: 0; }
+
+  .conv-card__preview {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-2);
+  }
+
+  .conv-card[data-unread] .conv-card__preview { color: var(--lc-text-1); }
+
+  /* уведомление площадки: тише переписки и курсивом */
+  .conv-card__preview[data-source="avito"] { font-style: italic; color: var(--lc-text-3); }
+  .conv-card[data-unread] .conv-card__preview[data-source="avito"] { color: var(--lc-text-2); }
+
+  /* мяч у клиента — строка гаснет: здесь работа сделана */
+  .conv-card[data-answered] .conv-card__name,
+  .conv-card[data-answered] .conv-card__preview { color: var(--lc-text-3); }
+  .conv-card[data-answered] .conv-card__avatar { opacity: 0.6; }
+
+  .conv-card__chip {
+    flex: none;
+    height: 18px;
+    padding: 0 var(--lc-space-2);
+    border-radius: var(--lc-radius-pill);
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-medium);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .conv-card__chip--danger {
+    background: var(--lc-danger-subtle);
+    color: var(--lc-danger-text);
+    border: 1px solid var(--lc-danger);
+  }
+
+  .conv-card__chip--status { border: 1px solid transparent; }
+
+  .lc-status-chip[data-status="new"] { background: var(--lc-status-new-bg); color: var(--lc-status-new-text); }
+  .lc-status-chip[data-status="in_progress"] { background: var(--lc-status-inprogress-bg); color: var(--lc-status-inprogress-text); }
+  .lc-status-chip[data-status="waiting_client"] { background: var(--lc-status-waiting-bg); color: var(--lc-status-waiting-text); }
+  .lc-status-chip[data-status="closed"] { background: var(--lc-status-closed-bg); color: var(--lc-status-closed-text); }
+
+  .conv-card__unread {
+    flex: none;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--lc-radius-pill);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lc-unread-bg);
+    color: var(--lc-unread-text);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+    line-height: 1;
+  }
+
+  /* ── ячейка времени = шкала ожидания (wait-gauge.css) ─────────────── */
+
+  .wait-gauge {
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--lc-row-time-w);
+    align-self: stretch;
+    overflow: hidden;
+    border-radius: 0 4px 4px 0;
+    margin-left: var(--lc-space-2);
+  }
+
+  .wait-gauge__fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    transform-origin: bottom;
+    background: var(--lc-warn-soft);
+  }
+
+  .wait-gauge__value,
+  .wait-gauge__time {
+    position: relative;
+    font-variant-numeric: var(--lc-num);
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .wait-gauge[data-level="idle"] .wait-gauge__time { font-size: 11.5px; color: var(--lc-text-5); }
+  .wait-gauge[data-level="calm"] .wait-gauge__value { font-size: 15px; font-weight: 500; color: var(--lc-warn-text); }
+  .wait-gauge[data-level="warn"] .wait-gauge__value { font-size: 17px; font-weight: 600; color: var(--lc-warn-text); }
+  .wait-gauge[data-level="late"] .wait-gauge__fill { background: var(--lc-warn); }
+  .wait-gauge[data-level="late"] .wait-gauge__value { font-size: 17px; font-weight: 700; color: var(--lc-on-warn); }
+  .wait-gauge[data-level="lost"] .wait-gauge__value { font-size: 15px; font-weight: 700; color: var(--lc-danger-text); }
+
+  /* ── подвал списка: моя смена ─────────────────────────────────────── */
+
+  .my-today {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: var(--lc-space-2) var(--lc-space-3);
+    border-top: 1px solid var(--lc-border);
+    background: var(--lc-bg-0);
+  }
+
+  .my-today__line { font-size: var(--lc-fz-caption); color: var(--lc-text-2); }
+  .my-today__line--sub { color: var(--lc-text-3); }
+  .my-today__warn { color: var(--lc-warning-text); font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
+
+  /* ══════════════════════════════════════ ЦЕНТР: ЛЕНТА ════════════════ */
+
+  .chat-thread-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: var(--lc-bg-0);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    overflow: hidden;
+  }
+
+  .thread-header {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    min-height: 64px;
+    padding: var(--lc-space-2) var(--lc-space-4);
+    border-bottom: 1px solid var(--lc-border);
+    background: var(--lc-bg-0);
+  }
+
+  .thread-header__info { flex: 1 1 200px; min-width: 0; }
+
+  .thread-header__name {
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+    margin: 0;
+  }
+
+  .thread-header__sub {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    min-width: 0;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+  }
+
+  /* партнёр · источник · город — рабочая метка, а не примечание */
+  .thread-header__lead {
+    flex: 0 0 auto;
+    max-width: 100%;
+    padding: var(--lc-space-0) var(--lc-space-2);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-info-subtle);
+    color: var(--lc-info-text);
+    font-weight: var(--lc-fw-semibold);
+    white-space: nowrap;
+  }
+
+  .thread-header__status {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 var(--lc-space-3);
+    border-radius: var(--lc-radius-pill);
+    white-space: nowrap;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .thread-actions__more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: var(--lc-radius-md);
+    background: transparent;
+    color: var(--lc-text-2);
+  }
+
+  /* «в работе у …» — ответ на вопрос «чей это диалог», всегда на экране */
+  .working-on {
+    padding: 4px var(--lc-space-4);
+    border-bottom: 1px solid var(--lc-border);
+    background: var(--lc-surface);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+  }
+
+  .working-on[data-mine="true"] { background: transparent; }
+
+  .thread-scroll {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: var(--lc-space-4);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .thread-virtual { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+  .msg-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-4) 0 var(--lc-space-3);
+  }
+
+  .msg-divider::before,
+  .msg-divider::after { content: ""; flex: 1; height: 1px; background: var(--lc-border); }
+
+  .msg-divider span {
+    flex: none;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-3);
+    white-space: nowrap;
+  }
+
+  .msg { display: flex; padding: var(--lc-space-2) 0 0; }
+  .msg--cont { padding-top: 2px; }
+
+  .msg__avatar { flex: none; margin-right: var(--lc-space-2); align-self: flex-end; }
+  .msg__avatar--placeholder { width: 32px; }
+
+  .msg__bubble {
+    max-width: 70%;
+    padding: var(--lc-space-3) var(--lc-space-4);
+    border-radius: var(--lc-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-1);
+    box-shadow: var(--lc-shadow-0);
+  }
+
+  .msg__text {
+    margin: 0;
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+  }
+
+  .msg__author {
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-3);
+  }
+
+  .msg__meta {
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .msg__status { display: inline-flex; }
+
+  .msg--in { justify-content: flex-start; }
+
+  .msg--in .msg__bubble {
+    background: var(--lc-bubble-in);
+    color: var(--lc-bubble-in-text);
+    border-bottom-left-radius: var(--lc-space-1);
+  }
+
+  .msg--out { justify-content: flex-end; }
+
+  .msg--out .msg__bubble {
+    background: var(--lc-bubble-out);
+    color: var(--lc-bubble-out-text);
+    border-bottom-right-radius: var(--lc-space-1);
+  }
+
+  .msg--out .msg__author,
+  .msg--out .msg__meta { color: var(--lc-bubble-out-meta); }
+
+  .msg--system { justify-content: center; }
+
+  .msg__system-text {
+    display: inline-block;
+    padding: var(--lc-space-1) var(--lc-space-3);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-bubble-system-text);
+    text-align: center;
+    max-width: 80%;
+  }
+
+  /* свёрнутая серия служебных записей — лог весит одну строку */
+  .msg--events { justify-content: center; }
+
+  .thread-events__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    padding: var(--lc-space-1) var(--lc-space-3);
+    border: none;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    color: var(--lc-bubble-system-text);
+    font-size: var(--lc-fz-caption);
+  }
+
+  /* ── панель ввода (composer.css) ──────────────────────────────────── */
+
+  .composer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    border-top: 1px solid var(--lc-border);
+    background: var(--lc-bg-0);
+  }
+
+  .composer__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-1);
+    min-height: 56px;
+    padding: var(--lc-space-2) var(--lc-space-2) var(--lc-space-1);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-0);
+  }
+
+  .composer__input {
+    padding: var(--lc-space-1) var(--lc-space-2);
+    font-size: var(--lc-fz-body);
+    line-height: 20px;
+    color: var(--lc-text-3);
+  }
+
+  .composer__tools { display: flex; align-items: center; gap: var(--lc-space-1); }
+  .composer__spacer { flex: 1; }
+
+  .composer__tool {
+    width: var(--lc-btn-h-sm);
+    height: var(--lc-btn-h-sm);
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: var(--lc-btn-radius);
+    background: transparent;
+    color: var(--lc-text-3);
+  }
+
+  .composer__send {
+    flex: none;
+    width: var(--lc-btn-h-sm);
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+  }
+
+  .composer__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lc-space-3);
+    padding: 0 var(--lc-space-1);
+  }
+
+  .composer__modes {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+  }
+
+  .composer__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    border: none;
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+    padding: var(--lc-space-1) var(--lc-space-3);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+  }
+
+  .composer__mode[data-active] {
+    background: var(--lc-surface);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-medium);
+    box-shadow: var(--lc-shadow-0);
+  }
+
+  .composer__hint { margin-left: auto; font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  .composer__hint kbd {
+    font-family: inherit;
+    font-size: var(--lc-fz-micro);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-xs);
+    padding: 1px 5px;
+    color: var(--lc-text-2);
+  }
+
+  /* ═══════════════════════════════ ПРАВАЯ КОЛОНКА: КАРТОЧКА КЛИЕНТА ═══ */
+
+  .client-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-3);
+    padding-inline: var(--lc-space-1);
+    overflow: hidden;
+  }
+
+  .card-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    padding: var(--lc-space-4);
+    background: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    box-shadow: var(--lc-shadow-1);
+  }
+
+  .card-section__title {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    margin: 0;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-3);
+  }
+
+  .card-section__title svg { color: var(--lc-text-disabled); flex: none; }
+
+  .card-section__name {
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+  }
+
+  /* имя правится нажатием на само имя — отдельной кнопки «изменить» нет */
+  .card-name__trigger {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    margin-inline-start: -6px;
+    border: 0;
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-bg-2);
+    color: inherit;
+    font: inherit;
+  }
+
+  .card-phone {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    border-radius: var(--lc-radius-sm);
+    padding: var(--lc-space-1) var(--lc-space-2);
+    margin: 0 calc(-1 * var(--lc-space-2));
+    color: var(--lc-text-3);
+  }
+
+  .card-phone__value {
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+    text-decoration: none;
+    font-variant-numeric: var(--lc-num);
+    white-space: nowrap;
+  }
+
+  .card-phone__copy {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: var(--lc-radius-xs);
+    background: transparent;
+    color: var(--lc-text-3);
+  }
+
+  .card-phone__source { font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  .card-line { font-size: var(--lc-fz-body); color: var(--lc-text-1); }
+  .card-line--sub { font-size: var(--lc-fz-body); color: var(--lc-text-2); }
+  .card-note { font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  .card-avito-id { display: flex; flex-direction: column; gap: 2px; margin-top: var(--lc-space-1); }
+  .card-idline { display: flex; align-items: center; gap: var(--lc-space-1); }
+
+  .card-idline__value {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+    white-space: nowrap;
+  }
+
+  .card-idline__hint { display: inline-flex; align-items: center; color: var(--lc-text-disabled); }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: var(--lc-space-2); }
+
+  .card-tag {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--lc-space-0) var(--lc-space-3);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .card-client-history {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    margin-top: var(--lc-space-1);
+    padding-top: var(--lc-space-2);
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .card-history {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 var(--lc-space-4);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-3);
+  }
+
+  .card-history::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--lc-border);
+  }
+
+  .card-history__row {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 2px;
+    padding: var(--lc-space-1) var(--lc-space-2);
+    margin-left: calc(-1 * var(--lc-space-2));
+    border-radius: var(--lc-radius-sm);
+  }
+
+  .card-history__row::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--lc-space-2) + 1px);
+    top: 10px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--lc-primary);
+    box-shadow: 0 0 0 3px var(--lc-surface);
+  }
+
+  .card-history__title { font-size: var(--lc-fz-caption); color: var(--lc-text-1); }
+  .card-history__meta { font-size: var(--lc-fz-micro); color: var(--lc-text-3); }
+
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-link);
+    text-decoration: none;
+  }
+
+  .card-field { display: flex; flex-direction: column; gap: var(--lc-space-1); }
+  .card-field__label { font-size: var(--lc-fz-caption); color: var(--lc-text-3); }
+
+  /* значение правится на месте — селект, а не «значение + кнопка» */
+  .card-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-space-3);
+    background: var(--lc-bg-0);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-note);
+  }
+
+  .card-select svg { color: var(--lc-text-3); }
+
+  .card-participants { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--lc-space-2); }
+
+  .card-participant {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    min-height: 24px;
+    padding: var(--lc-space-0) var(--lc-space-2) var(--lc-space-0) var(--lc-space-3);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .card-participant__remove {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--lc-text-3);
+  }
+
+  .card-notes-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    margin-top: var(--lc-space-1);
+    padding-top: var(--lc-space-2);
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .card-notes-head { display: flex; align-items: center; justify-content: space-between; gap: var(--lc-space-2); }
+
+  .card-notes-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    padding: var(--lc-space-1) 0;
+    border: none;
+    background: transparent;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-3);
+  }
+
+  .card-notes-toggle svg { color: var(--lc-text-disabled); flex: none; }
+
+  .btn-subtle {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 var(--lc-space-2);
+    border: none;
+    border-radius: var(--lc-btn-radius);
+    background: transparent;
+    color: var(--lc-primary-text);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .card-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--lc-space-2); }
+
+  .card-notes__item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--lc-space-2) var(--lc-space-3);
+    border-left: 3px solid var(--lc-bubble-note-accent);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bubble-note);
+    color: var(--lc-bubble-note-text);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .card-notes__meta { font-size: var(--lc-fz-micro); opacity: 0.8; }
+</style>
+
+<div class="page">
+
+  <header class="head">
+    <div>
+      <h1 class="head__title">Экран «Чаты» — рабочее место смены</h1>
+      <p class="head__sub">
+        Три колонки: список 340 │ лента │ карточка клиента 380, зазор 24. Экран отвечает на один
+        вопрос — кому отвечать прямо сейчас, поэтому цвет здесь несёт ровно один смысл: янтарь —
+        клиент ждёт, красный — диалог брошен, зелёный — действие. Рельс разделов слева не показан.
+      </p>
+    </div>
+    <div class="head__meta">
+      <span class="stamp">1600 × 978</span>
+      <span class="stamp">тёмная тема</span>
+    </div>
+  </header>
+
+  <div class="chats-page">
+
+    <!-- ═══════════════════════════════════ СПИСОК ДИАЛОГОВ ═══════════ -->
+    <section class="chat-list-pane">
+      <header class="chat-list-pane__header">
+        <div class="chat-list-pane__title"><h1>Чаты</h1></div>
+
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="search__ph">Поиск: имя, телефон, текст</span>
+          <span class="chat-list-pane__kbd">Ctrl+K</span>
+        </div>
+
+        <!-- вкладки отвечают на один вопрос «чей диалог»; долг и сужения — тем же рядом -->
+        <div class="chat-list-pane__toolbar">
+          <div class="chat-tabs">
+            <span class="chat-tabs__tab">Входящие<span class="chat-tabs__count chat-tabs__count--queue lc-num">11</span></span>
+            <span class="chat-tabs__tab" data-active>Мои<span class="chat-tabs__count chat-tabs__count--quiet lc-num">59</span></span>
+            <span class="chat-tabs__tab">Все</span>
+          </div>
+          <span class="chat-debt" title="Ждут вашего ответа: 7">7</span>
+          <span class="chat-filters-toggle" title="Фильтры">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+          </span>
+        </div>
+      </header>
+
+      <div class="chat-list-pane__scroll">
+
+        <!-- 1. закреплён, ждёт в очереди, служебное сообщение площадки -->
+        <div class="conv-card" data-urgency="waiting" data-unread>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av2">СК</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1">
+                <span class="conv-card__pin" title="Закреплено вами">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+                </span>
+                <span class="conv-card__name lc-truncate">Семён Карташов</span>
+              </span>
+              <span class="conv-card__line2 lc-truncate">Тимофей</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate" data-source="avito">Авито: Клиент оформил заказ, ожидает подтверждения</span>
+                <span class="conv-card__unread lc-num">4</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="calm" title="Клиент ждёт ответа 3 мин">
+              <span class="wait-gauge__value lc-num">3м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 2. открытый диалог: ждёт нас 6 минут -->
+        <div class="conv-card" data-active data-urgency="none" data-awaiting>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av1">ВШ</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Вера Шатилова</span></span>
+              <span class="conv-card__line2 lc-truncate">Тимофей</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Хорошо, жду. Только домофон не работает</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="warn" title="Клиент ждёт ответа 6 мин">
+              <span class="wait-gauge__fill" style="transform:scaleY(0.4)"></span>
+              <span class="wait-gauge__value lc-num">6м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. передан вам -->
+        <div class="conv-card" data-urgency="none" data-awaiting data-unread>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av6">ЕР</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1">
+                <span class="conv-card__flag" title="Диалог передан вам">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+                </span>
+                <span class="conv-card__name lc-truncate">Евгений Рыбин</span>
+              </span>
+              <span class="conv-card__line2 lc-truncate">Дамир</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Сколько будет стоить замена барабана?</span>
+                <span class="conv-card__unread lc-num">2</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="warn" title="Клиент ждёт ответа 9 мин">
+              <span class="wait-gauge__fill" style="transform:scaleY(0.6)"></span>
+              <span class="wait-gauge__value lc-num">9м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 4. ответ не дошёл до клиента -->
+        <div class="conv-card" data-urgency="undelivered" data-awaiting>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av7">КВ</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Кира Воробьёва</span></span>
+              <span class="conv-card__line2 lc-truncate">Валентина</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Вы: Мастер подъедет с 14 до 16</span>
+                <span class="conv-card__chip conv-card__chip--danger">не отправлено</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="warn" title="Клиент ждёт ответа 12 мин">
+              <span class="wait-gauge__fill" style="transform:scaleY(0.8)"></span>
+              <span class="wait-gauge__value lc-num">12м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 5. мяч у клиента — строка гаснет -->
+        <div class="conv-card" data-urgency="none" data-answered>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av0">УС</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Ульяна Сизова</span></span>
+              <span class="conv-card__line2 lc-truncate">Дамир</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Вы: Записал на завтра с 10 до 12, мастер позвонит</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="idle" title="12:41 у вас · 10:41 по Москве">
+              <span class="wait-gauge__time lc-num">14м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 6. недовольный клиент, ждёт больше пятнадцати минут -->
+        <div class="conv-card" data-urgency="negative" data-awaiting>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av5">ВМ</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Вадим Мурашов</span></span>
+              <span class="conv-card__line2 lc-truncate">Тимофей · Филипп Зубарев</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Мастер не приехал, вы издеваетесь?</span>
+                <span class="conv-card__chip conv-card__chip--danger">негатив</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="late" title="Клиент ждёт ответа 18 мин">
+              <span class="wait-gauge__fill" style="transform:scaleY(1)"></span>
+              <span class="wait-gauge__value lc-num">18м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 7. диалог ведёт бот -->
+        <div class="conv-card" data-urgency="none" data-answered>
+          <div class="conv-card__main">
+            <span class="conv-card__avatar">
+              <span class="client-avatar client-avatar--44 av4">ТЛ</span>
+              <span class="conv-card__bot" title="Диалог ведёт бот">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 16h.01"/><path d="M16 16h.01"/></svg>
+              </span>
+            </span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Тихон Ларионов</span></span>
+              <span class="conv-card__line2 lc-truncate">Александр</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Вы: Подскажите адрес и удобное время</span>
+                <span class="conv-card__chip conv-card__chip--status lc-status-chip" data-status="waiting_client">Ждёт клиента</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="idle" title="12:33 у вас · 10:33 по Москве">
+              <span class="wait-gauge__time lc-num">22м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 8. от диалога отказались все -->
+        <div class="conv-card" data-urgency="escalated">
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av3">ЖП</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Жанна Пономаренко</span></span>
+              <span class="conv-card__line2 lc-truncate">Анатолий</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Мастера сегодня можно вызвать?</span>
+                <span class="conv-card__chip conv-card__chip--danger">никто не берёт</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="lost" title="Отказались все — клиент ждёт 41 мин">
+              <span class="wait-gauge__value lc-num">41м</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 9. закрытый -->
+        <div class="conv-card" data-urgency="none">
+          <div class="conv-card__main">
+            <span class="conv-card__avatar"><span class="client-avatar client-avatar--44 av1">ЛГ</span></span>
+            <span class="conv-card__body">
+              <span class="conv-card__line1"><span class="conv-card__name lc-truncate">Лилия Горелова</span></span>
+              <span class="conv-card__line2 lc-truncate">Анатолий · Ефим Кочетов</span>
+              <span class="conv-card__line3">
+                <span class="conv-card__preview lc-truncate">Вы: Готово, мастер закрыл заявку</span>
+                <span class="conv-card__chip conv-card__chip--status lc-status-chip" data-status="closed">Закрыт</span>
+              </span>
+            </span>
+            <span class="wait-gauge" data-level="idle" title="5 авг, 18:12 у вас · 16:12 по Москве">
+              <span class="wait-gauge__time lc-num">5 авг</span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="my-today">
+        <span class="my-today__line">Сегодня: 14 взято · 9 закрыто</span>
+        <span class="my-today__line my-today__line--sub">
+          FRT 1 мин 40 с ·
+          <span class="my-today__warn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            7 ждут ответа
+          </span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ ЛЕНТА ═════════════ -->
+    <section class="chat-thread-pane">
+
+      <header class="thread-header">
+        <span class="client-avatar client-avatar--40 av1">ВШ</span>
+        <div class="thread-header__info">
+          <div class="thread-header__name">Вера Шатилова</div>
+          <div class="thread-header__sub">
+            <span class="thread-header__lead">партнёр 7 · источник В43 · город Челябинск</span>
+            <span class="lc-truncate">Тимофей · Ремонт стиральных машин на дому</span>
+          </div>
+        </div>
+        <span class="thread-header__status lc-status-chip" data-status="in_progress">В работе · ждёт 6 мин</span>
+        <span class="thread-actions__more" title="Ещё">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+        </span>
+      </header>
+
+      <div class="working-on" data-mine="true">В работе у вас · здесь же Ефим Кочетов</div>
+
+      <div class="thread-scroll">
+        <div class="thread-virtual">
+
+          <div class="msg-divider"><span>Сегодня</span></div>
+
+          <div class="msg msg--in">
+            <div class="msg__avatar"><span class="client-avatar client-avatar--32 av1">ВШ</span></div>
+            <div class="msg__bubble">
+              <p class="msg__text">Здравствуйте! Стиральная машина Bosch не отжимает, гудит и останавливается на середине программы. Сколько будет стоить починить?</p>
+              <span class="msg__meta">11:38</span>
+            </div>
+          </div>
+
+          <div class="msg msg--system">
+            <span class="msg__system-text">Статус: Новый → В работе. Кочетов Ефим · 11:42</span>
+          </div>
+
+          <div class="msg msg--out">
+            <div class="msg__bubble">
+              <span class="msg__author">Ефим Кочетов</span>
+              <p class="msg__text">Здравствуйте, Вера! Похоже на износ подшипника или засор насоса — точнее скажет мастер на месте. Диагностика бесплатная, если соглашаетесь на ремонт.</p>
+              <span class="msg__meta">
+                11:43
+                <i class="msg__status" title="Доставлено">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </i>
+              </span>
+            </div>
+          </div>
+
+          <div class="msg msg--out msg--cont">
+            <div class="msg__bubble">
+              <p class="msg__text">Подскажите адрес и удобное время — запишу вас на сегодня.</p>
+              <span class="msg__meta">
+                11:44
+                <i class="msg__status" title="Доставлено">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </i>
+              </span>
+            </div>
+          </div>
+
+          <div class="msg msg--in">
+            <div class="msg__avatar"><span class="client-avatar client-avatar--32 av1">ВШ</span></div>
+            <div class="msg__bubble">
+              <p class="msg__text">Челябинск, Садовая 104, квартира 27. Можно после 16:00?</p>
+              <span class="msg__meta">11:51</span>
+            </div>
+          </div>
+
+          <div class="msg msg--out">
+            <div class="msg__bubble">
+              <p class="msg__text">Записал на сегодня с 16 до 18. Мастер позвонит за полчаса до выезда.</p>
+              <span class="msg__meta">
+                11:52
+                <i class="msg__status" title="Доставлено">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </i>
+              </span>
+            </div>
+          </div>
+
+          <div class="msg msg--events">
+            <span class="thread-events__toggle">
+              История статусов: 4 события
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+
+          <div class="msg msg--in">
+            <div class="msg__avatar"><span class="client-avatar client-avatar--32 av1">ВШ</span></div>
+            <div class="msg__bubble">
+              <p class="msg__text">Хорошо, жду. Только домофон не работает, наберите на телефон.</p>
+              <span class="msg__meta">12:49</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="composer">
+        <div class="composer__field">
+          <div class="composer__input">Напишите сообщение…</div>
+          <div class="composer__tools">
+            <span class="composer__tool" title="Быстрые ответы · /">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+            <span class="composer__tool" title="Прикрепить файл">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </span>
+            <span class="composer__spacer"></span>
+            <span class="composer__send" title="Отправить сообщение">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="composer__footer">
+          <div class="composer__modes">
+            <span class="composer__mode" data-active>Сообщение</span>
+            <span class="composer__mode">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Заметка
+            </span>
+          </div>
+          <span class="composer__hint">
+            <kbd>Enter</kbd> — отправить · <kbd>Shift+Enter</kbd> — перенос · <kbd>Ctrl+D</kbd> — закрыть диалог
+          </span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═══════════════════════════════════ КАРТОЧКА КЛИЕНТА ══════════ -->
+    <aside class="client-card">
+
+      <section class="card-section">
+        <h3 class="card-section__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Клиент
+        </h3>
+
+        <span class="card-name__trigger card-section__name">Вера Шатилова</span>
+
+        <div class="card-tags">
+          <span class="card-tag">★ 4.8 · на Авито</span>
+        </div>
+
+        <div class="card-phone">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a class="card-phone__value" href="tel:+79125550177">+7 912 555-01-77</a>
+          <span class="card-phone__copy" title="Скопировать телефон">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </span>
+          <span class="card-phone__source">(из диалога)</span>
+        </div>
+
+        <div class="card-line">Писал ещё на канал: Дамир</div>
+
+        <div class="card-avito-id">
+          <div class="card-idline">
+            <span class="card-idline__value">ID 37150482</span>
+            <span class="card-idline__hint" title="Профиль Авито ещё не отдал ссылку — спрашиваем">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </span>
+            <span class="card-phone__copy" title="Скопировать идентификатор клиента на Авито">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="card-client-history">
+          <div class="card-line">Обращений: 3, включая это</div>
+          <ul class="card-history">
+            <li>
+              <div class="card-history__row">
+                <span class="card-history__title lc-truncate">Ремонт стиральных машин на дому</span>
+                <span class="card-history__meta lc-truncate">Закрыт · 14 июля · Дамир · Ефим Кочетов</span>
+              </div>
+            </li>
+            <li>
+              <div class="card-history__row">
+                <span class="card-history__title lc-truncate">Ремонт посудомоечных машин</span>
+                <span class="card-history__meta lc-truncate">Закрыт · 2 марта · Тимофей · Филипп Зубарев</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <h3 class="card-section__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Заявка
+        </h3>
+        <div class="card-line">Ремонт стиральных машин на дому</div>
+        <div class="card-line--sub">от 1 500 ₽ · Челябинск · 14:49 у клиента</div>
+        <a class="card-link" href="#">Открыть на Авито →</a>
+      </section>
+
+      <section class="card-section">
+        <h3 class="card-section__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Ход диалога
+        </h3>
+
+        <div class="card-field">
+          <span class="card-field__label">Статус</span>
+          <span class="card-select">
+            В работе
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+          <span class="card-note">Уже 1 ч 11 мин</span>
+        </div>
+
+        <div class="card-field">
+          <span class="card-field__label">Ответственный</span>
+          <span class="card-select">
+            Вы
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+
+        <div class="card-field">
+          <span class="card-field__label">Позваны</span>
+          <ul class="card-participants">
+            <li class="card-participant">
+              Ефим Кочетов
+              <span class="card-participant__remove" title="Убрать Ефима Кочетова">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m18 6-12 12"/><path d="m6 6 12 12"/></svg>
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-notes-row">
+          <div class="card-notes-head">
+            <span class="card-notes-toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Заметки (1)
+            </span>
+            <span class="btn-subtle">Добавить</span>
+          </div>
+          <ul class="card-notes">
+            <li class="card-notes__item">
+              <span>Звонил в 12:10, не берёт трубку — написал в чат</span>
+              <span class="card-notes__meta">Ефим Кочетов</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </aside>
+
+  </div>
+
+  <p class="legend">
+    <b>Состояние читается цветом и формой, а не подписью.</b> Ячейка времени работает шкалой: до пяти
+    минут только цифра, дальше заливка растёт снизу и на пятнадцатой минуте занимает ячейку целиком —
+    срочность видно боковым зрением, до чтения. Полоса слева одна на строку и берёт самый срочный
+    повод: красная — брошенный, недовольный или недоставленный, янтарная — клиент ждёт. Отвеченная
+    строка гаснет: работа сделана, смотреть не на что. Чип на строке ровно один, иначе он съедает
+    превью, ради которого строку и читают. Числа набраны моноширинными цифрами, чтобы столбец
+    ожидания сравнивался взглядом.
+  </p>
+
+</div>

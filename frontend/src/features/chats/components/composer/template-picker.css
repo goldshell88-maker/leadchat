@@ -1,0 +1,161 @@
+/* Пикер быстрых ответов (11 §3.1): всплывает над композером. */
+
+.tpl-popover {
+  position: absolute;
+  left: var(--lc-space-4);
+  right: var(--lc-space-4);
+  bottom: calc(100% - var(--lc-space-2));
+  max-width: 520px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  /*
+   * ⚠ ВЫСОТА ПО ЭКРАНУ, А НЕ 340 px (замер 03.09). В библиотеке 64 заготовки,
+   * а в окно помещалось пять строк — содержимое в десять раз выше видимой
+   * части. `70vh` даёт втрое больше строк на обычном мониторе и не вылезает за
+   * край на ноутбуке; потолок в 560 px нужен, чтобы попап не занял весь экран
+   * там, где он высокий.
+   */
+  max-height: min(70vh, 560px);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-bg-0);
+  box-shadow: var(--lc-shadow-2);
+  overflow: hidden;
+}
+
+.tpl-popover__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.tpl-popover__search {
+  height: 32px;
+  padding: 0 var(--lc-space-3);
+  border: 1px solid var(--lc-border-strong);
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-bg-0);
+  color: var(--lc-text-1);
+  font: inherit;
+  font-size: var(--lc-fz-body);
+}
+
+.tpl-popover__search:focus-visible {
+  outline: none;
+  border-color: var(--lc-focus-border);
+  box-shadow: 0 0 0 3px var(--lc-focus-ring);
+}
+
+.tpl-popover__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--lc-space-1) 0;
+}
+
+.tpl-popover__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-4);
+}
+
+.tpl-group__label {
+  padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-0);
+  font-size: var(--lc-fz-caption);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--lc-text-3);
+  text-transform: uppercase;
+}
+
+.tpl-row {
+  display: flex;
+  gap: var(--lc-space-3);
+  width: 100%;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--lc-fz-body);
+}
+
+.tpl-row[data-active="true"] {
+  background: var(--lc-primary-subtle);
+}
+
+/*
+ * ⚠ 190, А НЕ 140 — ПОД САМОЕ ДЛИННОЕ НАЗВАНИЕ (замер на бою 29.08).
+ *
+ * Колонка стояла 140 px, а четыре из тридцати девяти общих заготовок просят
+ * 164–180: «Наберу через пару минут», «Дистанционно не скажу», «Подъеду и
+ * сориентирую», «Сориентирую на месте». Многоточие здесь живое, обрыв видно,
+ * — но прочитать название всё равно было негде, а по названию заготовку и
+ * выбирают. 190 покрывает замеренный максимум с запасом в 10 px.
+ *
+ * Колонка остаётся ЖЁСТКОЙ, а не растущей: одинаковая ширина у всех строк —
+ * то, ради чего список читается сверху вниз одним движением глаза. Отдать
+ * ширину под содержимое значит рассыпать колонку. Отнятые у превью ответа
+ * 50 px не потеря: превью обрезано по смыслу, название — нет.
+ */
+.tpl-row__title {
+  flex: none;
+  width: 190px;
+  font-weight: 600;
+  color: var(--lc-text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl-row__body {
+  flex: 1;
+  min-width: 0;
+  color: var(--lc-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl-popover__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+  /* ⚠ ПЯТЫЙ СЛУЧАЙ ОДНОГО И ТОГО ЖЕ ДЕФЕКТА (разбор дизайна 28.08).
+     Механизм разобран у `.card-merge__row .lc-btn` и заперт сторожем
+     test/buttonNoShrink.test.ts: у Mantine-кнопки на корне `overflow: hidden`,
+     он обнуляет её автоминимум, подпись внутри режется посреди буквы без
+     многоточия. Здесь подсказка расползалась на три строки, а «Управлять
+     шаблонами» срезалось. Перенос + пол кнопке. */
+  flex-wrap: wrap;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border-top: 1px solid var(--lc-border);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+/* Кнопка подвала не сжимается — см. довод у `.tpl-popover__foot` выше. */
+.tpl-popover__foot .lc-btn {
+  flex: none;
+}
+
+/*
+ * ⚠ ЗАГОЛОВОК ГРУППЫ ЛИПНЕТ К ВЕРХУ СПИСКА (разбор 03.09).
+ *
+ * Прокрутка списка — 2328 px при видимом окне в треть экрана. Заголовки
+ * уезжали вверх вместе с содержимым, и на середине прокрутки было не понять, в
+ * какой папке находишься: строки называются коротко («В городе», «Фото»), а
+ * область у них общая.
+ */
+.tpl-group__label {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--lc-bg-0);
+}

@@ -1,0 +1,550 @@
+<!-- @dsCard group="Настройки" -->
+<meta charset="utf-8">
+<title>Люди и каналы</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    color-scheme: dark;
+
+    /* §1.1 нейтральная шкала */
+    --lc-slate-500: #64748b;
+
+    /* §1.4 единый акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-ink-on-accent: #04160a;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* §3 границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+
+    /* §3.2 текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+
+    /* §3.3 роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-focus-border: var(--lc-a-500);
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-pill: 999px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-md: 40px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+
+    /* §2.5 движение, §2.7 прозрачности */
+    --lc-dur-fast: 150ms;
+    --lc-ease: cubic-bezier(0.2, 0, 0, 1);
+    --lc-opacity-disabled: 0.45;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-0);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════════════════ каркас /settings/* (settings.css) ══════════════ */
+
+  .screen {
+    width: 1600px;
+    display: flex;
+    background: var(--lc-bg-0);
+  }
+
+  .nav {
+    width: 220px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--lc-space-4) var(--lc-space-2);
+    border-right: 1px solid var(--lc-border);
+    background: var(--lc-bg-1);
+  }
+
+  .nav a {
+    padding: 8px 12px;
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-text-2);
+    text-decoration: none;
+    font-size: var(--lc-fz-body);
+  }
+
+  .nav a.on {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-4) var(--lc-space-5) var(--lc-space-5);
+  }
+
+  /* ═════════════════════════ шапка решётки ════════════════════════════ */
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+  }
+
+  .field {
+    width: 200px;
+    height: var(--lc-btn-h-md);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--lc-space-3);
+    border: 1px solid var(--lc-border-strong);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-raise);
+    color: var(--lc-slate-500);
+  }
+
+  .scale {
+    margin-inline-start: auto;
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .save {
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-btn-px-md);
+    border: 0;
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+    font: inherit;
+    font-weight: var(--lc-fw-semibold);
+    font-variant-numeric: var(--lc-num);
+    cursor: pointer;
+  }
+
+  /* ═════════════════════════ рамка прокрутки ══════════════════════════ */
+
+  .scroll {
+    height: 620px;
+    overflow: auto;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-surface);
+  }
+
+  .scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+  .scroll::-webkit-scrollbar-corner { background: transparent; }
+  .scroll::-webkit-scrollbar-thumb {
+    background: var(--lc-line-strong);
+    border-radius: var(--lc-radius-pill);
+  }
+
+  .grid {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--lc-fz-body);
+  }
+
+  /* ─────────────────────────── липкая шапка ─────────────────────────── */
+
+  .grid thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    width: 38px;
+    min-width: 38px;
+    max-width: 38px;
+    padding: var(--lc-space-2) 0 var(--lc-space-1);
+    background: var(--lc-surface);
+    border-bottom: 1px solid var(--lc-border);
+    vertical-align: bottom;
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+  }
+
+  /* Подпись канала снизу вверх: единственный способ показать полное
+     «Стас КП · B81» в колонке шириной с галочку. */
+  .grid thead span {
+    display: inline-block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    max-height: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--lc-fz-caption);
+    line-height: 1.1;
+    cursor: pointer;
+  }
+
+  .grid thead th:hover span,
+  .grid thead th.hovh span { color: var(--lc-text-1); }
+
+  .grid thead th.corner {
+    position: sticky;
+    left: 0;
+    /* Угол перекрывает и шапку, и колонку имён — значит слой выше обеих. */
+    z-index: 4;
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    padding: var(--lc-space-2) var(--lc-space-3);
+    text-align: start;
+    border-inline-end: 1px solid var(--lc-border);
+  }
+
+  /* Черта каждые пять колонок: без неё в ряду одинаковых галочек глаз
+     теряет место. */
+  .grid th.f,
+  .grid td.f { border-inline-end: 1px solid var(--lc-border); }
+
+  /* ────────────────────── липкая колонка имён ───────────────────────── */
+
+  .grid tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    padding: var(--lc-space-2) var(--lc-space-3);
+    background: var(--lc-surface);
+    border-inline-end: 1px solid var(--lc-border);
+    border-bottom: 1px solid var(--lc-border);
+    text-align: start;
+    font-weight: var(--lc-fw-medium);
+    display: flex;
+    align-items: baseline;
+    gap: var(--lc-space-2);
+  }
+
+  .p {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--lc-text-1);
+  }
+
+  .s {
+    flex: none;
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    font-variant-numeric: var(--lc-num);
+    white-space: nowrap;
+  }
+
+  /* Тронутая строка помечена акцентом по краю липкой колонки: иначе три
+     правки из тысячи двухсот ячеек ищешь прокруткой вбок, а «Сохранить (3)»
+     называет число, которого на экране не найти. Метка на КРАЮ, а не на
+     подписи: подпись у одних строк «31 из 34», у других «Не ведёт диалоги», и
+     красить оба смысла одним зелёным нельзя. */
+  .grid tbody tr.edited th { box-shadow: inset 3px 0 0 var(--lc-primary); }
+
+  .rb {
+    flex: none;
+    padding: 2px 8px;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-pill);
+    background: transparent;
+    color: var(--lc-text-2);
+    font: inherit;
+    font-size: var(--lc-fz-micro);
+    cursor: pointer;
+    /* Проступает под курсором по строке: тридцать пять кнопок подряд в покое
+       превращают колонку имён в частокол. */
+    opacity: 0;
+    transition: opacity var(--lc-dur-fast) var(--lc-ease);
+  }
+
+  .grid tbody tr:hover .rb,
+  .grid tbody tr.hov .rb { opacity: 1; }
+
+  /* Кто не может вести каналы — строка утоплена на панель: видно без чтения
+     подписи, а его галочки снять можно. */
+  .grid tbody tr.off th,
+  .grid tbody tr.off td { background: var(--lc-bg-1); }
+  .grid tbody tr.off .p { color: var(--lc-text-3); }
+
+  /* ──────────────────────────── ячейки ──────────────────────────────── */
+
+  .grid td {
+    position: relative;
+    width: 38px;
+    min-width: 38px;
+    max-width: 38px;
+    height: 38px;
+    padding: 0;
+    border-bottom: 1px solid var(--lc-border);
+    cursor: pointer;
+  }
+
+  /* Галочка: цель нажатия — вся ячейка, а не восемнадцать пикселей
+     посередине. */
+  .grid td::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 1px solid var(--lc-border-strong);
+    border-radius: var(--lc-radius-xs);
+  }
+
+  /* Заливка тихая, а не фирменная: назначено 29,7 канала из 34, то есть
+     галочка — это НОРМА, и тысяча двести ярких пятен закрашивают собой и
+     черту каждой пятой колонки, и перекрестье, и непринятую правку. Самый
+     громкий зелёный остаётся тому, что надо заметить. */
+  .grid td.k::before {
+    background: var(--lc-a-800);
+    border-color: var(--lc-a-700);
+  }
+
+  .grid td.k::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 9px;
+    margin: -6px 0 0 -3px;
+    border: solid var(--lc-a-300);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .grid td.d { cursor: default; }
+  .grid td.d::before { opacity: var(--lc-opacity-disabled); }
+
+  /* ПЕРЕКРЕСТЬЕ. Строку подсвечивает :hover, колонку — полоса заведомо выше
+     таблицы, которую обрезает рамка прокрутки.
+
+     ⚠ ПОЛОСА ЛЕЖИТ НАД ФОНОМ, А НЕ ПОД НИМ. При `z-index: -1` она уходит за
+     непрозрачный фон самой рамки прокрутки и не видна вовсе; поэтому слой 0,
+     а галочки подняты на 1 и остаются поверх.
+
+     ⚠ ЗАЛИВКА ПОЛУПРОЗРАЧНАЯ И АКЦЕНТНАЯ. Нейтральное наведение отличается от
+     поверхности на 1.13 — на полосе в тридцать четыре ячейки такую разницу не
+     видно, а полупрозрачность не гасит кольцо непринятой правки под собой. */
+  .grid td i {
+    position: absolute;
+    z-index: 0;
+    inset-inline: 0;
+    top: -100vh;
+    height: 300vh;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .grid td:hover i,
+  .grid td.hov i { background: color-mix(in srgb, var(--lc-primary) 8%, transparent); }
+
+  .grid tbody tr:hover th,
+  .grid tbody tr:hover td,
+  .grid tbody tr.hov th,
+  .grid tbody tr.hov td {
+    /* Липкой колонке имён нужна НЕПРОЗРАЧНАЯ заливка: сквозь полупрозрачную
+       под ней поедут ячейки. */
+    background: color-mix(in srgb, var(--lc-primary) 8%, var(--lc-surface));
+  }
+
+  /* Непринятая правка видна до сохранения: иначе «Сохранить (3)» называет
+     число, которого на экране не найти. */
+  .grid td.ch,
+  .grid tbody tr:hover td.ch,
+  .grid tbody tr.hov td.ch,
+  .grid tbody tr.off td.ch {
+    background: var(--lc-selected);
+    box-shadow: inset 0 0 0 1px var(--lc-primary);
+  }
+</style>
+
+<div class="screen">
+  <nav class="nav">
+    <a href="#">Аккаунты Авито</a>
+    <a href="#" class="on">Люди и каналы</a>
+    <a href="#">Быстрые ответы</a>
+    <a href="#">Боты</a>
+    <a href="#">Лид-бот</a>
+    <a href="#">Автозаявки</a>
+    <a href="#">Распределение</a>
+    <a href="#">Команда</a>
+    <a href="#">Профиль</a>
+  </nav>
+
+  <div class="content">
+    <div class="head">
+      <div class="field">Сотрудник</div>
+      <div class="field">Канал</div>
+      <div class="scale">35 × 34</div>
+      <button class="save">Сохранить (3)</button>
+    </div>
+
+    <div class="scroll">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th class="corner">Сотрудник</th>
+            <th><span>Александр БТ · B81</span></th>
+            <th><span>Александр КП · B81</span></th>
+            <th><span>Александр МНЧ · B81</span></th>
+            <th><span>Анатолий БТ · A45</span></th>
+            <th class="f"><span>Анатолий КП · A45</span></th>
+            <th><span>Андрей КП · C78</span></th>
+            <th><span>Аркадий МНЧ · B81</span></th>
+            <th class="hovh"><span>Борис КП · A45</span></th>
+            <th><span>Валерий БТ · C78</span></th>
+            <th class="f"><span>Валерий КП · C78</span></th>
+            <th><span>Виталий МНЧ · A45</span></th>
+            <th><span>Владимир КП · B81</span></th>
+            <th><span>Геннадий БТ · A45</span></th>
+            <th><span>Григорий КП · C78</span></th>
+            <th class="f"><span>Денис МНЧ · B81</span></th>
+            <th><span>Егор КП · A45</span></th>
+            <th><span>Иван БТ · C78</span></th>
+            <th><span>Игнат КП · B81</span></th>
+            <th><span>Кирилл МНЧ · A45</span></th>
+            <th class="f"><span>Константин КП · C78</span></th>
+            <th><span>Максим БТ · B81</span></th>
+            <th><span>Матвей КП · A45</span></th>
+            <th><span>Михаил МНЧ · C78</span></th>
+            <th><span>Никита КП · B81</span></th>
+            <th class="f"><span>Олег БТ · A45</span></th>
+            <th><span>Павел КП · C78</span></th>
+            <th><span>Роман МНЧ · B81</span></th>
+            <th><span>Сергей КП · A45</span></th>
+            <th><span>Стас КП · B81</span></th>
+            <th class="f"><span>Тимур БТ · C78</span></th>
+            <th><span>Фёдор КП · A45</span></th>
+            <th><span>Эдуард МНЧ · B81</span></th>
+            <th><span>Юрий КП · C78</span></th>
+            <th><span>Ярослав БТ · A45</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="p">Антон Белозёров</span><span class="s">31 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Арина Щеглова</span><span class="s">34 из 34</span><button class="rb">нигде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Вероника Лыкова</span><span class="s">29 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Глеб Овчинников</span><span class="s">33 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Диана Рябинина</span><span class="s">30 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Елена Чистякова</span><span class="s">32 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr class="off edited">
+            <th><span class="p">Захар Субботин</span><span class="s">Не ведёт диалоги</span><button class="rb">везде</button></th>
+            <td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="k"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="ch"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="k"><i></i></td><td class="d"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d f"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td><td class="d"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Инна Тетерина</span><span class="s">28 из 34</span><button class="rb">везде</button></th>
+            <td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Лев Гончаренко</span><span class="s">34 из 34</span><button class="rb">нигде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr class="edited">
+            <th><span class="p">Лидия Уварова</span><span class="s">31 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k ch f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k ch"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr class="hov">
+            <th><span class="p">Любовь Гаврилова</span><span class="s">30 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k hov"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Руслан Кудинов</span><span class="s">33 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+          <tr>
+            <th><span class="p">Софья Лобанова</span><span class="s">29 из 34</span><button class="rb">везде</button></th>
+            <td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td><i></i></td><td class="k"><i></i></td><td class="k f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="f"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td><td class="k"><i></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

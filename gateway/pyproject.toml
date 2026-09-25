@@ -1,0 +1,26 @@
+[project]
+name = "leadchat-gateway"
+version = "0.1.0"
+description = "Шлюз внешних API LeadChat: ключи, сеть и разбор ответов провайдеров живут здесь, на Амстердаме (docs/46)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.4",
+    "structlog>=24.1",
+    "anthropic>=0.40",
+]
+
+# На Амстердам едет исходник (rsync + venv + pip -r requirements.txt), колёса
+# не собираются. Точные версии — в requirements.txt, они же стоят в uv.lock
+# корня: тесты шлюза гоняются корневым окружением LeadChat.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+ignore = ["B008"]

@@ -1,0 +1,193 @@
+/* UI Kit — каталог системы (docs/16-DESIGN-SYSTEM-2026.md §8). */
+
+.uikit {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--lc-space-6) var(--lc-space-5) var(--lc-space-9);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-6);
+}
+
+.uikit__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lc-space-4);
+  flex-wrap: wrap;
+}
+
+.uikit__h1 {
+  margin: 0;
+  font-size: var(--lc-fz-page);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.uikit__h2 {
+  margin: 0;
+  font-size: var(--lc-fz-section);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.uikit__note {
+  margin: 0;
+  font-size: var(--lc-fz-caption);
+  line-height: var(--lc-lh-body);
+  color: var(--lc-text-2);
+  max-width: 70ch;
+}
+
+.uikit__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-3);
+  padding: var(--lc-space-5);
+  background: var(--lc-bg-0);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+}
+
+.uikit__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lc-space-4);
+  padding: var(--lc-space-2) 0;
+  border-top: 1px dashed var(--lc-border);
+}
+
+.uikit__label {
+  flex: none;
+  width: 120px;
+  padding-top: 6px;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.uikit__row-items {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lc-space-3);
+  min-width: 0;
+}
+
+/* --- цвета --- */
+
+.uikit__swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+.uikit__chipcolor {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--lc-radius-sm);
+  border: 1px solid var(--lc-border);
+  flex: none;
+}
+
+.uikit code {
+  font-family: var(--lc-font-mono);
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+/* --- форма --- */
+
+.uikit__box {
+  width: 72px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+.uikit__spacer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+.uikit__spacer span {
+  display: block;
+  height: 20px;
+  background: var(--lc-primary);
+  /* ⚠ 2px — ФОРМА ДАННЫХ, А НЕ ЭЛЕМЕНТА. Столбик/ячейка величиной в несколько
+     пикселей: возьми радиус из шкалы (6 и больше) — и столбик превратится в
+     таблетку, у которой не видно высоты, то есть самой величины. */
+  border-radius: var(--lc-radius-mark);
+}
+
+/* --- демонстрации компонентов --- */
+
+/* Список карточек живёт в контейнере шириной с настоящую колонку: карточка
+   рассчитана на 340px, и на всю ширину страницы она выглядела бы не так,
+   как выглядит в работе. */
+/*
+ * ВИТРИНА ПОКАЗЫВАЕТ РОВНО ТО, ЧТО РИСУЕТ ПРОДУКТ. Здесь стоял радиус 12 там,
+ * где живые `.chat-list-pane` и `.chat-thread-pane` рисуются 16-м. Витрина —
+ * место, по которому систему СВЕРЯЮТ; расходясь с продуктом на шаг радиуса,
+ * она превращается из эталона в ещё один источник разнобоя.
+ */
+.uikit__list {
+  width: 340px;
+  max-width: 100%;
+  padding: var(--lc-space-2) 0;
+  background: var(--lc-bg-0);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+}
+
+.uikit__list > * {
+  margin-bottom: 6px;
+}
+
+.uikit__thread {
+  display: flex;
+  flex-direction: column;
+  padding: var(--lc-space-4);
+  background: var(--lc-bg-0);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+}
+
+.uikit__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--lc-space-3);
+}
+
+.uikit__card {
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+}
+
+.uikit__icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--lc-space-3);
+}
+
+.uikit__icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-3) var(--lc-space-1);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  color: var(--lc-text-1);
+  text-align: center;
+}

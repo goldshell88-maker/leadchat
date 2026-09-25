@@ -1,0 +1,1035 @@
+/*
+ * ЛЕВАЯ КОЛОНКА — список диалогов (docs/16-DESIGN-SYSTEM-2026.md §4.3).
+ *
+ * Строки стали карточками. Плотность при этом почти не упала: 84px против 76
+ * — восемь пикселей за отделённость и место под быстрые действия. Дальше
+ * «воздуха» добавлять нельзя: у оператора в смену перед глазами сотни строк,
+ * и каждая лишняя двадцатка пикселей — это минус одна строка на экране.
+ *
+ * ВЫСОТА СТРОКИ ЖЁСТКО СВЯЗАНА С ChatListPane.ROW_HEIGHT (84).
+ * Список виртуализирован: карточка 78 + зазор 6. Меняя одно — меняйте оба,
+ * иначе строки наедут друг на друга.
+ */
+
+.chat-list-pane {
+  /*
+   * ⚠ ЗАЗОР СТРОК ЖИВЁТ ПАРОЙ С ChatListPane.ROW_HEIGHT (84) И ПОТОМУ ИМЕНОВАН,
+   * А НЕ ВПИСАН ЧИСЛОМ. 84 − 78 (высота карточки) = 6; на шкале --lc-space-*
+   * шестёрки нет и заводить её нельзя — это не ступень воздуха, а остаток
+   * арифметики виртуализации. Имя здесь затем, чтобы то же число в верхнем поле
+   * ленты и у скелетона перестало быть тремя независимыми шестёрками.
+   */
+  --lc-row-gap: 6px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  background: var(--lc-bg-0);
+  border-radius: var(--lc-radius-lg);
+  border: 1px solid var(--lc-border);
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------- шапка -- */
+
+.chat-list-pane__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-3);
+  /* ⚠ БОКОВОЕ ПОЛЕ 16, А НЕ 12 — ЭТО ЛЕВАЯ ВЕРТИКАЛЬ ВСЕГО КАДРА (огранка 08.09).
+     Замер до правки: «Чаты», поиск и вкладки стояли на 13px от края колонки
+     (1 рамка панели + 12), аватар строки — на 22, имя в шапке ленты — на 17.
+     Три вертикали в одном кадре. Шестнадцать здесь и 8 внутри строки ниже
+     дают обеим ровно 17 — ту же, что у ленты. */
+  padding: var(--lc-space-4) var(--lc-space-4) var(--lc-space-3);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.chat-list-pane__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+}
+
+/* Тот же токен, что у шапки остальных разделов: заголовок здесь —
+   единственное название экрана, а не подпись колонки. */
+.chat-list-pane__title h1 {
+  margin: 0;
+  font-size: var(--lc-fz-page);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+  letter-spacing: -0.01em;
+}
+
+
+/*
+ * ПАНЕЛЬ ФИЛЬТРОВ — БЛОК В ПОТОКЕ КОЛОНКИ, А НЕ СЛОЙ ПОВЕРХ НЕЁ.
+ *
+ * Заявка владельца №6: панель вылезала за колонку и накрывала список. Её
+ * чинили шириной поповера, и не помогло — поповер по устройству живёт вне
+ * потока. Теперь кнопка и поля лежат обычным блоком в шапке: открытая панель
+ * СДВИГАЕТ список вниз, а не закрывает его собой.
+ */
+/*
+ * ⚠ ОДНА СТРОКА НА ВСЮ ШАПКУ СПИСКА: ВКЛАДКИ, ДОЛГ, ФИЛЬТР (просьба владельца
+ * 04.09 со скриншотом-образцом: «сделай по аналогии в одну строчку, а не как
+ * сейчас»).
+ *
+ * Было два ряда: вкладки в одном, долг и кнопка «Фильтры» — в следующем. В
+ * колонке 340 пикселей второй ряд контролов отнимает у списка высоту целой
+ * строки диалога.
+ *
+ * ⚠ ПЕРЕНОС ОСТАВЛЕН ЗАПАСНЫМ ВЫХОДОМ, А НЕ НОРМОЙ. При трёхзначных счётчиках
+ * («Входящие 128», «Мои 411») ряд лучше разложить на две строки, чем обрезать:
+ * обрезанное число врёт, а перенесённое — просто занимает место.
+ */
+/*
+ * Строка поиска: поле во всю ширину, значок сужений справа от него.
+ *
+ * ⚠ ПОЧЕМУ СУЖЕНИЯ ЗДЕСЬ, А НЕ У ВКЛАДОК (05.09). В ряду вкладок они
+ * помещались с запасом в четыре пикселя — это везение, а не раскладка:
+ * трёхзначный счётчик, поднятая шкала на большом мониторе или системное
+ * увеличение шрифта съедают его целиком, и ряд переносится. Владелец прислал
+ * скриншот этого дважды. У поля поиска запас есть всегда: оно тянется.
+ */
+.chat-list-pane__seek {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+}
+
+.chat-list-pane__search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-list-pane__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  flex-wrap: wrap;
+}
+
+/*
+ * Поля — СТОЛБИКОМ, каждое во всю ширину.
+ *
+ * Рядом с переносом они стояли, пока их было три и панель висела поповером.
+ * В колонке 340 пикселей на поле приходилось по 99, и «Менеджер: все» не
+ * помещался в собственное поле. Полей осталось два (канал и метка), места
+ * для ряда всё равно не хватает, а столбик даёт каждому полную ширину и
+ * читается сверху вниз — как и всё остальное в колонке.
+ */
+.chat-list-pane__filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  width: 100%;
+}
+
+.chat-list-pane__filters > * {
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * `.chat-list-pane__counts`, `.chat-list-pane__count` и
+ * `.chat-list-pane__count-note` удалены 12 августа вместе со счётчиком у
+ * заголовка: при открытой очереди он показывал ровно то же число, что бейдж
+ * таба «Входящие» и бейдж иконки раздела в рельсе, а пунктирный чип «кроме
+ * закрытых» объяснял цифру, которую вернее было убрать. Разбор владельца —
+ * в ChatListPane.tsx над заголовком.
+ */
+
+/* ------------------------------------------------------- вкладки-чипы -- */
+
+.chat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lc-space-1);
+  transition: opacity var(--lc-motion-fast);
+}
+
+/*
+ * Во время поиска вкладки приглушаются — ищем по всем диалогам сразу.
+ *
+ * Гасим ТОЛЬКО подписи, а не всё поддерево. Прозрачность на контейнере
+ * создавала групповую композицию и роняла заодно счётчики: красный бейдж
+ * очереди уходил на 2.49:1. Вкладки при этом остаются кликабельными, то есть
+ * это приглушение, а не запрет, — и число ждущих обращений гасить нельзя.
+ */
+.chat-tabs[data-dimmed] .chat-tabs__tab {
+  color: var(--lc-text-3);
+}
+
+/*
+ * КАПСУЛА ОСТАЁТСЯ, ВЫСОТА БЕРЁТСЯ ИЗ ШКАЛЫ. Форма здесь работает: это не
+ * кнопка-действие, а положение переключателя, и круглые края честно говорят
+ * «выбери одно из». Высота же к смыслу отношения не имеет — 30 против 32 у
+ * соседей по ряду были случайностью.
+ */
+.chat-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  height: var(--lc-btn-h-sm);
+  /* ⚠ УЗКОЕ ПОЛЕ, А НЕ СРЕДНЕЕ (04.09). В ряду четыре жильца, а колонка 340:
+     на средних полях (16) ряд не помещался и переносил значок сужений на
+     вторую строку — ровно то, что владелец прислал скриншотом. Шестнадцать
+     против двенадцати это двадцать четыре пикселя на трёх вкладках. */
+  padding: 0 var(--lc-btn-px-sm);
+  border: 1px solid transparent;
+  border-radius: var(--lc-radius-pill);
+  background: transparent;
+  color: var(--lc-text-2);
+  font-family: inherit;
+  font-size: var(--lc-fz-note);
+  font-weight: var(--lc-fw-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease),
+    border-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.chat-tabs__tab:hover {
+  background: var(--lc-surface-hover);
+  color: var(--lc-text-1);
+}
+
+.chat-tabs__tab[data-active] {
+  background: var(--lc-selected);
+  border-color: var(--lc-primary);
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-semibold);
+}
+
+.chat-tabs__count {
+  min-width: 18px;
+  height: 20px;
+  /* Одна величина на оба счётчика кадра: здесь было 5, у непрочитанных — 6,
+     при одинаковой роли и одинаковой пилюле. Обе на ступень шкалы. */
+  padding: 0 var(--lc-space-1);
+  border-radius: var(--lc-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lc-unread-bg);
+  color: var(--lc-unread-text);
+  font-size: var(--lc-fz-micro);
+  font-weight: var(--lc-fw-semibold);
+  line-height: 1;
+  font-variant-numeric: var(--lc-num);
+}
+
+/* Бейдж «Входящих» — красный: на одной панели два счётчика про разное
+   («сколько ждёт решения» и «сколько непрочитано»), и различать их надо
+   цветом, а не только положением. */
+.chat-tabs__count--queue {
+  background: var(--lc-danger-solid);
+  color: var(--lc-on-danger);
+}
+
+.chat-list-pane__found {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+}
+
+/*
+ * ЧИП НАЛОЖЕННОГО СУЖЕНИЯ — для того, чего в панели «Фильтры» нет.
+ *
+ * Сюда попадает только сужение, пришедшее ИЗВНЕ (переход «Диалоги ↗» из
+ * отчёта по сотрудникам). Поля панели чипов не получают: их видно и так, а
+ * второй способ показать одно и то же — ровно то, от чего уходили 12 августа.
+ *
+ * Тот же приём уже стоит на «Разборе диалогов» (массив `скрытыеСужения`), и
+ * здесь он решает ту же беду: список сужен, а сказать об этом нечем.
+ */
+.chat-list-pane__applied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lc-space-1);
+  max-width: 100%;
+}
+
+.chat-list-pane__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--lc-space-0) var(--lc-space-1) var(--lc-space-0) var(--lc-space-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-surface);
+  overflow: hidden;
+  /* ⚠ `text-overflow` ЗДЕСЬ НЕ РАБОТАЛ И ОБЕЩАЛ ТО, ЧЕГО НЕТ (разбор дизайна
+     28.08). На flex-контейнере он инертен: собственный текст становится
+     анонимным флекс-элементом, наследует `nowrap`, а его автоминимум равен всей
+     строке — сжаться не может, многоточия не бывает. Весь дефицит выдавливал
+     крестик за край чипа, и снять сужение было нечем. Обрезкой теперь занят
+     вложенный `__chip-label`, у него для этого есть собственная ширина. */
+  white-space: nowrap;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+}
+
+/* Подпись уступает место, крестик — нет: он единственный способ снять
+   сужение, и уехать за край он не имеет права. `min-width: 0` приходит из
+   `.lc-truncate`, там же обрезка многоточием. */
+.chat-list-pane__chip-label {
+  flex: 1 1 auto;
+}
+
+/*
+ * ⚠ КРЕСТИК — ЦЕЛЬ НАЖАТИЯ 24×24, А НЕ РАЗМЕР ЗНАЧКА (05.09).
+ *
+ * Значок 12 px, у Mantine `compact-xs` высота 18 — по значку такого размера
+ * промахиваются, а крестик здесь единственный способ снять сужение. До сегодня
+ * чипов было два и появлялись они редко; теперь чип есть у каждого включённого
+ * фильтра, и промах стал ежедневным. Минимум задаём кнопке, а не чипу: сам чип
+ * от этого не растёт, `padding` остаётся прежним.
+ */
+.chat-list-pane__chip > button {
+  flex: none;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+/* «Сбросить всё» — соседка чипов по строке, и переносится вместе с ними.
+   Та же высота цели нажатия: строка обязана быть однородной. */
+.chat-list-pane__applied-reset {
+  flex: none;
+  min-height: 24px;
+}
+
+/* --------------------------------------------------------------- лента -- */
+
+.chat-list-pane__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  /* Было 8 при зазоре между строками 6: первый зазор ленты на 2px больше
+     остальных, и верхняя строка «висела» ниже своей сетки. */
+  padding-top: var(--lc-row-gap);
+}
+
+/*
+ * Смена выборки: прежние строки на месте, но приглушены, пока едут новые
+ * (аудит 06.09: вкладка, фильтр и каждая буква поиска давали скелет на время
+ * «RTT + 39…115 мс»). Это состояние ЗАГРУЗКИ длиной в один ответ сервера, а не
+ * состояние покоя, — потому здесь прозрачность на контейнере допустима,
+ * вопреки правилу «гасим цветом» ниже: то правило про строки, которые
+ * остаются приглушёнными всю смену и обязаны читаться. Здесь же полсекунды
+ * спустя приедут новые строки в полной яркости.
+ */
+.chat-list-pane__scroll[data-placeholder] {
+  opacity: var(--lc-opacity-muted);
+  transition: opacity var(--lc-motion-fast);
+}
+
+.chat-list-pane__virtual {
+  position: relative;
+  width: 100%;
+}
+
+.chat-list-pane__virtual-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* ----------------------------------------------- карточка диалога 78px -- */
+
+.conv-card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: 78px;
+  margin: 0 var(--lc-space-2);
+  border-radius: var(--lc-radius-md);
+  /*
+   * ⚠ РАМКИ У СТРОКИ НЕТ ВОВСЕ — ЕЁ РИСУЕТ ВНУТРЕННЯЯ ТЕНЬ У ВЫБРАННОЙ (огранка
+   * 08.09). Здесь стояло `border: 1px solid transparent`: прозрачный пиксель
+   * ничего не рисовал в 39 строках из 40, но место занимал во всех, и аватар
+   * из-за него стоял на 18px от края колонки вместо 17 — на пиксель мимо
+   * вертикали заголовка. Тень места не занимает и рисуется поверх заливки.
+   */
+  border: none;
+  background: transparent;
+  /*
+   * Обрезка своим радиусом нужна янтарной ячейке: она прижата к правому краю
+   * строки (у `.conv-card__main` справа поля нет), и без неё её заливка вылезала
+   * бы за скруглённые углы. Скругление ячейке даёт строка — см. wait-gauge.css.
+   */
+  overflow: hidden;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    box-shadow var(--lc-dur-fast) var(--lc-ease);
+}
+
+/*
+ * ⚠ КОНТУР ВЫБРАННОЙ СТРОКИ — ОТДЕЛЬНЫМ СЛОЕМ ПОВЕРХ СОДЕРЖИМОГО, А НЕ ТЕНЬЮ
+ * САМОЙ СТРОКИ.
+ *
+ * `box-shadow: inset` рисуется НАД фоном, но ПОД детьми. Янтарная ячейка теперь
+ * прижата к правому краю строки и во всю её высоту — обычная внутренняя тень
+ * ушла бы под неё, и зелёная линия выбранного диалога рвалась бы на 48px справа.
+ * Прежний `border` этого не знал: рамка живёт снаружи поля и детьми не
+ * перекрывается. Слой возвращает ровно то поведение — контур один в один.
+ *
+ * Цвет прозрачный в покое, а не `display: none`: так остаётся переход, который
+ * раньше давал `border-color` в списке `transition` выше.
+ */
+.conv-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px transparent;
+  pointer-events: none;
+  transition: box-shadow var(--lc-dur-fast) var(--lc-ease);
+}
+
+.conv-card[data-active]::after {
+  box-shadow: inset 0 0 0 1px var(--lc-primary);
+}
+
+/* Полоса срочности. Внутри карточки, а не снаружи: приклеенная снаружи
+   полоска ломает скругление и «выпадает» из карточки при наведении. */
+.conv-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: var(--lc-radius-pill);
+  background: transparent;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    top var(--lc-dur-fast) var(--lc-ease),
+    bottom var(--lc-dur-fast) var(--lc-ease);
+}
+
+.conv-card[data-urgency="escalated"]::before,
+.conv-card[data-urgency="negative"]::before,
+.conv-card[data-urgency="undelivered"]::before {
+  background: var(--lc-danger);
+  top: 8px;
+  bottom: 8px;
+}
+
+.conv-card[data-urgency="waiting"]::before {
+  background: var(--lc-warning);
+}
+
+
+
+.conv-card:hover {
+  background: var(--lc-surface-hover);
+}
+
+/* Выбранный диалог: заливка, рамка И свечение. Три признака вместо одного —
+   потому что при наведении на соседа заливка у них становится похожей, а
+   оператор весь день отвечает в одном из сорока. */
+.conv-card[data-active] {
+  background: var(--lc-selected);
+  /* Ореол — на самой строке, зелёная линия — слоем `::after` выше: она обязана
+     лечь поверх янтарной ячейки, а не под неё. */
+  box-shadow: var(--lc-shadow-glow);
+}
+
+.conv-card__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-3);
+  /*
+   * ⚠ СЛЕВА 8, СПРАВА 0, И ОБА ЧИСЛА ОСМЫСЛЕННЫ (огранка 08.09).
+   * Слева: 8 (вылет карточки) + 8 = 16, плюс рамка панели = 17 от края колонки
+   * — та же вертикаль, что у заголовка «Чаты» и у имени в шапке ленты.
+   * Справа: янтарная ячейка — КОЛОНКА строки, а не виджет поверх неё, и обязана
+   * доходить до её края; скругление ей даёт сама строка (`overflow: hidden`).
+   * Прежние 12 справа держали ячейку на весу и заодно отнимали у превью 12px.
+   */
+  padding: 0 0 0 var(--lc-space-2);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--lc-text-1);
+}
+
+.conv-card__main:focus-visible {
+  outline: 2px solid var(--lc-focus-border);
+  outline-offset: -2px;
+  border-radius: var(--lc-radius-md);
+}
+
+/* -------------------------------------------------------------- аватар -- */
+
+.conv-card__avatar {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+
+.client-avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lc-radius-circle);
+  font-weight: var(--lc-fw-semibold);
+}
+
+/* Фото из Авито (15 августа). `object-fit: cover` обязателен: CDN отдаёт
+   квадрат, но полагаться на чужие пропорции нельзя — вытянутое лицо в кружке
+   читается как поломка. Рамка токеном — фото на белом фоне светлой темы
+   иначе сливается с карточкой. */
+.client-avatar--photo {
+  object-fit: cover;
+  border: 1px solid var(--lc-border);
+}
+
+/* Значок бота на аватаре. Обводка цветом карточки вырезает его из аватара —
+   без неё значок сливается с инициалами. */
+.conv-card__bot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-accent-solid);
+  color: var(--lc-on-accent);
+  box-shadow: 0 0 0 2px var(--lc-bg-0);
+}
+
+.conv-card[data-active] .conv-card__bot {
+  box-shadow: 0 0 0 2px var(--lc-selected);
+}
+
+/* --------------------------------------------------------------- текст -- */
+
+.conv-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* Было 3 — единственное место шкалы, где стояло нечётное число мимо неё. */
+  gap: var(--lc-space-1);
+}
+
+.conv-card__line1 {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  min-width: 0;
+}
+
+/*
+ * «ПЕРЕДАН ВАМ» — СИНИЙ, А НЕ ЯНТАРНЫЙ (разбор интерфейса 13.08).
+ *
+ * Значок стоял `--lc-warning` — тем же #f59e0b, что полоса срочности по левому краю
+ * этой же карточки и заливка шкалы ожидания у правого. Три янтарных предмета в строке
+ * высотой 78px, из них два про клиента, а один — про то, КАК диалог сюда попал.
+ *
+ * ⚠ ЧТО ИМЕННО ЭТО ЛОМАЛО. Шкала ожидания задумана как то, что читают боковым зрением
+ * ДО чтения цифры (WaitGauge: «заливку, растущую снизу вверх, видно боковым зрением,
+ * ещё до чтения»). Янтарная метка на строке со свежим клиентом попадала в тот же
+ * канал и подделывалась под ожидание — строка выглядела ждущей, не будучи ею.
+ *
+ * ⚠ ПОЧЕМУ НЕ СЕРЫЙ, КАК У БУЛАВКИ. У булавки записано: «тихая и серая, в отличие от
+ * янтарного „передан вам": это не событие, требующее реакции». Довод верен, и он же
+ * запрещает гасить флаг до серого: передача РЕАКЦИИ ТРЕБУЕТ — просто не той, что
+ * ожидание клиента. Поэтому не «тише», а В ДРУГОМ КАНАЛЕ: синий на этом экране
+ * свободен, за срочность не отвечает и со шкалой не спорит (ΔE к янтарю 38).
+ */
+.conv-card__flag {
+  flex: none;
+  color: var(--lc-info);
+  font-size: var(--lc-fz-note);
+}
+
+/* Булавка закрепления. Приглушённая намеренно — см. разметку строки. */
+.conv-card__pin {
+  flex: none;
+  color: var(--lc-text-4);
+  font-size: var(--lc-fz-note);
+}
+
+.conv-card__name {
+  flex: 1;
+  font-size: var(--lc-fz-body);
+  font-weight: var(--lc-fw-medium);
+  color: var(--lc-text-1);
+}
+
+.conv-card[data-unread] .conv-card__name {
+  font-weight: var(--lc-fw-semibold);
+}
+
+.conv-card__line2 {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.conv-card__line3 {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  min-width: 0;
+}
+
+/*
+ * ⚠ 13.08: ПРИОРИТЕТ ПЕРЕВЁРНУТ — УСТУПАЕТ ПРЕВЬЮ, А НЕ ЧИП.
+ *
+ * Здесь стояло обратное: «превью не сжимается чипом до многоточия… чип уступает
+ * первым», с полом `min-width: 96px`. Довод был верный — по превью оператор узнаёт
+ * диалог, не открывая, — но следствие оказалось хуже причины.
+ *
+ * Замер при окне 1440: телу строки достаётся 172px, а нужно 96 (пол превью) + 8 +
+ * 98 (чип) = 202. Лишнее не обрезалось и не переносилось, а ВЫЛЕЗАЛО НАРУЖУ и
+ * уходило под шкалу ожидания — пряталась самая дорогая метка списка,
+ * «не отправлено», то есть «ответ до клиента не дошёл».
+ *
+ * Дать уступить чипу тоже пробовал (проверено на живом экране): он сжимается до
+ * «не о…», и метка перестаёт что-либо значить. Разница в том, КАК эти двое
+ * деградируют. Превью — длинный свободный текст, оно теряет хвост и остаётся
+ * узнаваемым: «Вы: Ремонт холоди…». Чип — короткий ярлык фиксированной длины,
+ * обрезка убивает его целиком.
+ *
+ * Поэтому пол снят: превью сжимается до нуля и обрезается многоточием (`lc-truncate`
+ * на нём уже стоит), а чип показывается всегда и целиком.
+ */
+.conv-card__preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.conv-card[data-unread] .conv-card__preview {
+  color: var(--lc-text-1);
+}
+
+/* Служебное сообщение Авито в превью (дефект 12): видно, но тише переписки.
+   Ярче делать нельзя — уведомление площадки не требует ответа и не должно
+   соревноваться за внимание с ждущим клиентом в соседней строке. Курсив
+   отличает его от слов клиента и там, где цвет не читается (яркий свет,
+   монохромный монитор). */
+.conv-card__preview[data-source="avito"] {
+  font-style: italic;
+  color: var(--lc-text-3);
+}
+
+.conv-card[data-unread] .conv-card__preview[data-source="avito"] {
+  color: var(--lc-text-2);
+}
+
+/* ----------------------------------------------- ответил — строка гаснет -- */
+
+/*
+ * «ЗДЕСЬ Я СВОЮ РАБОТУ СДЕЛАЛ» (просьба владельца 30.08).
+ *
+ * ⚠ ГАСИМ ЦВЕТОМ, А НЕ `opacity` НА КАРТОЧКЕ, И ЭТО НЕ ВКУСОВЩИНА. Владелец
+ * просил прозрачность 0.6 на всю карточку — ровно этот приём уже подводил нас
+ * этажом выше: прозрачность на контейнере создаёт групповую композицию и
+ * роняет ВСЁ поддерево разом, включая чипы и бейджи. Тогда красный бейдж
+ * очереди ушёл на 2.49:1, и правило переписали на приглушение подписей
+ * (см. `.chat-tabs[data-dimmed]` выше). Повторять ту же ошибку в соседнем
+ * файле незачем: глазу нужна тихая строка, а не полупрозрачные цифры.
+ *
+ * Аватар — картинка, контраст текста он не роняет, и его гасим прозрачностью:
+ * именно он делает строку «серой» с полуметра.
+ *
+ * `:not([data-unread])` — страховка, а не украшение. Непрочитанные и ожидание
+ * считаются разными путями (счётчик оператора против канонического
+ * `waiting_since`), и если они разойдутся, строка с непрочитанным останется
+ * яркой. Молча погасить непрочитанное хуже, чем показать лишнюю тревогу.
+ */
+.conv-card[data-answered]:not([data-unread]) .conv-card__name,
+.conv-card[data-answered]:not([data-unread]) .conv-card__preview {
+  color: var(--lc-text-3);
+}
+
+.conv-card[data-answered]:not([data-unread]) .conv-card__avatar {
+  opacity: 0.6;
+}
+
+/*
+ * Под курсором, у открытой строки и при фокусе с клавиатуры — полная яркость.
+ * Приглушение здесь про «сюда можно не смотреть», а не про «это нельзя
+ * прочитать»: как только человек навёлся, строка обязана читаться нормально.
+ */
+.conv-card[data-answered]:hover .conv-card__name,
+.conv-card[data-answered][data-active] .conv-card__name,
+.conv-card[data-answered]:focus-within .conv-card__name {
+  color: var(--lc-text-1);
+}
+
+.conv-card[data-answered]:hover .conv-card__preview,
+.conv-card[data-answered][data-active] .conv-card__preview,
+.conv-card[data-answered]:focus-within .conv-card__preview {
+  color: var(--lc-text-2);
+}
+
+.conv-card[data-answered]:hover .conv-card__avatar,
+.conv-card[data-answered][data-active] .conv-card__avatar,
+.conv-card[data-answered]:focus-within .conv-card__avatar {
+  opacity: 1;
+}
+
+/*
+ * Служебная запись Авито в погашенной строке остаётся тише переписки — иначе
+ * приглушение подняло бы её до уровня обычного превью и уведомление площадки
+ * стало бы заметнее ответа клиента в соседней строке.
+ */
+.conv-card[data-answered]:not([data-unread]) .conv-card__preview[data-source="avito"] {
+  color: var(--lc-text-4);
+}
+
+/* --------------------------------------------------------------- чипы -- */
+
+/*
+ * ⚠ ЧИП УСТУПАЕТ ПЕРВЫМ — ТЕПЕРЬ И В КОДЕ, А НЕ ТОЛЬКО В КОММЕНТАРИИ ВЫШЕ.
+ *
+ * Стояло `flex: none`, то есть уступать он не мог физически. Вместе с полом
+ * превью (`min-width: 96px`) это не влезало в тело строки при обычной ширине
+ * колонки: замер при окне 1440 — телу 172px, а нужно 96 + 8 + 98 = 202. Лишнее
+ * не обрезалось и не переносилось, а ВЫЛЕЗАЛО НАРУЖУ и уходило под шкалу
+ * ожидания. Пряталась при этом самая дорогая метка списка — «не отправлено»,
+ * то есть «ответ до клиента не дошёл».
+ *
+ * Обрезанный, но видимый чип лучше спрятанного: полный текст остаётся в `title`,
+ * а сам факт «с этой строкой что-то не так» виден с любой ширины.
+ */
+.conv-card__chip {
+  flex: none;
+  height: 18px;
+  padding: 0 var(--lc-space-2);
+  border-radius: var(--lc-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--lc-fz-micro);
+  font-weight: var(--lc-fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.conv-card__chip--danger {
+  background: var(--lc-danger-subtle);
+  color: var(--lc-danger-text);
+  border: 1px solid var(--lc-danger);
+}
+
+/* Чип статуса: форма отсюда, цвет — из общего `.lc-status-chip`
+   (app/lc-base.css) по атрибуту `data-status`. Своего фона здесь нет
+   намеренно: пятая копия цветов статуса — ровно то, от чего docs/38 и
+   избавляется. */
+.conv-card__chip--status {
+  border: 1px solid transparent;
+}
+
+.conv-card__unread {
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  /* Та же величина, что у счётчика вкладок: две одинаковые по смыслу пилюли
+     стояли на 5 и 6 и выглядели разной ширины при одинаковом числе. */
+  padding: 0 var(--lc-space-1);
+  border-radius: var(--lc-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lc-unread-bg);
+  color: var(--lc-unread-text);
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-semibold);
+  line-height: 1;
+}
+
+/*
+ * БЫСТРЫХ ДЕЙСТВИЙ ПО НАВЕДЕНИЮ ЗДЕСЬ БОЛЬШЕ НЕТ.
+ *
+ * Правила `.conv-card__actions` / `.conv-card__action` удалены вместе с
+ * ховер-иконкой «Передать диалог» (разбор владельца, 12 августа): то же
+ * действие было ещё в трёх местах экрана, и в списке оно вредило больше
+ * всего — передавать диалог, не открыв переписку, всё равно нельзя.
+ * Объяснение — в шапке ConversationListItem.tsx.
+ */
+
+/* ------------------------------------------------------------- прочее -- */
+
+.conv-loader {
+  height: 78px;
+  display: grid;
+  place-items: center;
+}
+
+.chat-list-pane__kbd {
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+  background: var(--lc-bg-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  padding: var(--lc-space-0) var(--lc-space-1);
+  white-space: nowrap;
+  font-variant-numeric: var(--lc-num);
+}
+
+.chat-list-pane__footer {
+  flex: none;
+  padding: var(--lc-space-3);
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-bg-0);
+}
+
+/* ---------------------------------------------------------- скелетоны -- */
+
+.conv-skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-3);
+  height: 78px;
+  margin: 0 var(--lc-space-2) var(--lc-row-gap);
+  padding: 0 var(--lc-space-3);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-surface);
+}
+
+.conv-skeleton__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-bg-2);
+  animation: lc-skeleton-pulse var(--lc-skeleton-speed) ease-in-out infinite;
+}
+
+.conv-skeleton__lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.conv-skeleton__line {
+  height: 10px;
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-bg-2);
+  animation: lc-skeleton-pulse var(--lc-skeleton-speed) ease-in-out infinite;
+}
+
+
+/* `.conv-card__chip--wait` (и его уровень `late`) удалён 12 августа. Чипа
+   ожидания в строке нет с прошлого редизайна — срок показывает шкала
+   `WaitGauge`, — а правила остались лежать и пережили свою разметку. Сторож
+   `cssDeadClasses` их не ловит: имя начинается с приставки динамического
+   модификатора `conv-card__chip--`, и он считает такие классы живыми не
+   глядя. То есть здесь надо смотреть глазами, на сторожа не полагаясь. */
+
+/* `.chat-list-pane__queue-tools` удалён 11 августа. Это была строка под кнопку
+   «Разгрузить…», а саму разгрузку очереди вырезали целиком коммитом 7d8724e
+   («Разгрузка очереди убрана целиком: кнопка, окно, ручки, ночное задание,
+   уведомление») — правило пережило свою кнопку и осталось висеть без единого
+   потребителя. В списке аудита из 13 классов его не было; нашёл сторож
+   `src/test/cssDeadClasses.test.ts`. */
+
+/* ---------------------------------------------- сколько взято и сколько ждут -- */
+
+/*
+ * ⚠ ЖАЛОБА ВЛАДЕЛЬЦА 02.09: «нет интуитивно понятной навигации, сколько у меня
+ * диалогов взято, сколько диалогов не отвечено; в какие я просто зашёл
+ * посмотреть, в какие ответил — всё сливается с общим фоном».
+ *
+ * Замер боя того же дня показал, насколько это про потерянную работу, а не про
+ * вид: у одного диспетчера 27 диалогов, ждут ответа одиннадцать, и ВОСЕМЬ из
+ * них он уже открывал — значит бейджа непрочитанного на них нет и от
+ * шестнадцати сделанных они не отличались ничем.
+ *
+ * ДВА ЧИСЛА РАЗНОГО ВЕСА, И РАЗНИЦА НАМЕРЕННАЯ. «Взято» — справка, она тихая и
+ * нейтральная. «Ждут ответа» — долг, и он единственный на панели имеет право
+ * на цвет тревоги. Уравняй их, и оба станут фоном: панель, где всё важное,
+ * не показывает ничего.
+ */
+.chat-tabs__count--quiet {
+  background: var(--lc-bg-2);
+  color: var(--lc-text-3);
+  font-weight: var(--lc-fw-medium);
+}
+
+.chat-tabs__tab[data-active] .chat-tabs__count--quiet {
+  color: var(--lc-text-2);
+}
+
+/*
+ * Долг — кнопка, а не подпись: см. довод у разметки. Число без перехода
+ * оставляет ту же прокрутку, ради отмены которой оно и заведено.
+ */
+.chat-debt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  height: var(--lc-btn-h-sm);
+  /* ⚠ ТОЧКА СНЯТА, ОСТАЛОСЬ ЧИСЛО (04.09). Точка с зазором занимала тринадцать
+     пикселей — те самые, из-за которых ряд переносился. Смысл она несла не
+     формой, а ЦВЕТОМ: тот же янтарь, что у полосы ждущих строк. Цвет остался
+     на числе, значит осталась и связь. */
+  padding: 0 var(--lc-space-2);
+  /* Контур в покое обязателен: это главный указатель на панели, а подложка
+     `subtle` на тёмной теме почти сливается с фоном колонки. */
+  border: 1px solid color-mix(in srgb, var(--lc-warning) 45%, transparent);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-warning-subtle);
+  color: var(--lc-warning-text);
+  font-family: inherit;
+  font-size: var(--lc-fz-note);
+  font-weight: var(--lc-fw-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    border-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.chat-debt:hover {
+  border-color: var(--lc-warning);
+}
+
+.chat-debt:focus-visible {
+  outline: 2px solid var(--lc-focus-border);
+  outline-offset: 2px;
+}
+
+/* Включено — заливка целиком: список сужен, и сказать об этом надо так, чтобы
+   человек не искал потом «куда делись остальные». */
+.chat-debt[data-on] {
+  background: var(--lc-warning-solid);
+  color: var(--lc-on-warning);
+  font-weight: var(--lc-fw-semibold);
+}
+
+.chat-debt__num {
+  /* Число — единственное, что здесь читают: оно и несёт весь вес. */
+  /*
+   * ⚠ ВЕС БЫЛ ОБЪЯВЛЕН, НО НЕ ВЫДАН (05.09). Комментарий выше верен: слов в
+   * чипе не осталось, читают ровно цифру. А набрана она была `--lc-fz-note` —
+   * тем же кеглем, что подписи вкладок слева и счётчики внутри них. Показатель
+   * ничем не отличался от подписи, рядом с которой стоит.
+   *
+   * Ступень вверх, до кегля тела: «одиннадцать ждут ответа» — единственное
+   * число этой панели, по которому принимают решение (жалоба 02.09: «нет
+   * интуитивно понятной навигации, сколько диалогов не отвечено»). Ряду это
+   * стоит двух пикселей ширины и ничего не ломает: значок сужений и так
+   * переносится на вторую строку при трёх вкладках со счётчиками (замер: ряду
+   * нужно 340px, в колонке 314).
+   */
+  font-size: var(--lc-fz-body);
+  font-weight: var(--lc-fw-semibold);
+  font-variant-numeric: var(--lc-num);
+}
+
+/* ------------------------------------------- ждёт ответа: видно с левого края -- */
+
+/*
+ * ⚠ ЖАЛОБА 02.09: «в какие я просто зашёл посмотреть, в какие ответил — всё
+ * сливается с общим фоном».
+ *
+ * ЧТО БЫЛО. Состояние строки жило в одной ячейке 48px у ПРАВОГО края — шкале
+ * ожидания. Глаз читает строку слева направо и слева не находил ничего:
+ * отвеченная приглушена, ждущая «обычная». Отсутствие приглушения — сигнал
+ * отрицательный, а среди двадцати семи строк отрицательные сигналы не читаются.
+ *
+ * ПОЧЕМУ ПОЛОСА ЗДЕСЬ УМЕСТНА, ХОТЯ ВЫШЕ НАПИСАНО «НЕ ВЕШАТЬ ЕЁ НА
+ * НЕПРОЧИТАННОЕ». Тот довод был про `unread_count` — признак, который стоит
+ * почти у всех и потому перестаёт быть признаком. Ожидание — другое дело, и
+ * это измерено на боевых данных 02.09: 3 из 66 у одного диспетчера, 11 из 27 у
+ * другого. Меньшинство, и притом ровно то, с чем надо что-то делать.
+ *
+ * ПОЛОСА ТОЛЬКО ТАМ, ГДЕ СРОЧНОСТИ НЕТ. Недоставленное, эскалация, негатив и
+ * очередь заняли её раньше и по более веским поводам — они не «ждут ответа», а
+ * «сломалось». Перекрасить их в янтарь значило бы понизить тревогу.
+ */
+.conv-card[data-awaiting][data-urgency="none"]::before {
+  background: var(--lc-warning);
+}
+
+/*
+ * Имя в полный вес — второй признак того же состояния, для тех, кто читает
+ * строку, а не сканирует край. Раньше полужирным помечалось только
+ * непрочитанное; прочитанный и неотвеченный диалог оставался светлым и вместе
+ * с приглушёнными отвеченными сливался в один серый столбик.
+ */
+.conv-card[data-awaiting] .conv-card__name {
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+/*
+ * Фильтр прижат к правому краю ряда — как в образце, который показал владелец.
+ * Слева вкладки отвечают «чей диалог», справа стоит сужение: два разных
+ * вопроса разведены концами строки, а не соседством.
+ */
+.chat-filters-toggle {
+  /* Прижим к правому краю больше не нужен: кнопка стоит в строке поиска
+     последней, и её место задаёт сам ряд. */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  /* Та же высота, что у долга рядом: ряд обязан стоять по одной линии. */
+  height: var(--lc-btn-h-sm);
+  /* Было 6 при 8 у долга рядом — одинаковые пилюли ряда разной плотности.
+     Ряду это ничего не стоит: поле поиска слева тянется (`flex: 1 1 auto`). */
+  padding: 0 var(--lc-space-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-pill);
+  background: transparent;
+  color: var(--lc-text-2);
+  cursor: pointer;
+  flex: none;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    border-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.chat-filters-toggle:hover {
+  border-color: var(--lc-border-strong);
+  color: var(--lc-text-1);
+}
+
+.chat-filters-toggle:focus-visible {
+  outline: 2px solid var(--lc-focus-border);
+  outline-offset: 2px;
+}
+
+/* Сужения включены — кнопка горит: свёрнутая панель прячет и поля, и то, что
+   они работают, а забытый фильтр без метки читается как сломанный список. */
+.chat-filters-toggle[data-on] {
+  /* Тот же зелёный, что у выбранной вкладки рядом: «включено» в этом ряду
+     обязано выглядеть одинаково, иначе цвет перестаёт что-либо значить. */
+  border-color: var(--lc-primary);
+  background: var(--lc-selected);
+  color: var(--lc-text-1);
+}
+
+.chat-filters-toggle__count {
+  font-size: var(--lc-fz-micro);
+  font-weight: var(--lc-fw-semibold);
+  font-variant-numeric: var(--lc-num);
+}

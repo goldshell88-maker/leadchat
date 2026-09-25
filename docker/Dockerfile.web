@@ -1,0 +1,72 @@
+# ============================================================================
+# LeadChat web: сборка React-фронта + nginx со статикой (05 §2.4).
+# Образ: ghcr.io/<ns>/leadchat-web:<tag> — версионируется тем же тегом, что api.
+#
+# Контекст сборки — КОРЕНЬ репозитория:
+#   docker build -f docker/Dockerfile.web -t leadchat-web:dev .
+# ============================================================================
+
+# ---------- frontend build ----------
+FROM node:22-slim AS front
+
+WORKDIR /front
+
+# слой зависимостей отдельно от кода — кэшируется между сборками
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+# Копируем ровно то, что нужно сборке. Явный список вместо `COPY frontend/ ./`
+# осознанно: иначе в образ уезжает host-овый frontend/node_modules (на macOS —
+# с нативными бинарями esbuild под arm64, сборка в linux-контейнере ломается)
+# и frontend/dist. Добавили новый файл в корень frontend/ — допишите сюда.
+COPY frontend/index.html frontend/tsconfig.json frontend/vite.config.ts ./
+COPY frontend/src ./src
+COPY frontend/public ./public
+
+# Vite инлайнит VITE_* на этапе сборки — runtime-конфига у SPA нет (05 §4)
+ARG VITE_SENTRY_DSN=""
+ARG VITE_APP_VERSION="dev"
+ENV VITE_SENTRY_DSN=$VITE_SENTRY_DSN \
+    VITE_APP_VERSION=$VITE_APP_VERSION
+
+RUN npm run build            # tsc --noEmit && vite build -> /front/dist
+
+# vite собирает с sourcemap: true — с прода их не раздают (05 §7.1),
+# поэтому в образ они не едут вовсе (nginx на всякий случай ещё и 404-ит).
+RUN find dist -name '*.map' -delete
+
+# Предсжатие для gzip_static: максимальный уровень один раз при сборке,
+# в рантайме nginx только отдаёт готовый .gz (нулевой CPU на запрос).
+RUN find dist -type f \
+      \( -name '*.js' -o -name '*.css' -o -name '*.html' \
+         -o -name '*.svg' -o -name '*.json' -o -name '*.txt' \) \
+      -size +1k -exec gzip -9 -k {} \;
+
+# ---------- nginx ----------
+FROM nginx:1.27-alpine
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+COPY docker/nginx/nginx.conf        /etc/nginx/nginx.conf
+COPY docker/nginx/snippets/         /etc/nginx/snippets/
+COPY docker/nginx/templates/        /etc/nginx/templates/
+COPY docker/nginx/entrypoint.d/     /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/*.sh
+
+# Тело ответа /healthz (location = /healthz в шаблоне vhost'а). Именно файл,
+# а не `return 200`: с return не работает allow/deny (rewrite-фаза идёт раньше
+# access-фазы) и liveness-ручка торчала бы наружу. Держим вне webroot.
+RUN printf 'ok\n' > /etc/nginx/healthz.txt
+
+COPY --from=front /front/dist /usr/share/nginx/html
+
+# envsubst штатного entrypoint'а: /etc/nginx/templates/*.template ->
+# /etc/nginx/conf.d/*.conf. Фильтр критичен — без него envsubst съел бы
+# и переменные nginx ($host, $uri, $secure_link_expires…).
+ENV NGINX_ENVSUBST_FILTER='^(DOMAIN|MEDIA_SIGN_KEY)$' \
+    NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+
+EXPOSE 80 443
+
+# CMD/ENTRYPOINT — как в базовом образе (nginx -g 'daemon off;'),
+# менять нельзя: иначе не отработают /docker-entrypoint.d/* (см. 40-reload-loop.sh)

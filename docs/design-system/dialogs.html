@@ -1,0 +1,961 @@
+<!-- @dsCard group="Экраны" -->
+<meta charset="utf-8">
+<title>Разбор диалогов</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.1 нейтральная шкала */
+    --lc-slate-400: #94a3b8;
+    --lc-slate-500: #64748b;
+
+    /* §1.2 синий (info) */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+
+    /* §1.3 красный (danger) */
+    --lc-red-500: #ef4444;
+    --lc-red-700: #b91c1c;
+    --lc-red-950: #2c1113;
+
+    /* §1.4 единый акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.5 янтарь (warning) */
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+
+    /* §1.6 фиолетовый (бот, AI) */
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+
+    /* §2.1 сетка 8pt */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-pill: 999px;
+
+    /* §2.3 колонки и рельс */
+    --lc-gutter: 24px;
+    --lc-rail-w: 72px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §2.7 слои */
+    --lc-z-sticky: 10;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+    --lc-selected: #1e2c24;
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+    --lc-disabled-bg: var(--lc-bg-raise);
+    --lc-disabled-edge: #505a55;
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-text-disabled: var(--lc-text-5);
+
+    /* акцент, состояния */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-danger: #e5484d;
+    --lc-danger-solid: #dc2626;
+    --lc-danger-text: #ff9ea1;
+    --lc-warn: var(--lc-amber-500);
+    --lc-warn-text: #d9a94e;
+    --lc-link: var(--lc-blue-400);
+
+    /* §3.11 статусы диалога */
+    --lc-status-new-bg: var(--lc-blue-950);
+    --lc-status-new-text: var(--lc-blue-300);
+    --lc-status-inprogress-bg: #10240f;
+    --lc-status-inprogress-text: var(--lc-a-300);
+    --lc-status-waiting-bg: var(--lc-purple-950);
+    --lc-status-waiting-text: var(--lc-purple-300);
+    --lc-status-closed-bg: #1f2522;
+    --lc-status-closed-text: var(--lc-text-2);
+
+    /* §3.9 тени */
+    --lc-shadow-0: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+  }
+
+  /* ═══════════════════════════════════════════════ каркас макета ═══════ */
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-1);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .screen {
+    width: 1600px;
+    height: 1040px;
+    display: flex;
+    background: var(--lc-bg-1);
+    overflow: hidden;
+  }
+
+  .lc-num { font-variant-numeric: var(--lc-num); }
+
+  /* ─────────────────────────────────────────────── рельс разделов ────── */
+
+  .rail {
+    flex: none;
+    width: var(--lc-rail-w);
+    border-right: 1px solid var(--lc-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--lc-space-3) 0;
+    gap: var(--lc-space-1);
+  }
+
+  .rail__mark {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-primary);
+    color: var(--lc-on-primary);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-semibold);
+    margin-bottom: var(--lc-space-3);
+  }
+
+  .rail__section {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+    margin-bottom: var(--lc-space-1);
+  }
+
+  .rail__item {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-3);
+  }
+
+  .rail__item[data-active] {
+    background: var(--lc-selected);
+    color: var(--lc-primary-text);
+  }
+
+  .rail__item[data-active]::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 11px;
+    bottom: 11px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--lc-primary);
+  }
+
+  .rail__spacer { flex: 1; }
+
+  .rail__badge {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-danger-solid);
+    color: #ffffff;
+    font-size: var(--lc-fz-micro);
+    line-height: 16px;
+    font-variant-numeric: var(--lc-num);
+    box-sizing: border-box;
+  }
+
+  .rail__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--lc-radius-pill);
+    display: grid;
+    place-items: center;
+    background: var(--lc-a-800);
+    color: #ffffff;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  /* ───────────────────────────────────────────── страница разбора ────── */
+
+  .dt {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-4);
+    padding: var(--lc-space-5);
+  }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lc-space-4);
+  }
+
+  .page-header__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-1);
+    min-width: 0;
+  }
+
+  .page-header__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    color: var(--lc-text-1);
+  }
+
+  .page-header__description {
+    margin: 0;
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-2);
+  }
+
+  .page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    flex: none;
+  }
+
+  .found {
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+    margin-right: var(--lc-space-2);
+  }
+
+  /* контролы: одна высота 32 на весь экран */
+
+  .ctl {
+    height: var(--lc-btn-h-sm);
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-btn-gap);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-surface);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-caption);
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .ctl svg { flex: none; color: var(--lc-text-3); }
+
+  .ctl--field { justify-content: space-between; }
+  .ctl--placeholder { color: var(--lc-text-4); }
+  .ctl--subtle {
+    border-color: transparent;
+    background: none;
+    color: var(--lc-text-2);
+  }
+  .ctl--disabled {
+    background: var(--lc-disabled-bg);
+    border-color: var(--lc-disabled-edge);
+    color: var(--lc-text-4);
+  }
+
+  .ctl__chev { color: var(--lc-text-3); }
+
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  /* ─────────────────────────────────────────────────── таблица ───────── */
+
+  .dt__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background-color: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--lc-fz-note);
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: var(--lc-z-sticky);
+    background: var(--lc-surface);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    vertical-align: bottom;
+    text-align: left;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-3);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  th[data-numeric] { text-align: right; }
+
+  .dt__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  th[data-numeric] .dt__sort { flex-direction: row-reverse; }
+
+  .dt__sort[data-active] {
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  /*
+   * ОДНА ВЫСОТА СТРОКИ И ОДНА ПЕРВАЯ ЛИНИЯ.
+   *
+   * Таблицу читают по горизонтали, сравнивая соседние строки по одной колонке.
+   * Телефон и метки под именем делали строки разной высоты, а `vertical-align:
+   * middle` двигал имя вверх-вниз относительно статуса и чисел. Здесь высота
+   * фиксирована, а все ячейки выровнены по верху: имя, чип, оператор, канал и
+   * числа стоят на одной линии в каждой строке, второстепенное свисает вниз.
+   */
+  td {
+    height: 60px;
+    padding: 13px var(--lc-space-4);
+    vertical-align: top;
+    border-bottom: 1px solid rgba(51, 60, 55, 0.5);
+    color: var(--lc-text-2);
+  }
+
+  tr:last-child td { border-bottom: 0; }
+
+  td[data-numeric] {
+    text-align: right;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  tr[data-hover] td { background: var(--lc-surface-hover); }
+
+  /* Одна строка таблицы — одна строка на экране: обрезка вместо переноса. */
+  .dt__ell {
+    display: block;
+    max-width: 15ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dt__ell--wide { max-width: 22ch; }
+
+  .dt__client {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .dt__open {
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-1);
+    text-decoration: none;
+  }
+
+  .dt__phone {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .dt__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .dt__tag {
+    padding: 0 6px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-surface-hover);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-caption);
+    line-height: 18px;
+  }
+
+  .dt__status-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .dt__status {
+    display: inline-flex;
+    align-items: center;
+    margin-top: -1px;
+    height: 22px;
+    padding: 0 var(--lc-space-3);
+    border-radius: var(--lc-radius-pill);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+  }
+
+  .dt__status[data-status="new"] {
+    background: var(--lc-status-new-bg);
+    color: var(--lc-status-new-text);
+  }
+
+  .dt__status[data-status="in_progress"] {
+    background: var(--lc-status-inprogress-bg);
+    color: var(--lc-status-inprogress-text);
+  }
+
+  .dt__status[data-status="waiting_client"] {
+    background: var(--lc-status-waiting-bg);
+    color: var(--lc-status-waiting-text);
+  }
+
+  .dt__status[data-status="closed"] {
+    background: var(--lc-status-closed-bg);
+    color: var(--lc-status-closed-text);
+  }
+
+  /* Признак бота — приглушённый: уточняет статус, а не спорит с ним. */
+  .dt__bot {
+    padding: 0 6px;
+    border-radius: var(--lc-radius-pill);
+    border: 1px solid var(--lc-border);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+    line-height: 18px;
+    white-space: nowrap;
+  }
+
+  /* Дольше пятнадцати минут — красным; «ещё не ответили» намеренно приглушено. */
+  .dt__frt[data-late] {
+    color: var(--lc-danger-text);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .dt__frt[data-never] { color: var(--lc-text-disabled); }
+
+  .dt__dash { color: var(--lc-text-4); }
+
+  .dt__pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lc-space-4);
+  }
+
+  .dt__pager span {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+</style>
+
+<div class="screen">
+  <!-- ═══ рельс разделов (72px, как --lc-rail-w) ═══ -->
+  <nav class="rail">
+    <div class="rail__mark">LP</div>
+    <div class="rail__section">Разделы</div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-4-.8L3 21l1.9-4.6A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg>
+      <span class="rail__badge lc-num">7</span>
+    </div>
+
+    <div class="rail__item" data-active>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
+    </div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 14h.01M15 14h.01"/></svg>
+    </div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg>
+    </div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    </div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6l1.6 2.3 2.8-.5.5 2.8 2.3 1.6-1.4 2.4 1.4 2.4-2.3 1.6-.5 2.8-2.8-.5-1.6 2.3-1.6-2.3-2.8.5-.5-2.8-2.3-1.6L4.2 12 2.8 9.6l2.3-1.6.5-2.8 2.8.5L12 2.6Z"/></svg>
+    </div>
+
+    <div class="rail__spacer"></div>
+
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/></svg>
+    </div>
+    <div class="rail__avatar">ДК</div>
+  </nav>
+
+  <!-- ═══ страница «Разбор диалогов» ═══ -->
+  <main class="dt">
+    <header class="page-header">
+      <div class="page-header__text">
+        <h1 class="page-header__title">Разбор диалогов</h1>
+        <p class="page-header__description">Скорость ответа, объём переписки, кто вёл</p>
+      </div>
+      <div class="page-header__actions">
+        <span class="found">Найдено: 68213</span>
+        <span class="ctl ctl--field" style="width:170px">
+          Время: по Москве
+          <svg class="ctl__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span class="ctl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
+          Выгрузить CSV
+        </span>
+      </div>
+    </header>
+
+    <div class="filters">
+      <span class="ctl" style="width:240px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/></svg>
+        <span class="ctl--placeholder">Имя или текст сообщения</span>
+      </span>
+      <span class="ctl ctl--field" style="width:150px">
+        30 дней
+        <svg class="ctl__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </span>
+      <span class="ctl ctl--field" style="width:180px">
+        <span class="ctl--placeholder">Канал: все</span>
+        <svg class="ctl__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </span>
+      <span class="ctl">Ещё</span>
+      <span class="ctl ctl--subtle">Сбросить фильтры</span>
+    </div>
+
+    <div class="dt__scroll">
+      <table>
+        <colgroup>
+          <col style="width:250px">
+          <col style="width:148px">
+          <col style="width:172px">
+          <col style="width:180px">
+          <col style="width:118px">
+          <col style="width:128px">
+          <col style="width:116px">
+          <col style="width:240px">
+          <col style="width:126px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Клиент</th>
+            <th scope="col"><span class="dt__sort">Статус</span></th>
+            <th scope="col">Оператор</th>
+            <th scope="col">Канал</th>
+            <th scope="col" data-numeric><span class="dt__sort">Первый ответ</span></th>
+            <th scope="col" data-numeric>Длительность</th>
+            <th scope="col" data-numeric>Сообщений</th>
+            <th scope="col">Объявление</th>
+            <th scope="col">
+              <span class="dt__sort" data-active>Последнее
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Тамара Белкина</span>
+                <span class="dt__phone">+7 900 111-22-40</span>
+                <span class="dt__tags"><span class="dt__tag">замер</span></span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="new">Новый</span></span></td>
+            <td><span class="dt__ell dt__dash">—</span></td>
+            <td><span class="dt__ell">Александр КП</span></td>
+            <td data-numeric><span class="dt__frt">4 мин</span></td>
+            <td data-numeric>12 мин</td>
+            <td data-numeric>6</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт стиральных машин на дому</span></td>
+            <td class="lc-num">04.09 15:42</td>
+          </tr>
+
+          <tr data-hover>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Арсений Пестов</span>
+                <span class="dt__phone">+7 900 111-22-41</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Даниил Бессонов</span></td>
+            <td><span class="dt__ell">Анатолий БТ</span></td>
+            <td data-numeric><span class="dt__frt">2 мин</span></td>
+            <td data-numeric>41 мин</td>
+            <td data-numeric>14</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт холодильников, выезд мастера</span></td>
+            <td class="lc-num">04.09 15:38</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Алёна Туманова</span>
+                <span class="dt__phone">+7 900 111-22-42</span>
+                <span class="dt__tags"><span class="dt__tag">перезвонить</span></span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="waiting_client">Ждёт клиента</span></span></td>
+            <td><span class="dt__ell">Маргарита Кондратенко</span></td>
+            <td><span class="dt__ell">Ист - 41 / Север-2</span></td>
+            <td data-numeric><span class="dt__frt">7 мин</span></td>
+            <td data-numeric>1 ч 12 м</td>
+            <td data-numeric>21</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт телевизоров на дому</span></td>
+            <td class="lc-num">04.09 15:31</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Родион Самсонов</span>
+                <span class="dt__phone">+7 900 111-22-43</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Варвара Мишина</span></td>
+            <td><span class="dt__ell">! Парт - 7 / Ист - В43 МНЧ !</span></td>
+            <td data-numeric><span class="dt__frt" data-late>38 мин</span></td>
+            <td data-numeric>2 ч 4 м</td>
+            <td data-numeric>33</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт посудомоечных машин</span></td>
+            <td class="lc-num">04.09 15:24</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Фёдор Кротов</span>
+                <span class="dt__phone">+7 900 111-22-44</span>
+                <span class="dt__tags"><span class="dt__tag">негатив</span></span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="closed">Закрыт</span></span></td>
+            <td><span class="dt__ell">Даниил Бессонов</span></td>
+            <td><span class="dt__ell">Александр МНЧ</span></td>
+            <td data-numeric><span class="dt__frt">1 мин</span></td>
+            <td data-numeric>26 мин</td>
+            <td data-numeric>9</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт микроволновых печей</span></td>
+            <td class="lc-num">04.09 15:19</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Елизавета Кострова</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="new">Новый</span></span></td>
+            <td><span class="dt__ell dt__dash">—</span></td>
+            <td><span class="dt__ell">Александр КП</span></td>
+            <td data-numeric><span class="dt__frt" data-never>—</span></td>
+            <td data-numeric>3 мин</td>
+            <td data-numeric>2</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт варочных панелей</span></td>
+            <td class="lc-num">04.09 15:12</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Станислав Ревин</span>
+                <span class="dt__phone">+7 900 111-22-45</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Мирон Долгих</span></td>
+            <td><span class="dt__ell">Анатолий БТ</span></td>
+            <td data-numeric><span class="dt__frt">3 мин</span></td>
+            <td data-numeric>47 мин</td>
+            <td data-numeric>17</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт духовых шкафов</span></td>
+            <td class="lc-num">04.09 15:07</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Римма Бурова</span>
+                <span class="dt__phone">+7 900 111-22-46</span>
+                <span class="dt__tags"><span class="dt__tag">замер</span><span class="dt__tag">срочно</span></span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="waiting_client">Ждёт клиента</span></span></td>
+            <td><span class="dt__ell">Варвара Мишина</span></td>
+            <td><span class="dt__ell">Ист - 41 / Север-2</span></td>
+            <td data-numeric><span class="dt__frt">9 мин</span></td>
+            <td data-numeric>1 ч 38 м</td>
+            <td data-numeric>24</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт кофемашин</span></td>
+            <td class="lc-num">04.09 14:58</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Илья Фомичёв</span>
+                <span class="dt__phone">+7 900 111-22-47</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Мирон Долгих</span></td>
+            <td><span class="dt__ell">Александр КП</span></td>
+            <td data-numeric><span class="dt__frt" data-late>52 мин</span></td>
+            <td data-numeric>3 ч 22 м</td>
+            <td data-numeric>41</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт стиральных машин на дому</span></td>
+            <td class="lc-num">04.09 14:51</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Раиса Смородина</span>
+                <span class="dt__phone">+7 900 111-22-48</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="closed">Закрыт</span></span></td>
+            <td><span class="dt__ell">Маргарита Кондратенко</span></td>
+            <td><span class="dt__ell">Александр МНЧ</span></td>
+            <td data-numeric><span class="dt__frt">5 мин</span></td>
+            <td data-numeric>18 мин</td>
+            <td data-numeric>7</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт водонагревателей</span></td>
+            <td class="lc-num">04.09 14:44</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Марат Галиев</span>
+              </div>
+            </td>
+            <td>
+              <span class="dt__status-cell">
+                <span class="dt__status" data-status="new">Новый</span>
+                <span class="dt__bot">бот</span>
+              </span>
+            </td>
+            <td><span class="dt__ell dt__dash">—</span></td>
+            <td><span class="dt__ell">Анатолий БТ</span></td>
+            <td data-numeric><span class="dt__frt">41 с</span></td>
+            <td data-numeric>41 с</td>
+            <td data-numeric>3</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт сушильных машин</span></td>
+            <td class="lc-num">04.09 14:39</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Таисия Шмелёва</span>
+                <span class="dt__phone">+7 900 111-22-49</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Даниил Бессонов</span></td>
+            <td><span class="dt__ell">! Парт - 7 / Ист - В43 МНЧ !</span></td>
+            <td data-numeric><span class="dt__frt">6 мин</span></td>
+            <td data-numeric>55 мин</td>
+            <td data-numeric>19</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт вытяжек</span></td>
+            <td class="lc-num">04.09 14:33</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Трофим Никонов</span>
+                <span class="dt__phone">+7 900 111-22-50</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="waiting_client">Ждёт клиента</span></span></td>
+            <td><span class="dt__ell">Варвара Мишина</span></td>
+            <td><span class="dt__ell">Александр КП</span></td>
+            <td data-numeric><span class="dt__frt">12 мин</span></td>
+            <td data-numeric>2 ч 47 м</td>
+            <td data-numeric>28</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт холодильников, выезд мастера</span></td>
+            <td class="lc-num">04.09 14:27</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Олеся Кирсанова</span>
+                <span class="dt__tags"><span class="dt__tag">перезвонить</span></span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="closed">Закрыт</span></span></td>
+            <td><span class="dt__ell">Мирон Долгих</span></td>
+            <td><span class="dt__ell">Ист - 41 / Север-2</span></td>
+            <td data-numeric><span class="dt__frt" data-never>—</span></td>
+            <td data-numeric>9 мин</td>
+            <td data-numeric>4</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт телевизоров на дому</span></td>
+            <td class="lc-num">04.09 14:21</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Всеволод Рожков</span>
+                <span class="dt__phone">+7 900 111-22-51</span>
+              </div>
+            </td>
+            <td>
+              <span class="dt__status-cell">
+                <span class="dt__status" data-status="in_progress">В работе</span>
+                <span class="dt__bot">бот</span>
+              </span>
+            </td>
+            <td><span class="dt__ell">Маргарита Кондратенко</span></td>
+            <td><span class="dt__ell">Александр МНЧ</span></td>
+            <td data-numeric><span class="dt__frt">1 мин</span></td>
+            <td data-numeric>1 ч 9 м</td>
+            <td data-numeric>16</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт индукционных плит</span></td>
+            <td class="lc-num">04.09 14:14</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Ангелина Пташкина</span>
+                <span class="dt__phone">+7 900 111-22-52</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="new">Новый</span></span></td>
+            <td><span class="dt__ell dt__dash">—</span></td>
+            <td><span class="dt__ell">Анатолий БТ</span></td>
+            <td data-numeric><span class="dt__frt" data-late>22 мин</span></td>
+            <td data-numeric>22 мин</td>
+            <td data-numeric>5</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт стиральных машин на дому</span></td>
+            <td class="lc-num">04.09 14:08</td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="dt__client">
+                <span class="dt__open dt__ell dt__ell--wide">Прохор Селиванов</span>
+                <span class="dt__phone">+7 900 111-22-53</span>
+              </div>
+            </td>
+            <td><span class="dt__status-cell"><span class="dt__status" data-status="in_progress">В работе</span></span></td>
+            <td><span class="dt__ell">Мирон Долгих</span></td>
+            <td><span class="dt__ell">Александр КП</span></td>
+            <td data-numeric><span class="dt__frt">8 мин</span></td>
+            <td data-numeric>1 ч 26 м</td>
+            <td data-numeric>23</td>
+            <td><span class="dt__ell dt__ell--wide">Ремонт морозильных камер</span></td>
+            <td class="lc-num">04.09 14:02</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dt__pager">
+      <span class="ctl ctl--disabled">Назад</span>
+      <span class="lc-num">1–50 из 68213</span>
+      <span class="ctl">Дальше</span>
+    </div>
+  </main>
+</div>

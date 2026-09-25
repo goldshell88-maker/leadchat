@@ -1,0 +1,863 @@
+<!-- @dsCard group="Настройки" -->
+<meta charset="utf-8">
+<title>Распределение диалогов</title>
+<style>
+  /* ═══ ТОКЕНЫ — дословно из frontend/src/app/lc-vars.css, тёмная тема ═══ */
+  :root {
+    /* §1.4 единый акцент */
+    --lc-a-100: #d6f4d5;
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-a-950: #0b2a0c;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 §1.3 §1.5 §1.6 */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-950: #1e1439;
+
+    /* §2.1 сетка 8pt */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-prose-max: 68ch;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-pill: 999px;
+
+    /* §2.3 каркас */
+    --lc-rail-w: 72px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-fz-page: 28px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §2.5 движение */
+    --lc-dur-fast: 150ms;
+    --lc-ease: cubic-bezier(0.2, 0, 0, 1);
+    --lc-motion-fast: var(--lc-dur-fast) var(--lc-ease);
+    --lc-opacity-disabled: 0.45;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+    --lc-disabled-bg: var(--lc-bg-raise);
+    --lc-disabled-edge: #505a55;
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-text-disabled: var(--lc-text-5);
+
+    /* знак и акцент */
+    --lc-brand: var(--lc-a-500);
+    --lc-on-brand: var(--lc-ink-on-accent);
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-primary-solid-hover: var(--lc-a-400);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+    --lc-focus-border: var(--lc-a-500);
+
+    /* предупреждение, ошибка, сведения */
+    --lc-warn: var(--lc-amber-500);
+    --lc-warn-text: #d9a94e;
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-danger: #e5484d;
+    --lc-danger-text: #ff9ea1;
+    --lc-info: var(--lc-blue-500);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+    --lc-presence-online: var(--lc-a-500);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+  }
+
+  /* ═══════════════════════════════ каркас карточки ═══════════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+  }
+
+  .lc-shot {
+    width: 1600px;
+    min-height: 900px;
+    display: flex;
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    color: var(--lc-text-1);
+    background: var(--lc-bg-0);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─────────────────────────────────────── левая панель (72px) ─────── */
+
+  .rail {
+    width: var(--lc-rail-w);
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: var(--lc-space-3) 0;
+    background: var(--lc-bg-1);
+    border-right: 1px solid var(--lc-border);
+  }
+
+  .rail__logo {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 10px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-brand);
+    color: var(--lc-on-brand);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-semibold);
+    letter-spacing: 0.2px;
+  }
+
+  .rail__item {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-3);
+  }
+
+  .rail__item[data-active] {
+    background: var(--lc-selected);
+    color: var(--lc-primary-text);
+  }
+
+  .rail__item[data-active]::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 11px;
+    bottom: 11px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--lc-primary);
+  }
+
+  .rail__divider {
+    width: 28px;
+    height: 1px;
+    margin: 10px auto;
+    background: var(--lc-border);
+  }
+
+  .rail__spacer { flex: 1; }
+
+  .rail__me {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    margin-top: var(--lc-space-2);
+    display: grid;
+    place-items: center;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-a-800);
+    color: var(--lc-a-100);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .rail__me::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-presence-online);
+    border: 2px solid var(--lc-bg-1);
+  }
+
+  /* ────────────────────────────── разделы настроек (220px) ─────────── */
+
+  .snav {
+    width: 220px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--lc-space-4) var(--lc-space-2);
+    border-right: 1px solid var(--lc-border);
+    background: var(--lc-bg-1);
+  }
+
+  .snav__item {
+    padding: 8px 12px;
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-body);
+  }
+
+  .snav__item[data-active] {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  /* ─────────────────────────────────────────── содержимое ──────────── */
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section {
+    flex: 1;
+    padding: var(--lc-space-4) var(--lc-space-5);
+  }
+
+  .page-header { margin-bottom: var(--lc-space-4); }
+
+  .page-header__title {
+    margin: 0 0 var(--lc-space-1);
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    color: var(--lc-text-1);
+  }
+
+  .page-header__description {
+    margin: 0;
+    max-width: 64ch;
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    color: var(--lc-text-2);
+  }
+
+  .block {
+    padding-bottom: var(--lc-space-5);
+    margin-bottom: var(--lc-space-5);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  .block--last {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .block p {
+    margin: 0;
+    max-width: var(--lc-prose-max);
+    color: var(--lc-text-2);
+  }
+
+  .lbl {
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-1);
+  }
+
+  .hint {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    max-width: var(--lc-prose-max);
+  }
+
+  .num { font-variant-numeric: var(--lc-num); }
+
+  /* ─────────────────────────────────────────── переключатель ───────── */
+
+  .sw {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex: none;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+  }
+
+  .sw__dot {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-text-4);
+    transition: left var(--lc-motion-fast);
+  }
+
+  .sw--on {
+    background: var(--lc-primary-solid);
+    border-color: var(--lc-primary-solid);
+  }
+
+  .sw--on .sw__dot {
+    left: 23px;
+    background: var(--lc-on-primary);
+  }
+
+  .sw--sm { width: 36px; height: 20px; }
+  .sw--sm .sw__dot { top: 2px; left: 2px; width: 14px; height: 14px; }
+  .sw--sm.sw--on .sw__dot { left: 18px; }
+
+  .swline {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lc-space-3);
+  }
+
+  .swline__text { display: flex; flex-direction: column; gap: 2px; }
+
+  /* ───────────────────────────────── две колонки: предел и порядок ── */
+
+  .cols {
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    gap: var(--lc-space-6);
+    align-items: stretch;
+  }
+
+  .fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-2);
+    padding-left: var(--lc-space-5);
+    border-left: 1px solid var(--lc-border);
+  }
+
+  .caprow {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-4);
+    flex-wrap: wrap;
+    margin-top: var(--lc-space-1);
+  }
+
+  .nfield {
+    display: flex;
+    align-items: center;
+    width: 110px;
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-space-1) 0 var(--lc-space-3);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-0);
+    color: var(--lc-text-1);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .nfield__v { flex: 1; }
+
+  .nfield__step {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    color: var(--lc-text-4);
+  }
+
+  .swline--inline { align-items: center; }
+
+  .swline--inline .lbl { font-weight: var(--lc-fw-regular); }
+
+  /* ─────────────────────────────────────────── порядок обхода ─────── */
+
+  .opts { display: flex; flex-direction: column; gap: var(--lc-space-1); }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-2) var(--lc-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--lc-radius-md);
+  }
+
+  .opt[data-on] {
+    background: var(--lc-primary-subtle);
+    border-color: var(--lc-primary);
+  }
+
+  .rd {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    flex: none;
+    border: 1px solid var(--lc-border-strong);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-0);
+  }
+
+  .opt[data-on] .rd { border-color: var(--lc-primary); }
+
+  .opt[data-on] .rd::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-primary);
+  }
+
+  .opt__text { display: flex; flex-direction: column; gap: 1px; }
+
+  /* ─────────────────────────────────────────── рабочие часы ───────── */
+
+  .hhead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--lc-space-4);
+    margin-bottom: var(--lc-space-1);
+  }
+
+  .h2 {
+    margin: 0;
+    font-size: var(--lc-fz-section);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    color: var(--lc-text-1);
+  }
+
+  .tz {
+    flex: none;
+    padding: 2px var(--lc-space-2);
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-info-subtle);
+    color: var(--lc-info-text);
+    font-size: var(--lc-fz-micro);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .hours {
+    margin-top: var(--lc-space-3);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-1);
+    overflow: hidden;
+  }
+
+  .hrow {
+    display: grid;
+    grid-template-columns: 116px 36px 1fr 132px;
+    align-items: center;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-2) var(--lc-space-4);
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .hrow--head {
+    border-top: 0;
+    padding-top: var(--lc-space-2);
+    padding-bottom: var(--lc-space-1);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .hrow--off { opacity: 0.5; }
+
+  .hday {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-1);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    flex: none;
+    margin-left: -12px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-warn);
+  }
+
+  .ruler {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    font-size: var(--lc-fz-micro);
+    font-variant-numeric: var(--lc-num);
+    color: var(--lc-text-4);
+  }
+
+  .ruler::after {
+    content: "24";
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .band {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    height: 26px;
+    border-radius: var(--lc-radius-xs);
+    overflow: hidden;
+  }
+
+  .c { background: var(--lc-bg-2); }
+  .c--on { background: var(--lc-a-800); }
+  .c--tick { box-shadow: inset -1px 0 0 var(--lc-bg-1); }
+
+  .hcell { text-align: right; }
+
+  .hval {
+    padding: 0;
+    border: 0;
+    background: none;
+    border-bottom: 1px dashed var(--lc-border-strong);
+    color: var(--lc-text-1);
+    font: inherit;
+    font-size: var(--lc-fz-note);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .hval--off {
+    border: 0;
+    color: var(--lc-text-4);
+    font-size: var(--lc-fz-note);
+  }
+
+  .hnotes {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--lc-space-4);
+    margin-top: var(--lc-space-2);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+  }
+
+  .block .foot {
+    margin-top: var(--lc-space-4);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    max-width: var(--lc-prose-max);
+  }
+
+  /* ─────────────────────────────────────────── полоса сохранения ──── */
+
+  .savebar {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-3) var(--lc-space-5);
+    border-top: 1px solid var(--lc-border);
+    background: var(--lc-bg-1);
+    box-shadow: var(--lc-shadow-1);
+  }
+
+  .btn {
+    height: var(--lc-btn-h-md);
+    padding: 0 var(--lc-btn-px-md);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-btn-gap);
+    border: 1px solid transparent;
+    border-radius: var(--lc-btn-radius);
+    font: inherit;
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .btn--primary {
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    border-color: var(--lc-border);
+    color: var(--lc-text-2);
+  }
+
+  .unsaved {
+    color: var(--lc-warning-text);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .savebar__right {
+    margin-left: auto;
+    color: var(--lc-text-4);
+    font-size: var(--lc-fz-caption);
+  }
+</style>
+
+<div class="lc-shot">
+
+  <!-- ═══════════════════════════ левая панель ═══════════════════════ -->
+  <aside class="rail">
+    <div class="rail__logo">LP</div>
+
+    <div class="rail__item" title="Чаты">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.1A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>
+    </div>
+    <div class="rail__item" title="Разбор диалогов">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h10M4 15h13M4 20h7"/></svg>
+    </div>
+    <div class="rail__item" title="Диалоги бота">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 4v3M9 12h.01M15 12h.01M9.5 16h5"/></svg>
+    </div>
+    <div class="rail__item" title="Живая лента">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 13 2.5-7h5"/></svg>
+    </div>
+    <div class="rail__item" title="Статистика">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V5M19 20v-7"/></svg>
+    </div>
+
+    <div class="rail__divider"></div>
+
+    <div class="rail__item" data-active title="Настройки">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </div>
+
+    <div class="rail__spacer"></div>
+
+    <div class="rail__item" title="Поиск по диалогам">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+    </div>
+    <div class="rail__item" title="Звук новых сообщений включён">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9v6h3.5L13 19V5L8.5 9H5z"/><path d="M16.5 9.5a3.5 3.5 0 0 1 0 5"/></svg>
+    </div>
+    <div class="rail__me">АК</div>
+  </aside>
+
+  <!-- ═══════════════════════════ разделы настроек ═══════════════════ -->
+  <nav class="snav">
+    <div class="snav__item">Аккаунты Авито</div>
+    <div class="snav__item">Люди и каналы</div>
+    <div class="snav__item">Быстрые ответы</div>
+    <div class="snav__item">Боты</div>
+    <div class="snav__item">Лид-бот</div>
+    <div class="snav__item">Автозаявки</div>
+    <div class="snav__item" data-active>Распределение</div>
+    <div class="snav__item">Команда</div>
+    <div class="snav__item">Профиль</div>
+  </nav>
+
+  <!-- ═══════════════════════════ содержимое ═════════════════════════ -->
+  <main class="content">
+    <div class="section">
+
+      <header class="page-header">
+        <h1 class="page-header__title">Распределение диалогов</h1>
+        <p class="page-header__description">Обычно новый диалог ждёт во «Входящих», пока его кто-нибудь не примет. Можно раздавать автоматически — тому, кто сейчас свободнее всех</p>
+      </header>
+
+      <!-- 1. Включение -->
+      <div class="block">
+        <div class="swline">
+          <span class="sw sw--on"><span class="sw__dot"></span></span>
+          <div class="swline__text">
+            <span class="lbl">Раздавать диалоги автоматически</span>
+            <span class="hint">Новый диалог сразу уходит свободному менеджеру</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Предел и порядок обхода -->
+      <div class="block">
+        <div class="cols">
+
+          <div class="fieldset">
+            <span class="lbl">Сколько диалогов держать на одном менеджере</span>
+            <span class="hint">Больше этого числа система ему не отдаст — диалог подождёт во «Входящих», где его видят все</span>
+            <div class="caprow">
+              <div class="nfield">
+                <span class="nfield__v num">6</span>
+                <span class="nfield__step">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3-3 3 3"/></svg>
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l3 3 3-3"/></svg>
+                </span>
+              </div>
+              <div class="swline swline--inline">
+                <span class="sw sw--sm"><span class="sw__dot"></span></span>
+                <span class="lbl">Без ограничения</span>
+              </div>
+            </div>
+            <span class="hint num">Сейчас в смене 12 менеджеров, в среднем 4 диалога на человека</span>
+          </div>
+
+          <div class="fieldset">
+            <span class="lbl">Кому уходит следующий диалог</span>
+            <span class="hint">Считается заново на каждый диалог, а не один раз на смену</span>
+            <div class="opts">
+              <div class="opt" data-on>
+                <span class="rd"></span>
+                <span class="opt__text">
+                  <span class="lbl">Тому, у кого меньше всего диалогов</span>
+                  <span class="hint">При равенстве — тому, кто дольше не получал новых</span>
+                </span>
+              </div>
+              <div class="opt">
+                <span class="rd"></span>
+                <span class="opt__text">
+                  <span class="lbl">По кругу, по очереди</span>
+                  <span class="hint">Каждому по одному подряд, текущая загрузка не смотрится</span>
+                </span>
+              </div>
+              <div class="opt">
+                <span class="rd"></span>
+                <span class="opt__text">
+                  <span class="lbl">Тому, кто дольше всех без нового диалога</span>
+                  <span class="hint">Считает время с прошлой раздачи, а не число диалогов</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. Рабочие часы -->
+      <div class="block block--last">
+        <div class="hhead">
+          <h2 class="h2">Рабочие часы</h2>
+          <span class="tz num">Московское время, UTC+3</span>
+        </div>
+        <p class="hint">Окно, по которому считается скорость первого ответа. Время вне окна в расчёт не идёт: ночная пауза не портит цифру, но и не украшает её</p>
+
+        <div class="hours">
+          <div class="hrow hrow--head">
+            <div></div>
+            <div></div>
+            <div class="ruler"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span><span>15</span><span>18</span><span>21</span></div>
+            <div class="hcell">Окно</div>
+          </div>
+        <div class="hrow">
+          <div class="hday">Понедельник</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 20:00</button></div>
+        </div>
+        <div class="hrow">
+          <div class="hday">Вторник</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 20:00</button></div>
+        </div>
+        <div class="hrow">
+          <div class="hday">Среда</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 20:00</button></div>
+        </div>
+        <div class="hrow">
+          <div class="hday">Четверг</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 20:00</button></div>
+        </div>
+        <div class="hrow">
+          <div class="hday">Пятница</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 20:00</button></div>
+        </div>
+        <div class="hrow">
+          <div class="hday"><span class="dot" title="не сохранено"></span>Суббота</div>
+          <span class="sw sw--sm sw--on"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c c--on"></span><span class="c c--on"></span><span class="c c--on c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><button class="hval">10:00 – 18:00</button></div>
+        </div>
+        <div class="hrow hrow--off">
+          <div class="hday">Воскресенье</div>
+          <span class="sw sw--sm"><span class="sw__dot"></span></span>
+          <div class="band"><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c c--tick"></span><span class="c"></span><span class="c"></span><span class="c"></span></div>
+          <div class="hcell"><span class="hval hval--off">Выходной</span></div>
+        </div>
+        </div>
+
+        <div class="hnotes">
+          <span>Окно правится прямо в строке: нажмите на время или протяните по клеткам</span>
+          <span>Отчёты пересчитываются раз в час — новые цифры появятся не мгновенно</span>
+        </div>
+
+        <p class="foot">Диалог уходит только тому, кто сейчас в сети и назначен на этот канал. Если подходящих нет — диалог остаётся во «Входящих».</p>
+      </div>
+
+    </div>
+
+    <!-- полоса сохранения -->
+    <div class="savebar">
+      <button class="btn btn--primary">Сохранить</button>
+      <button class="btn btn--ghost">Отменить</button>
+      <span class="unsaved num">Не сохранено: предел 6 вместо 5 и суббота до 18:00</span>
+      <span class="savebar__right">Правило применяется к новым диалогам — уже принятые не перераздаются</span>
+    </div>
+  </main>
+
+</div>

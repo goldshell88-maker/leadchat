@@ -1,0 +1,584 @@
+# ============================================================================
+# LeadChat — виртуальный хост (docs/05-DEPLOY-OPS.md §3.2).
+#
+# Это ШАБЛОН: штатный entrypoint образа nginx прогоняет его через envsubst
+# и кладёт результат в /etc/nginx/conf.d/leadchat.conf при каждом старте
+# контейнера. Подставляются РОВНО две переменные (NGINX_ENVSUBST_FILTER
+# в docker/Dockerfile.web):
+#   ${DOMAIN}          — chat.partner-lead-centre.ru
+#   ${MEDIA_SIGN_KEY}  — ключ подписи ссылок на вложения
+# Все остальные $переменные — это переменные nginx, они остаются как есть.
+#
+# Почему подстановка в рантайме, а не при сборке образа: ключ подписи —
+# секрет, в слоях образа в GHCR ему делать нечего.
+# ============================================================================
+
+upstream leadchat_api {
+    server api:8000;
+    keepalive 32;
+}
+
+# ---------- HTTP: только ACME, healthz и редирект на HTTPS ----------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN};
+
+    # ACME-челлендж (webroot certbot'а) — до всех редиректов
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        access_log off;
+    }
+
+    # liveness для docker healthcheck; снаружи закрыт.
+    #
+    # Отдаём ФАЙЛ, а не `return 200`: директива return живёт в rewrite-фазе,
+    # которая отрабатывает ДО access-фазы с allow/deny — с `return` этот
+    # endpoint был бы доступен из интернета вопреки правилам ниже (проверено
+    # запросом снаружи к собранному образу). Статика проходит access-фазу
+    # честно: с 127.0.0.1 — 200, снаружи — 403.
+    # Файл лежит вне webroot и создаётся в docker/Dockerfile.web.
+    location = /healthz {
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+        access_log off;
+        default_type text/plain;
+        alias /etc/nginx/healthz.txt;
+    }
+
+    # ---------- Внешний наблюдатель из Амстердама (план 5.2) ----------
+    #
+    # Единственный путь к служебной ручке снаружи самого сервера — и он не
+    # «снаружи» в обычном смысле: 10.10.0.0/24 это приватный мост WireGuard до
+    # нидерландской машины, трафик внутри него уже зашифрован туннелем.
+    # Публичный HTTPS по-прежнему отдаёт на /api/v1/internal/ честный 404.
+    #
+    # Зачем вообще пускать кого-то извне. Всё, что система знает о себе, она
+    # знает изнутри — и ровно поэтому не может заметить собственную смерть.
+    # Наблюдатель на другом континенте видит то, чего не видит она: что её нет.
+    #
+    # proxy_pass, а не return: content-фаза идёт ПОСЛЕ access-фазы, поэтому
+    # allow/deny здесь работает по-настоящему. С `return` было бы наоборот —
+    # см. подробный разбор у /healthz выше.
+    location ^~ /api/v1/internal/ {
+        allow 10.10.0.0/24;
+        deny all;
+        access_log off;
+        client_max_body_size 16k;
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-common.conf;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# ---------- HTTPS ----------
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # OCSP stapling: браузер узнаёт, не отозван ли сертификат, из нашего же
+    # ответа — не ходя к удостоверяющему центру. Меньше на один запрос при
+    # каждом первом соединении и на одного стороннего наблюдателя за тем, кто к
+    # нам ходит. Если stapling почему-то не сработает, nginx просто не приложит
+    # ответ — соединение от этого не ломается.
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    ssl_trusted_certificate /etc/letsencrypt/live/${DOMAIN}/chain.pem;
+    resolver 127.0.0.11 valid=300s ipv6=off;
+    resolver_timeout 5s;
+
+    include /etc/nginx/snippets/security-headers.conf;
+
+    # дефолтный лимит тела: обычные API-запросы маленькие
+    client_max_body_size 2m;
+    client_body_timeout   30s;
+    client_header_timeout 15s;
+    limit_conn perip 256;
+
+    # Дефолты проксирования на уровне server — location'ы их переопределяют
+    # (в сниппете proxy-common.conf их держать нельзя: include + переопределение
+    #  в том же блоке = "directive is duplicate").
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
+    # при пересоздании контейнера api (деплой) не отдаём 502 сразу — пробуем ещё раз;
+    # deploy.sh дополнительно делает nginx -s reload, чтобы перечитать upstream
+    proxy_next_upstream error timeout http_502 http_503 http_504;
+    proxy_next_upstream_tries 2;
+    proxy_next_upstream_timeout 5s;
+
+    # Swagger/OpenAPI в проде выключены в самом приложении (ENV=production),
+    # здесь — вторая линия: 404 без похода в бэкенд (07 §4.5 N7).
+    location ~ ^/api/(docs|redoc|openapi\.json)$ {
+        access_log off;
+        return 404;
+    }
+
+    # ---------- Глубокая проверка здоровья ОСТАЁТСЯ ОТКРЫТОЙ ----------
+    #
+    # ⚠ ЗДЕСЬ БЫЛА ЗАКРЫВАЮЩАЯ ПРАВКА, И Я ЕЁ СНЯЛ, ИЗМЕРИВ ПОСЛЕДСТВИЯ (01.09).
+    #
+    # Аудит предлагал пустить `/api/health/deep` только из приватной сети
+    # WireGuard: секретов в ответе нет, но посторонний видит рабочее состояние —
+    # длину очереди, живость воркера, возраст последних сообщений.
+    #
+    # Проверка показала, что цена такой правки несоизмерима. Наблюдатель из
+    # Амстердама (`deploy/watchdog-offsite.sh:162`) зовёт эту ручку по
+    # ПУБЛИЧНОМУ адресу, а не через мост: `${PROD_URL}/api/health/deep`. И это
+    # не оплошность, а замысел — сторож обязан проверять систему ТЕМ ЖЕ путём,
+    # которым к ней приходят люди. Уйди он на приватный мост, публичный отказ
+    # остался бы им незамеченным.
+    #
+    # То есть закрытие ослепило бы единственного, кто способен заметить смерть
+    # системы снаружи, ради сокрытия чисел, которые не являются секретом. Список
+    # разрешённых адресов эту беду не лечит: сменится адрес в Амстердаме — и
+    # оповещение умрёт молча, а узнаем мы об этом в день настоящей аварии.
+
+    # ---------- WebSocket (01 §11) ----------
+    # exact-match: /api/v1/ws — путь текущего фронта, /api/ws — канонический
+    # алиас из 01 §11. /api/v1/ws/ticket — обычный POST, уходит в location /api/.
+    # ⚠ ЖУРНАЛ ОБРАЩЕНИЙ ЗДЕСЬ ВКЛЮЧЁН, И БИЛЕТ В НЕГО НЕ ПОПАДАЕТ (09.09).
+    #
+    # Стояло `access_log off` с доводом «одноразовый тикет лежит в query — в
+    # логах ему делать нечего». Довод верный, а вывод из него — нет: формат
+    # `json_combined` (nginx.conf) пишет `$uri`, а НЕ `$request_uri`, то есть
+    # строки запроса в журнале обращений не бывает ни у одного location. Билет
+    # туда и не писался; выключение отнимало не утечку, а зрение. Замер на бою
+    # после правки: строк обращений с `wst_` — ноль.
+    #
+    # ⚠ А В ЖУРНАЛЕ ОШИБОК БИЛЕТ ЕСТЬ, И ФОРМАТОМ ЭТО НЕ ЛЕЧИТСЯ. Свои
+    # `[warn]`/`[error]` nginx печатает со строкой запроса ЦЕЛИКОМ, и
+    # `log_format` ими не управляет. `access_log off` от этого не спасал тоже —
+    # к журналу ошибок он отношения не имеет, то есть билет лежал там и до
+    # правки. Замер: 12 таких строк за полчаса, ВСЕ от одного предупреждения —
+    # «upstream sent duplicate header line: date» на апгрейде вебсокета
+    # (заголовок `Date` шлём не мы, грепом по `app/` его нет). Остаток безвреден
+    # по устройству самого билета: одноразовый, живёт 60 секунд
+    # (`ws_ticket_ttl_seconds`), журнал лежит внутри контейнера. Настоящее
+    # лечение — убрать дубль заголовка у upstream: тогда исчезнут и
+    # предупреждения, и остаток. Это отдельная работа.
+    #
+    # Цена молчания измерена жалобой 09.09: диспетчер прислал «WebSocket ...
+    # failed», и отличить «сеть не донесла» от «edge отказал» было НЕЧЕМ —
+    # неудавшийся апгрейд не оставлял следа нигде. Тот же класс, что
+    # «жалоба непроверяема, потому что в строке не было человека».
+    location = /api/v1/ws {
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-ws.conf;
+    }
+
+    location = /api/ws {
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-ws.conf;
+    }
+
+    # ---------- Логин: жёсткий rate-limit ----------
+    # дублирует прикладной лимит (DESIGN §9 / 01 §1.7); nginx ловит явный флуд
+    location = /api/v1/auth/login {
+        # nodelay: утренний вход всей смены — это всплеск, а не флуд;
+        # без него первые запросы стоят в очереди до минуты (07 §3)
+        limit_req zone=login burst=30 nodelay;
+        error_page 429 @api_too_many;
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-common.conf;
+    }
+
+    # ---------- Отказ по частоте — конвертом API (проверка 24.09) ----------
+    # Раньше лимит отвечал HTML-страницей nginx: фронт не находил в ней
+    # конверта и показывал «Запрос завершился с кодом 429», ничего не
+    # повторяя (5 583 таких отказа за 08.09–24.09). Код `too_many_requests`
+    # отличает этот отказ от лимитов самого приложения (`rate_limited`): до
+    # приложения запрос не дошёл, и фронт повторяет его через `Retry-After`
+    # для любого метода (`sendPatiently` в frontend/src/shared/api/http.ts).
+    # Ответы приложения этот обработчик не трогает: `proxy_intercept_errors`
+    # в API выключен, сюда попадает только отказ самого nginx.
+    location @api_too_many {
+        default_type application/json;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-store" always;
+        add_header Retry-After "1" always;
+        return 429 '{"error":{"code":"too_many_requests","message":"Слишком много запросов подряд — подождите пару секунд"}}';
+    }
+
+    # ---------- Служебный вход для скриптов на хосте (14 §2.1) ----------
+    # Наружу этой ручки нет вовсе. Её зовут backup.sh, restore-check.sh и
+    # healthcheck-alert.sh — все они живут НА ХОСТЕ и ходят напрямую в
+    # 127.0.0.1:8000 (порт api опубликован на loopback, см. docker-compose.prod.yml),
+    # поэтому публичный маршрут им не нужен, а публичный маршрут к ручке,
+    # принимающей сервисный токен, — лишняя мишень.
+    #
+    # ^~ (а не =): под 404 уходит весь префикс, включая будущие /internal/*.
+    # Именно 404, а не 403: снаружи такого пути просто не существует.
+    location ^~ /api/v1/internal/ {
+        access_log off;
+        return 404;
+    }
+
+    # ---------- Вебхуки Авито ----------
+    # свой rate-limit + лимит тела 1 МБ (DESIGN §9, 07 §4.4 W2)
+    location /api/hooks/ {
+        limit_req zone=hooks burst=100 nodelay;
+        client_max_body_size 1m;
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-common.conf;
+        # вебхук обязан отвечать быстро; если api завис — лучше быстрый 504,
+        # Авито ретраит, а reconciliation-поллинг всё равно догонит
+        proxy_read_timeout 10s;
+        proxy_next_upstream off; # ретраить вебхук на уровне nginx не нужно
+    }
+
+    # ---------- Загрузка вложения менеджером (POST /api/v1/media, 01 §6.5) ----------
+    location = /api/v1/media {
+        client_max_body_size 20m; # обязано совпадать с MEDIA_MAX_SIZE_MB
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-common.conf;
+        proxy_request_buffering off; # стримим тело сразу в api
+        proxy_read_timeout 120s;     # приём 20 МБ по медленному каналу
+    }
+
+    # ---------- Отдача вложений: подписанные ссылки (DESIGN §1.4, 01 §6.1) ----------
+    # Файлы отдаёт сам nginx, без похода в Python: API после RBAC-проверки диалога
+    # кладёт в attachments[].url подписанную ссылку
+    #   /api/v1/media/{relpath}?sig=<md5-b64url>&exp=<unix_ts>   (TTL 1 час)
+    # Формула обязана совпадать с signed_media_url() в app (05 §3.3):
+    #   md5("<exp><uri> <MEDIA_SIGN_KEY>") -> base64url без '='
+    location /api/v1/media/ {
+        secure_link $arg_sig,$arg_exp;
+        secure_link_md5 "$secure_link_expires$uri ${MEDIA_SIGN_KEY}";
+
+        if ($secure_link = "")  { return 403; } # подписи нет или битая
+        if ($secure_link = "0") { return 410; } # ссылка истекла — фронт перезапросит деталь
+
+        alias /var/leadchat/media/;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "private, max-age=3600" always;
+        # Не угадываем mime: всё отдаём как octet-stream, Content-Type для
+        # показа задаёт API в самой ссылке. Плюс nosniff из сниппета выше —
+        # загруженный клиентом .html никогда не исполнится в нашем origin.
+        types { }
+        default_type application/octet-stream;
+        access_log off;
+    }
+
+    # ---------- Снимки клиентов с CDN Авито — через нас, с кэшем (12.09) ----------
+    # API подменяет `https://NN.img.avito.st/<путь>` на подписанный
+    #   /api/v1/avito-img/NN.img.avito.st/<путь>?sig=…&exp=…   (та же подпись,
+    # что у своих вложений: services/media.py::proxied_avito_image_url). Хост
+    # зашит шаблоном — двузначный номер перед .img.avito.st, и ничто другое
+    # через этот location не уйдёт. Referer и cookie наружу не идут.
+    location ~ "^/api/v1/avito-img/(?<img_host>[0-9]{2}\.img\.avito\.st)/(?<img_path>[^?]+)$" {
+        secure_link $arg_sig,$arg_exp;
+        secure_link_md5 "$secure_link_expires$uri ${MEDIA_SIGN_KEY}";
+        if ($secure_link = "")  { return 403; }
+        if ($secure_link = "0") { return 410; }
+
+        proxy_pass https://$img_host/$img_path;
+        proxy_ssl_server_name on;
+        proxy_ssl_protocols TLSv1.2 TLSv1.3;
+        proxy_ssl_verify on;
+        proxy_ssl_verify_depth 3;
+        proxy_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+        proxy_set_header Host $img_host;
+        proxy_set_header Referer "";
+        proxy_set_header Cookie "";
+        proxy_set_header Accept "image/avif,image/webp,image/*,*/*;q=0.8";
+        proxy_http_version 1.1;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 20s;
+        proxy_intercept_errors on;
+
+        proxy_cache avito_img;
+        proxy_cache_key "$img_host/$img_path";
+        proxy_cache_valid 200 7d;
+        proxy_cache_valid 404 1m;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_lock on;
+        proxy_ignore_headers Cache-Control Expires Set-Cookie Vary;
+        proxy_hide_header Set-Cookie;
+
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "private, max-age=3600" always;
+        add_header X-Cache-Status $upstream_cache_status always;
+        access_log off;
+    }
+
+    # ---------- /download: инсталлятор десктопа + манифест автообновления ----------
+    # Каталог наполняет релиз десктопа (04-DESKTOP §6.1): CI по тегу desktop-v*
+    # (.github/workflows/desktop-release.yml) либо deploy/publish-desktop.sh
+    # вручную. nginx монтирует его :ro и только раздаёт — подписывать ему нечем,
+    # компрометация VPS не даёт подсунуть обновление (клиент проверяет minisign
+    # зашитым pubkey, 04 §6.2).
+    #
+    #   latest.json                          манифест tauri-updater
+    #   LeadChat_1.4.2_x64-setup.exe (+.sig) NSIS: сотрудники + автообновление
+    #   LeadChat_1.4.2_x64_ru-RU.msi (+.sig) MSI: развёртывание через GPO
+    #   LeadChat-Setup.exe                   симлинк на свежий setup.exe
+    #
+    # Кнопка «Скачать приложение для Windows» на /login ведёт на /download.
+    location = /download  { return 302 /download/LeadChat-Setup.exe; }
+    location = /download/ { return 302 /download/LeadChat-Setup.exe; }
+
+    location /download/ {
+        alias /var/leadchat/download/;
+        autoindex off; # листинга каталога наружу нет (дефолт, фиксируем явно)
+
+        # Стабильное имя — это СИМЛИНК, его цель меняется каждым релизом.
+        # Кэшировать его как версионированный файл нельзя: сотрудник, скачавший
+        # «свежий» инсталлятор из кэша прокси, получил бы прошлую версию.
+        # no-cache = обязательная перепроверка по ETag; не изменился — 304,
+        # тело не перекачивается.
+        location = /download/LeadChat-Setup.exe {
+            include /etc/nginx/snippets/security-headers.conf;
+            add_header Cache-Control "no-cache" always;
+            add_header Content-Disposition "attachment" always;
+            types { }
+            default_type application/octet-stream;
+        }
+
+        # Манифест обновления: клиент обязан увидеть новую версию сразу после
+        # релиза, поэтому только no-cache.
+        location ~ ^/download/[^/]+\.json$ {
+            include /etc/nginx/snippets/security-headers.conf;
+            add_header Cache-Control "no-cache" always;
+            types { }
+            default_type application/json;
+        }
+
+        # Версионированные инсталляторы: имя содержит версию, содержимое по
+        # этому имени уже не меняется. Час — намеренный потолок, а не
+        # «immutable»: даёт возможность перезалить артефакт в первые минуты
+        # после релиза, если что-то пошло не так.
+        # Content-Type принудительно octet-stream + nosniff из сниппета:
+        # браузер такой файл только скачивает, интерпретировать не пытается.
+        location ~ ^/download/[^/]+\.(exe|msi)$ {
+            include /etc/nginx/snippets/security-headers.conf;
+            add_header Cache-Control "public, max-age=3600" always;
+            add_header Content-Disposition "attachment" always;
+            types { }
+            default_type application/octet-stream;
+        }
+
+        # Подписи minisign — текстовые, нужны для ручной проверки релиза.
+        location ~ ^/download/[^/]+\.sig$ {
+            include /etc/nginx/snippets/security-headers.conf;
+            add_header Cache-Control "public, max-age=3600" always;
+            types { }
+            default_type text/plain;
+            charset utf-8;
+        }
+
+        # Всё остальное из каталога наружу не отдаём. Список разрешённых
+        # расширений выше — это allowlist: случайно оказавшийся в /download
+        # файл (черновик, ключ, лог) не станет публичным из-за того, что мы
+        # не догадались его запретить.
+        location ~ ^/download/ { return 404; }
+    }
+
+    # ---------- Остальной API ----------
+    # Два лимита сразу, nginx проверяет оба: `api` считает на ЧЕЛОВЕКА (ключ —
+    # хвост токена, map в nginx.conf), `api_addr` — страховка на адрес с
+    # потолком в семь наших офисов. До 06.09 зона api считалась на адрес, и
+    # весь офис за одним NAT делил 30 r/s на всех — 344–364 отказа 429 в
+    # сутки, все свои (разбор у зоны в nginx.conf).
+    # nodelay: залп кадров при возврате во вкладку — всплеск, а не флуд;
+    # burst=60 — две секунды планки на одного человека.
+    location /api/ {
+        limit_req zone=api      burst=60  nodelay;
+        limit_req zone=api_addr burst=400 nodelay;
+        error_page 429 @api_too_many;
+        proxy_pass http://leadchat_api;
+        include /etc/nginx/snippets/proxy-common.conf;
+
+        # ---- ответы API не кладём в кэш (аудит 08.09, SEC-02) ----
+        #
+        # ЧТО БЫЛО. У ответов API не стояло НИ ОДНОГО заголовка кэширования:
+        # проверено на бою 08.09 — `/api/health` возвращал только
+        # `content-type` и `x-content-type-options`. В ответах лежат переписка
+        # с клиентом, имена и телефоны; кто и как долго их держит, решал
+        # каждый посредник сам.
+        #
+        # ⚠ `Vary: Authorization` ВАЖНЕЕ, ЧЕМ КАЖЕТСЯ. Вся смена сидит за одним
+        # офисным NAT (см. зону api_addr выше). Общий кэш без этого заголовка
+        # вправе отдать ответ, посчитанный для ОДНОГО токена, соседу с другим —
+        # то есть показать диспетчеру чужие диалоги. `no-store` и так это
+        # закрывает, но два заслона здесь стоят одной строки.
+        #
+        # ⚠ `add_header` В LOCATION ПОЛНОСТЬЮ ЗАМЕНЯЕТ НАБОР ИЗ SERVER — про это
+        # написано в самом сниппете. Поэтому security-headers подключается
+        # здесь ЯВНО: без этой строки API остался бы вообще без заголовков
+        # защиты, и правка, задуманная как усиление, ослабила бы его.
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-store" always;
+        add_header Vary "Authorization" always;
+    }
+
+    # ---------- React-статика ----------
+    # хэшированные ассеты Vite: кэшируем навсегда
+    location /assets/ {
+        root /usr/share/nginx/html;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        access_log off;
+        try_files $uri =404;
+    }
+
+    # ⚠ КАРТЫ КОДА С ПРОДА НЕ РАЗДАЁМ (05 §7.1). Здесь было написано «они
+    # уезжают в Sentry из CI» — проверено 08.09 грепом по `.github/workflows`,
+    # Dockerfile и `deploy/`: `sentry-cli` не вызывается нигде, карты не
+    # уезжали никуда. С той же правкой сборка их больше и не делает
+    # (`vite.config.ts`, `sourcemap: false`), так что правило ниже стало
+    # страховкой на случай возврата, а не единственным заслоном.
+    # Регексп сужен до /assets/, чтобы не задеть вложение с расширением .map.
+    location ~ ^/assets/.+\.map$ { access_log off; return 404; }
+
+    # ---------- Сервис-воркер уведомлений ----------
+    #
+    # ⚠ БЕЗ ЭТОГО LOCATION ВОРКЕР НЕ ВСТАЁТ ВООБЩЕ, И МОЛЧА. До 07.09 /sw.js
+    # попадал под SPA-fallback ниже и отдавался как index.html:
+    #
+    #   $ curl -sS -o /dev/null -w '%{http_code} %{content_type} %{size_download}' .../sw.js
+    #   200 text/html 14103
+    #
+    # Браузер отказывает регистрации воркера, отданного с типом text/html, —
+    # отказ виден только в консоли вкладки, а приложение работает как ни в чём
+    # не бывало, просто без кнопок «Принять»/«Отклонить» в уведомлении.
+    #
+    # ⚠ `root` ЗДЕСЬ ОБЯЗАТЕЛЕН И ЯВЕН: на уровне server в этом файле его нет
+    # вовсе (каталог статики объявлен внутри /assets/ и внутри `location /`),
+    # унаследовать неоткуда. Забыть его — снова получить index.html, но уже
+    # молча и без 404.
+    #
+    # no-cache — обязательная перепроверка по ETag, тот же довод, что у
+    # /download/LeadChat-Setup.exe: у воркера свой цикл обновления, и кэш
+    # браузера или прокси продлил бы жизнь старому коду поверх него.
+    #
+    # Content-Type не назначаем руками: mime.types отдаёт .js как
+    # application/javascript (проверено на бою на /assets/*.js), а это ровно то,
+    # что браузер принимает для регистрации.
+    location = /sw.js {
+        root /usr/share/nginx/html;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri =404;
+    }
+
+    # Короткая ссылка «подключите свой аккаунт Авито».
+    #
+    # По ней приходит человек, у которого пароль от аккаунта Авито, — он в
+    # LeadChat не заходит и не обязан. Ссылку отправляют в мессенджере, и
+    # адрес вида /api/v1/avito/connect/<токен> в переписке выглядит как то,
+    # по чему не стоит переходить. Короткий путь — ровно об этом доверии.
+    location ^~ /connect/ {
+        rewrite ^/connect/(.*)$ /api/v1/avito/connect/$1 break;
+        proxy_pass http://leadchat_api;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Request-Id $request_id;
+    }
+
+    # Страница согласия ВСТРОЕННОГО имитатора Авито.
+    #
+    # ЗАЧЕМ ОНА В ПРОДЕ. Пока не выданы боевые ключи разработчика Авито, прод
+    # работает на имитаторе (docker-compose.override.yml), и `AVITO_AUTH_URL`
+    # указывает сюда. Без этого маршрута кнопка «Подключить аккаунт Авито»
+    # уводила браузер на /fake-oauth, nginx отдавал ему саму систему по
+    # SPA-fallback, и человек возвращался с «Не удалось подключить аккаунт» —
+    # адрес был объявлен, а вести ему было некуда.
+    #
+    # Через переменную и resolver, а НЕ прямым upstream: без имитатора
+    # (боевая сборка без override) nginx с прямым `proxy_pass` не запустился
+    # бы вовсе — «host not found in upstream». С переменной имя разрешается в
+    # момент запроса, и отсутствие имитатора даёт 502 на одном этом адресе
+    # вместо мёртвого сервера целиком.
+    #
+    # Когда выдадут боевые ключи, `AVITO_AUTH_URL` станет https://avito.ru/oauth,
+    # и сюда просто перестанут ходить.
+    location = /fake-oauth {
+        resolver 127.0.0.11 valid=30s;  # встроенный DNS docker
+        set $fake_avito "fake-avito:8020";
+        proxy_pass http://$fake_avito/oauth$is_args$args;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SPA-fallback: любые маршруты (/chats/123, /settings/…) -> index.html
+    # ---------- пробы сканеров: 404 вместо оболочки приложения ----------
+    #
+    # ⚠ SPA-ЗАГЛУШКА НИЖЕ ОТВЕЧАЕТ 200 НА ВСЁ, И ЭТО ВИДНО СНАРУЖИ (аудит
+    # 08.09, SEC-05). Замер на бою: `/.env`, `/.git/config`, `/wp-login.php` —
+    # все три `200 text/html 14103b`. Секретов в ответе нет, там оболочка
+    # приложения, но сканер читает 200 как «файл есть» и остаётся: за такими
+    # пробами идёт перебор путей, а каждая проба стоит нам запроса к nginx.
+    #
+    # ⚠ ПОЧЕМУ НЕ «404 НА ВСЁ НЕИЗВЕСТНОЕ». Разделы приложения — обычные
+    # адреса (`/dialogs`, `/settings/accounts`), и они ОБЯЗАНЫ отдавать
+    # оболочку: без этого ссылка на раздел, открытая из мессенджера, покажет
+    # 404. Отличие простое и надёжное: у раздела приложения не бывает
+    # расширения и не бывает точки в начале сегмента.
+    location ^~ /.well-known/ {
+        # Каталог открыт намеренно: ACME-проверка ходит по HTTP (блок выше), а
+        # здесь с 09.09 лежит `security.txt` — адрес для связи по уязвимостям
+        # (RFC 9116). Правило точечных путей ниже его бы съело, и спасает
+        # именно модификатор `^~`: он запрещает nginx переходить к регулярным
+        # location'ам. Проверено: `/.env` и `/.git/config` по-прежнему 404.
+        #
+        # ⚠ ВТОРОЙ LOCATION НА ЭТОТ ЖЕ ПУТЬ ЕСТЬ, И СЛИВАТЬ ИХ НЕЛЬЗЯ.
+        # `/.well-known/acme-challenge/` живёт в блоке :80 со своим корнем
+        # `/var/www/certbot` — это продление сертификата. Здесь блок :443 и
+        # корень статики; объединение положило бы обновление сертификата.
+        root /usr/share/nginx/html;
+        # ⚠ RFC 9116 §3 ТРЕБУЕТ `text/plain; charset=utf-8` — MUST. Своего
+        # charset у nginx нет по умолчанию (директивы нет во всём конфиге), и
+        # `.txt` уезжает голым `text/plain`. Ставим ровно здесь, а не на
+        # уровне http: там правка задела бы index.html, robots.txt и sw.js
+        # разом, а SM-13 сверяет тип `/sw.js` строкой.
+        charset utf-8;
+        include /etc/nginx/snippets/security-headers.conf;
+        try_files $uri =404;
+    }
+    # ⚠ ЛЕГАСИ-ПУТЬ ОБЯЗАН ВЕСТИ К КАНОНИЧЕСКОМУ, А НЕ К ОБОЛОЧКЕ ПРИЛОЖЕНИЯ.
+    # Замер на бою 09.09: `/security.txt` отдавал 200 text/html 5143 байта —
+    # SPA-заглушку. Исследователь, проверяющий старый адрес из RFC 9116 §3,
+    # видел двухсотку и HTML и делал вывод «файла нет». Точное совпадение `=`
+    # сильнее и заглушки, и правила по расширениям ниже.
+    location = /security.txt { return 301 /.well-known/security.txt; }
+    location ~ ^/\. { access_log off; return 404; }
+    #
+    # ⚠ ПУТИ ПРИЛОЖЕНИЯ ИСКЛЮЧЕНЫ ОТРИЦАТЕЛЬНЫМ ПРОСМОТРОМ, И БЕЗ НЕГО ПРАВИЛО
+    # ЛОМАЕТ РАБОТУ. Регулярное правило в nginx СИЛЬНЕЕ префиксного, то есть
+    # оно перебивает `location /api/`. Вложения клиент присылает со своими
+    # именами, и файл «отчёт.log» или «смета.yml» уехал бы в 404 вместо
+    # выдачи — на ровном месте, и заметили бы это не сразу.
+    location ~* ^/(?!api/|assets/|download/).*\.(php|aspx?|jsp|cgi|pl|sql|bak|old|ini|conf|log|env|ya?ml|sh)$ {
+        access_log off;
+        return 404;
+    }
+
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri /index.html;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-cache" always; # index.html всегда свежий
+        # ⚠ КОММЕНТАРИЙ «CSP ОСОЗНАННО НЕ ВКЛЮЧЁН» СНЯТ 08.09 — ОН УСТАРЕЛ НА
+        # НЕДЕЛЮ. Политика включена 1 сентября и приезжает сюда вместе со
+        # `security-headers.conf` (строка выше): встроенный скрипт темы
+        # разрешён поимённо по хешу, `style-src` оставлен с 'unsafe-inline'
+        # ради Mantine/emotion — ровно тот довод, который здесь и был описан,
+        # только он давно превратился из плана в сделанное. Разбор целиком —
+        # в самом сниппете; проверяет её на бою SM-12.
+    }
+}

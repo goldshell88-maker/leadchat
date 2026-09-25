@@ -1,0 +1,14 @@
+# LeadChat security contact (RFC 9116).
+#
+# Found a vulnerability? Message @unlukyguy on Telegram, in Russian or English.
+# The account belongs to a person, not a bot, so expect a human reply.
+#
+# Please do not run automated scans, load tests or exploits against the live
+# system: dispatchers work in it around the clock, and downtime interrupts
+# real conversations with real customers. A description and, if you have one,
+# a proof of concept are enough.
+#
+# There is no paid bug bounty programme.
+Contact: https://t.me/unlukyguy
+Expires: 2027-09-01T00:00:00Z
+Preferred-Languages: ru, en

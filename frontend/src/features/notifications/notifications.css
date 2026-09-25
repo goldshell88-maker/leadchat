@@ -1,0 +1,530 @@
+/* Центр уведомлений (14 §3): колокольчик, список, плашки критичного, журнал. */
+
+/* Кегль здесь не задаём: внутри SVG с явными width/height, и правило
+   `font-size: 18px` не влияло ни на что — остаток от эпохи, когда значок был
+   эмодзи (POLISH-24). */
+/*
+ * Геометрия — из общей шкалы контролов (`--lc-btn-*`, разбор в lc-vars.css).
+ * Своё число здесь означало бы ещё одну высоту на экране: их было десять.
+ */
+.lc-bell {
+  position: relative;
+  width: var(--lc-btn-h-sm);
+  height: var(--lc-btn-h-sm);
+  display: grid;
+  place-items: center;
+  border-radius: var(--lc-btn-radius);
+  color: var(--lc-text-2);
+  transition: background var(--lc-motion-fast);
+}
+
+.lc-bell:hover {
+  background: var(--lc-bg-2);
+}
+
+.lc-bell__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  /* Счётчик — капсула: радиус равен половине высоты при любой ширине, и «9px»
+     был просто половиной восемнадцати, записанной руками. */
+  border-radius: var(--lc-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lc-danger-solid);
+  color: var(--lc-on-danger);
+  font-size: var(--lc-fz-micro);
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* «Сколько именно — неизвестно»: загрузка центра не удалась (NOTIF-01).
+   Не красный кружок с числом (числа у нас нет) и не пустота (пустота читается
+   как «новостей нет»), а знак вопроса цвета предупреждения. */
+.lc-bell__badge--unknown {
+  background: var(--lc-warning-solid);
+  color: var(--lc-on-warning);
+}
+
+/* --- Выпадающий список --------------------------------------------------- */
+
+.lc-notify-panel {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.lc-notify-panel__head,
+.lc-notify-panel__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2);
+}
+
+.lc-notify-panel__head {
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.lc-notify-panel__foot {
+  border-top: 1px solid var(--lc-border);
+  justify-content: center;
+}
+
+/* Предупреждение под «Отметить все прочитанными»: массовая пометка намеренно
+   не гасит красные плашки, и знать об этом надо ДО нажатия. */
+.lc-notify-panel__note {
+  padding: var(--lc-space-1) var(--lc-space-2) var(--lc-space-2);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.lc-notify-panel__list {
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* Пустота и неудача загрузки живут в одном блоке, и обе — с объяснением.
+   Раньше здесь была одна приглушённая серая строка без действия: она
+   одинаково годилась и под «ничего не пришло», и под «не смогли загрузить»
+   (NOTIF-01, POLISH-29). */
+.lc-notify-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-5) var(--lc-space-3);
+  text-align: center;
+}
+
+/*
+ * ПЕРВАЯ СТРОКА ПУСТОТЫ — ЗАГОЛОВОК, А НЕ ЕЩЁ ОДНА ПОДПИСЬ.
+ *
+ * Обе строки здесь были 13 и 12 пикселей приглушённым `--lc-text-3`: главное
+ * («уведомлений нет», «не удалось загрузить») и второстепенное («здесь
+ * появится всё важное») различались одним пикселем кегля и не различались
+ * цветом вовсе. С полуметра это читается как серый абзац, в котором надо
+ * искать смысл, — а в панели, куда заглядывают на две секунды, искать никто
+ * не станет.
+ *
+ * Канон берём домашний, у `.lc-empty__title` (lc-base.css): 16/600 в
+ * `--lc-text-1`. Сам `EmptyState` сюда не ставим — у него 88-пиксельная
+ * иллюстрация и поля `--lc-space-8`, а панель шириной 380 и живёт под
+ * колокольчиком.
+ */
+.lc-notify-panel__empty-title {
+  font-size: var(--lc-fz-card);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.lc-notify-row {
+  display: flex;
+  gap: var(--lc-space-2);
+  align-items: flex-start;
+  padding: var(--lc-space-2);
+  border: none;
+  border-left: 3px solid transparent;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background var(--lc-motion-fast);
+}
+
+.lc-notify-row:hover {
+  background: var(--lc-surface-hover);
+}
+
+/*
+ * Непрочитанное — НЕ тем же фоном, что наведение.
+ *
+ * Раньше оба брали одно значение, и это давало сразу две беды: непрочитанная
+ * строка выглядела вечно подсвеченной, а наведение на неё не меняло ничего —
+ * отклика на курсор не было там, куда чаще всего целятся.
+ *
+ * ПЕРВАЯ ПОПЫТКА ЗАМЕНЫ БЫЛА ПУСТЫШКОЙ, и это стоит записать. Правило ставило
+ * непрочитанному вес 600, а базовый заголовок УЖЕ был 600 — ни одного пикселя
+ * не менялось. В комментарии при этом стояло, что признак несут «вес шрифта и
+ * точка слева»; точки не существовало вовсе (капсула слева — это важность, она
+ * у всех строк). То есть признак был описан, но не существовал: фон убрали, а
+ * замену не сделали.
+ *
+ * Теперь база опущена до среднего, непрочитанное — полужирное, и разница
+ * действительно есть. Плюс подпись для скринридера: вес шрифта он не
+ * озвучивает.
+ */
+.lc-notify-row[data-unread] .lc-notify-row__title {
+  font-weight: var(--lc-fw-semibold);
+}
+
+.lc-notify-row[data-severity="critical"] {
+  border-left-color: var(--lc-danger);
+}
+
+.lc-notify-row[data-severity="warning"] {
+  border-left-color: var(--lc-warning);
+}
+
+.lc-notify-row[data-severity="info"] {
+  border-left-color: var(--lc-border-strong);
+}
+
+.lc-notify-row__icon {
+  font-size: var(--lc-fz-card);
+  line-height: 1.4;
+}
+
+.lc-notify-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lc-notify-row__head {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  flex-wrap: wrap;
+}
+
+.lc-notify-row__title {
+  font-size: var(--lc-fz-body);
+  /* СРЕДНИЙ, а не полужирный: полужирный отдан непрочитанному ниже. Пока
+     база была 600, правило для непрочитанного ставило те же 600 и не меняло
+     ни одного пикселя — признак существовал только в комментарии. */
+  font-weight: var(--lc-fw-medium);
+  color: var(--lc-text-1);
+}
+
+.lc-notify-row__text {
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.lc-notify-row__meta {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+/* Важность — цветом И словом: цвет не единственный признак (10 §доступность). */
+.lc-notify-severity {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--lc-space-2);
+  border-radius: var(--lc-radius-pill);
+  font-size: var(--lc-fz-micro);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lc-notify-severity--critical {
+  background: var(--lc-danger-subtle);
+  color: var(--lc-danger-text);
+}
+
+.lc-notify-severity--warning {
+  background: var(--lc-warning-subtle);
+  color: var(--lc-warning-text);
+}
+
+.lc-notify-severity--info {
+  background: var(--lc-bg-2);
+  color: var(--lc-text-3);
+}
+
+/* --- Плашки критичного --------------------------------------------------- */
+
+/* Разделитель плашек — сплошная линия 1px, как везде в системе (POLISH-41).
+   Раньше это был зазор `gap: 1px` на красной подложке: тот же пиксель, но
+   способом, которого больше нигде нет, и при смене фона он бы просто исчез. */
+.lc-critical {
+  display: flex;
+  flex-direction: column;
+}
+
+.lc-critical__item {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-3);
+  padding: var(--lc-space-2) var(--lc-space-4);
+  background: var(--lc-danger-subtle);
+  /*
+   * Плашка ВЫЕЗЖАЕТ, а не возникает. Рецепт домашний — те же кадры
+   * `lc-banner-in`, которыми появляются полосы связи и прав (app-layout.css):
+   * плашка встаёт в ту же стопку над рабочим местом и сдвигает вниз всё, что
+   * человек в этот момент читает. Восемь пикселей за четверть секунды
+   * объясняют, откуда взялась красная полоса; мгновенная подстановка читается
+   * как «экран дёрнулся». Уход не анимируем намеренно — см. довод там же.
+   */
+  animation: lc-banner-in var(--lc-dur-base) var(--lc-ease);
+}
+
+.lc-critical__item + .lc-critical__item,
+.lc-critical__item + .lc-critical__more {
+  border-top: 1px solid var(--lc-danger);
+}
+
+.lc-critical__icon {
+  font-size: var(--lc-fz-section);
+}
+
+.lc-critical__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.lc-critical__title {
+  font-size: var(--lc-fz-body);
+  color: var(--lc-danger-text);
+}
+
+.lc-critical__body {
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-2);
+}
+
+.lc-critical__actions {
+  display: flex;
+  gap: var(--lc-space-2);
+  flex-shrink: 0;
+}
+
+.lc-critical__more {
+  padding: 4px var(--lc-space-4);
+  border: none;
+  background: var(--lc-danger-subtle);
+  color: var(--lc-danger-text);
+  font: inherit;
+  font-size: var(--lc-fz-note);
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+
+/* --- Журнал /notifications ----------------------------------------------- */
+
+/* Обвязка — у `.lc-page` (NotificationsPage.tsx). */
+.lc-journal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-3);
+  overflow: auto;
+}
+
+.lc-journal__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lc-space-2);
+}
+
+.lc-journal__scroll {
+  overflow-x: auto;
+}
+
+/* Раскладка и шапка — у `.lc-table` (lc-base.css); своё — кегль плотной таблицы. */
+.lc-journal__table {
+  font-size: var(--lc-fz-note);
+}
+
+.lc-journal__row[data-unread] .lc-journal__title {
+  font-weight: 600;
+}
+
+.lc-journal__time {
+  white-space: nowrap;
+  color: var(--lc-text-2);
+}
+
+/*
+ * ⚠ «СОБЫТИЕ» — ЭТО ПРЕДЛОЖЕНИЕ, А НЕ ЯРЛЫК (замер 08.09).
+ *
+ * `white-space: nowrap` стоял здесь заодно со временем, как будто в колонке
+ * лежит короткое слово. Лежит же подпись вида уведомления из `catalog.ts`:
+ * «Аккаунт Авито требует переподключения», «Планировщик не подаёт признаков
+ * жизни», «Канал отобрали: подписка на события пропала». Запрет переноса
+ * превращал такую подпись в неразрывный минимум колонки, и вся таблица
+ * начинала требовать 896 пикселей независимо от того, сколько их есть.
+ *
+ * Замер на стенде (окно 900, рельс 218 — рабочему месту 634): колонки
+ * 97 · 88 · 335 · 108 · 268, из них «Событие» держала 335, а «Что произошло»
+ * ужималась до своего минимума 108. После переноса таблице довольно 658 —
+ * то есть один этот запрет стоил 238 пикселей.
+ */
+.lc-journal__kind {
+  color: var(--lc-text-2);
+}
+
+.lc-journal__title {
+  color: var(--lc-text-1);
+}
+
+.lc-journal__body {
+  color: var(--lc-text-2);
+}
+
+.lc-journal__actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/*
+ * `.lc-journal__empty` удалён 5 сентября вместе со своей разметкой: три пустых
+ * исхода журнала (не загрузилось, отбор ничего не нашёл, тишина) перешли на
+ * общий `EmptyState`, у которого своя раскладка. Мёртвое правило врало бы о
+ * том, что у журнала есть собственный вид пустоты (сторож cssDeadClasses).
+ */
+
+.lc-journal__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.lc-journal__skeleton-line {
+  height: 28px;
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-bg-2);
+  animation: lc-skeleton-pulse var(--lc-skeleton-speed) ease-in-out infinite;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-journal__skeleton-line {
+    animation: none;
+  }
+}
+
+/*
+ * ⚠ КОЛОНКА ДЕЙСТВИЙ УЕЗЖАЛА ЗА ПРАВЫЙ КРАЙ (замер 08.09).
+ *
+ * Механизм законный — `.lc-journal__scroll` объявлен `overflow-x: auto`, — но
+ * за край уезжала именно та колонка, ради которой в журнал и заходят:
+ * «Переподключить» у критичного «Канал отобрали». Замер до правок, окно 900 и
+ * рельс 218: прокрутка 262 пикселя, кнопка на 254 правее видимого края. На
+ * 768 — 394 и 386. Таблице было нужно 896 при доступных 634.
+ *
+ * ПОРОГ ПО МЕСТУ, А НЕ ПО ОКНУ. Рельс развёрнут по умолчанию (`railStore.ts`,
+ * `RAIL_WIDTH_EXPANDED = 218`), и содержимому достаётся окно минус эти 218 —
+ * медиазапрос по окну промахнулся бы на всю их ширину. Контейнер
+ * `lc-workspace` объявлен на `.lc-main` (app-layout.css), журнал лежит внутри.
+ *
+ * ПОЧЕМУ 705, А НЕ 658. Без правок ниже таблице довольно 658 (перенос подписи
+ * вида уже снял 238), но эти 658 меряются не по контейнеру: у `.lc-page` свои
+ * боковые поля, и рамке прокрутки достаётся ширина контейнера МИНУС 47
+ * (замерено на четырёх ширинах: 805 → 758, 699 → 652). Порог, поставленный по
+ * самой таблице, оставлял щель: при окне 918 и рельсе 218 контейнеру 699,
+ * рамке 652, а широкая ветка просила 658 — шесть пикселей прокрутки.
+ * 658 + 47 = 705. Стык проверен обеими сторонами: при 706 широкая ветка
+ * получает 659 из нужных 658, при 705 включается узкая и просит 473.
+ *
+ * ЧТО ЭТО ДАЁТ. Замер после правок: окно 900 (рельс 218) — прокрутка 262 → 0;
+ * окно 768 (рельс 218) — 394 → 0; окно 625 (рельс 72) — 0. Ниже 570 пикселей
+ * окна прокрутка остаётся: пять колонок в 294 пикселя не помещаются никак, и
+ * ответ на это — карточный режим `lc-table--cards`, а он требует `data-label`
+ * у каждой ячейки, то есть правки разметки (см. lc-table-cards.css).
+ */
+@container lc-workspace (max-width: 705px) {
+  /* Две кнопки в ряд просят 268 при собственной ширине 148: пусть встают
+     друг под друга, как в плашке критичного по соседству. Ряд собран Mantine
+     Group с `wrap="nowrap"`, поэтому перебиваем силой селектора. */
+  .lc-journal__actions .mantine-Group-root {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* Отступ ячейки вдвое уже: пять колонок × два отступа — это 40 пикселей,
+     которых на планшете ровно и не хватало (513 нужных против 502 данных). */
+  .lc-journal__table th,
+  .lc-journal__table td {
+    padding-inline: var(--lc-space-1);
+  }
+
+  /* «вчера, 23:58» переносится на две строки. На широком экране запрет
+     переноса здесь верен — время читают одним взглядом; на узком он стоит
+     47 пикселей колонки (97 → 50), и это последнее, чего не хватало. */
+  .lc-journal__time {
+    white-space: normal;
+  }
+}
+
+/*
+ * Страховка для движка без контейнерных запросов. Порог пересчитан на окно по
+ * развёрнутому рельсу: 699 места + 218 рельса + 1 граница = 918. При
+ * свёрнутом рельсе такой движок включит сжатия чуть раньше, чем нужно, — это
+ * дешевле, чем не включить их вовсе.
+ */
+@supports not (container-type: inline-size) {
+  @media (max-width: 924px) {
+    .lc-journal__actions .mantine-Group-root {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lc-journal__table th,
+    .lc-journal__table td {
+      padding-inline: var(--lc-space-1);
+    }
+
+    .lc-journal__time {
+      white-space: normal;
+    }
+  }
+}
+
+/*
+ * ⚠ УЗКИЙ ЭКРАН: КНОПКИ ПЛАШКИ УХОДЯТ ПОД ТЕКСТ (замер на стенде 05.09).
+ *
+ * ЧТО БЫЛО. В файле не было НИ ОДНОГО правила по ширине, а плашка критичного
+ * висит над каждым экраном приложения — она в каркасе. Ряд «значок · текст ·
+ * кнопки» держал кнопки на `flex-shrink: 0`, и на телефоне сжимался ровно
+ * текст. Замер на 375: колонка текста 58 пикселей, плашка 357 пикселей в
+ * высоту — заголовок «Канал отобрали: подписка на события пропала» вставал
+ * столбиком по одному слову, а «Переподключить» (71 px в одну строку) в 58 не
+ * влезала и НАЕЗЖАЛА на этот столбик. Три плашки — и телефон занят целиком
+ * тем, что нельзя прочитать.
+ *
+ * ПОЧЕМУ ПОРОГ 640. Кнопки занимают 246 px при любой ширине (замер тех же
+ * двух: «Переподключить» + «Подтвердить»). Обвес ряда — 32 отступа, 20 значок,
+ * 24 два зазора. Текст получает `W − 322`: на 767 это 450, на 640 — 323, на
+ * 560 — уже 243, то есть меньше самих кнопок. Ломается между 640 и 560, и 640
+ * — тот же порог, которым «Живая лента» по соседству отделяет телефон.
+ *
+ * `flex-basis: 100%` именно у КНОПОК, а не у текста: строка тогда переносится
+ * ровно один раз, значок и текст остаются вместе первой строкой, а кнопки
+ * получают собственную. Растягивание кнопок — по образцу `.page-header`: цель
+ * в 40 пикселей у правого края телефона попадается пальцем через раз.
+ */
+@media (max-width: 640px) {
+  .lc-critical__item {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--lc-space-2) var(--lc-space-3);
+  }
+
+  .lc-critical__actions {
+    flex-basis: 100%;
+  }
+
+  .lc-critical__actions > * {
+    flex: 1;
+  }
+}
+
+/* Своя строка на случай, если общий сброс движения в lc-vars.css однажды
+   переедет: плашка обязана появляться и без анимации. */
+@media (prefers-reduced-motion: reduce) {
+  .lc-critical__item {
+    animation: none;
+  }
+}

@@ -1,0 +1,261 @@
+/*
+ * Просмотр присланного снимка.
+ *
+ * ⚠ ЗАТЕМНЕНИЕ ЗДЕСЬ ОДНО НА ОБЕ ТЕМЫ, И ЭТО НАМЕРЕННО. Остальной интерфейс
+ * следует теме, но подложка просмотрщика — не «поверхность», а отсутствие
+ * поверхности: фотографию разглядывают на тёмном в любой теме, иначе светлый
+ * фон подмешивается к самому снимку и меняет то, что оператор на нём видит.
+ * Цвет берём непрозрачным по альфе, а не токеном фона, — токен светлеет в
+ * светлой теме и делает ровно это.
+ */
+.imgview {
+  position: fixed;
+  inset: 0;
+  z-index: 400; /* выше карточки клиента и всплывающих окон ленты */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 88%);
+  /* ⚠ СВЕРХУ БОЛЬШЕ, ЧЕМ С БОКОВ (разбор дизайна 28.08).
+     Верхняя полоса с именем файла и кнопками — 48px высотой, а поле было 16px:
+     замер показал, что полоса накрывает верхние РОВНО 32px снимка, и имя файла
+     ложится поверх того, что на нём написано. Наступает всегда, когда снимок
+     упирается в высоту окна. */
+  padding: var(--lc-space-8) var(--lc-space-4) var(--lc-space-4);
+  /* Курсор говорит, что фон — кнопка «закрыть»: подсказки здесь негде разместить. */
+  cursor: zoom-out;
+  /* ⚠ ПРИБЛИЖЁННЫЙ СНИМОК ОБЯЗАН ОБРЕЗАТЬСЯ ОКНОМ (05.09). Приближение — это
+     `transform: scale`, а он НЕ создаёт прокрутки и не считается раскладкой:
+     на 8× снимок вылезает за края экрана и на всякий случай добавляет странице
+     полосы прокрутки. */
+  overflow: hidden;
+  /* Щипок и протяжка принадлежат нам, а не браузеру: без этого мобильный
+     Safari масштабирует всю страницу вместо снимка. */
+  touch-action: none;
+}
+
+/*
+ * ⚠ `contain`, А НЕ `cover`. В ленте снимок был обрезан по краям
+ * (`object-fit: cover`), и у фотографии экрана с ошибкой пропадало именно то,
+ * ради чего её прислали, — текст по краю. Здесь картинка целиком и в своих
+ * пропорциях.
+ */
+.imgview__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--lc-radius-sm);
+  /* Курсор — единственная подсказка, что снимок вообще приближается:
+     подписи разместить негде, а полоса вверху занята именем файла. */
+  cursor: zoom-in;
+  touch-action: none;
+  /* Иначе двойное нажатие выделяет картинку, а протяжка мышью — «тащит» её. */
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+  /*
+   * ⚠ ПЛАВНОСТЬ ТОЛЬКО ДЛЯ ШАГОВ, И ОТМЕНЯЕТСЯ ОНА ИЗ TSX. Кнопки, клавиши и
+   * двойное нажатие меняют масштаб скачком — там переход нужен, иначе снимок
+   * «телепортируется». Колесо, перетаскивание и щипок ставят себе
+   * `transition: none` прямо в `style`: они идут за рукой, и 150мс задержки
+   * читаются как подтормаживание, а не как красота.
+   */
+  transition: transform var(--lc-dur-fast) var(--lc-ease);
+}
+
+/* Приближённый снимок можно тащить — курсор об этом и говорит. */
+.imgview__img--zoomed {
+  cursor: grab;
+}
+
+.imgview__img--zoomed:active {
+  cursor: grabbing;
+}
+
+.imgview__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* ⚠ ВЫШЕ СНИМКА, ЯВНО (05.09). У приближённого снимка появился `transform`,
+     а трансформированный элемент рисуется в том же слое, что и абсолютно
+     позиционированные соседи, — то есть по порядку в разметке, а он в ней
+     ПОЗЖЕ полосы. Без этой строки при первом же приближении имя файла и
+     кнопки уходили под снимок. */
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2) var(--lc-space-3);
+  /* Полоса поверх тёмного, но снимок может быть светлым — подложка обязательна. */
+  background: linear-gradient(rgb(0 0 0 / 65%), transparent);
+  color: #fff;
+  cursor: default;
+}
+
+.imgview__name {
+  flex: 1 1 auto;
+  /* ⚠ `min-width: 0` ОБЯЗАТЕЛЕН: без него флекс-элемент не сжимается ниже
+     содержимого, и `text-overflow` не срабатывает ни разу — длинное имя файла
+     вытолкнуло бы кнопки за край. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--lc-fz-caption);
+}
+
+.imgview__count {
+  flex: 0 0 auto;
+  font-size: var(--lc-fz-caption);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Три кнопки масштаба стоят вместе и читаются как один орган управления. */
+.imgview__zoom {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+/*
+ * Значение масштаба — кнопка «вернуть исходный», а не подпись: она и
+ * показывает состояние, и выводит из него. Ширина фиксирована, цифры
+ * моноширинные — иначе «100 %» → «150 %» дёргает соседние кнопки на каждом
+ * щелчке колеса.
+ */
+.imgview__scale {
+  width: auto;
+  min-width: 56px;
+  padding: 0 var(--lc-space-2);
+  font-size: var(--lc-fz-caption);
+  font-variant-numeric: var(--lc-num);
+}
+
+.imgview__act {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--lc-radius-sm);
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.imgview__act:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
+/*
+ * ⚠ `aria-disabled`, А НЕ `:disabled`. Настоящий `disabled` отнимает фокус в
+ * тот самый момент, когда человек с клавиатуры дошёл кнопкой до края шкалы, —
+ * фокус улетает в `body`, и место в интерфейсе теряется. Кнопка остаётся
+ * нажимаемой, но её действие упирается в границу масштаба.
+ */
+.imgview__act[aria-disabled="true"] {
+  opacity: var(--lc-opacity-disabled);
+  cursor: default;
+}
+
+.imgview__act[aria-disabled="true"]:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.imgview__act:focus-visible,
+.imgview__nav:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.imgview__nav {
+  position: absolute;
+  top: 50%;
+  /* Та же причина, что у полосы: приближённый снимок рисуется поверх соседей
+     по порядку в разметке, а стрелки в ней раньше него. */
+  z-index: 2;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--lc-radius-circle);
+  /* ⚠ ТЁМНАЯ ПОДЛОЖКА, А НЕ СВЕТЛАЯ (разбор дизайна 28.08).
+     Стрелки ложатся ПОВЕРХ снимка, когда он упирается в ширину окна. На белом
+     широком скриншоте — а их клиенты присылают постоянно — белый шеврон на
+     подложке из 12% белого не виден вовсе; при наведении 24% белого на белом
+     ровно то же самое. Затемнение читается на снимке любой светлоты, а на
+     тёмном фоне вокруг снимка оно совпадает с самим фоном и не мозолит глаз.
+     Литералы здесь по правилу файла: просмотрщик тёмный вне зависимости от
+     темы (довод в шапке). */
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.imgview__nav:hover {
+  background: rgb(0 0 0 / 70%);
+}
+
+.imgview__nav--prev {
+  left: var(--lc-space-3);
+}
+
+.imgview__nav--next {
+  right: var(--lc-space-3);
+}
+
+.imgview__broken {
+  max-width: 40ch;
+  text-align: center;
+  color: #fff;
+  cursor: default;
+}
+
+.imgview__broken-why {
+  margin-top: var(--lc-space-2);
+  font-size: var(--lc-fz-caption);
+  opacity: 0.8;
+}
+
+/* Узкий экран: стрелки прижимаются к краям и уменьшаются, чтобы не лежать
+   поверх самого снимка. */
+@media (max-width: 640px) {
+  .imgview {
+    /* Верхнее поле сохраняем и здесь: сокращённая запись иначе сотрёт его, и
+       на узком экране полоса снова ляжет на снимок. */
+    padding: var(--lc-space-8) var(--lc-space-2) var(--lc-space-2);
+  }
+
+  .imgview__nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .imgview__nav--prev {
+    left: 2px;
+  }
+
+  .imgview__nav--next {
+    right: 2px;
+  }
+}
+
+/*
+ * ⚠ ОБЩЕЕ ПРАВИЛО «УМЕНЬШИТЬ ДВИЖЕНИЕ» СЮДА НЕ ДОСТАЁТ. В `lc-vars.css` оно
+ * гасит `animation`, но НЕ `transition` — намеренно, иначе мигают состояния
+ * кнопок. Здесь же анимируется положение снимка на пол-экрана, а это ровно то
+ * движение, от которого человека укачивает. Гасим точечно.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .imgview__img {
+    transition: none;
+  }
+}

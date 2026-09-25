@@ -1,0 +1,353 @@
+/*
+ * Экран «Диалоги бота» (docs/45).
+ *
+ * КРАСНОГО ЗДЕСЬ НЕТ И БЫТЬ НЕ ДОЛЖНО. Он занят настоящими тревогами —
+ * счётчиком непрочитанных и критичными уведомлениями. Выкраси им ещё и
+ * плитки сбоев, и оба перестанут работать: экран, где красное всё, читается
+ * как авария, а авария, длящаяся всегда, перестаёт быть аварией.
+ *
+ * Тяжесть передаётся порядком (его задаёт сервер) и весом числа. Тёплый цвет
+ * — ровно в одном месте, у «не взял».
+ */
+
+/*
+ * ПРОКРУТКА СВОЯ, А НЕ ДОКУМЕНТНАЯ (замер на стенде 08.09).
+ *
+ * `.lc-page` нарочно не задаёт ни `flex`, ни прокрутку — так записано у него
+ * в lc-base.css: «лента и команда управляют прокруткой сами». Этот экран
+ * управлять забыл, и на трёх строках данных получалось вот что: 1024×700 —
+ * содержимое на 195px ниже нижнего края, 1280×627 — на 112px, 768×627 — на
+ * 420px. Прокрутка при этом появлялась у ДОКУМЕНТА: корень — прямой
+ * флекс-ребёнок `.lc-main` (`height: 100dvh`), а без `min-height: 0` такой
+ * ребёнок не сжимается ниже своего содержимого и выпирает из колонки.
+ *
+ * Рецепт взят у соседей дословно, а не придуман заново: `.stats-page`
+ * (stats.css), `.accounts-page` (accounts.css), `.lc-feed` (feed.css) — все
+ * трое живут `flex: 1; min-height: 0` + своя прокрутка. Разойдись здесь с
+ * ними, и полоса прокрутки на одном экране из пяти вела бы себя иначе.
+ */
+.bot-dialogs {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.bot-dialogs__filters {
+  display: flex;
+  gap: var(--lc-space-2);
+  align-items: center;
+  margin-bottom: var(--lc-space-4);
+}
+
+.bot-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--lc-space-2);
+  margin-bottom: var(--lc-space-4);
+}
+
+.bot-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--lc-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-bg-1);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.bot-tile:hover {
+  border-color: var(--lc-border);
+}
+
+/* Выделение выбранной плитки — тот же зелёный, каким подсвечен раздел в меню. */
+.bot-tile[data-active] {
+  background: var(--lc-primary-subtle);
+  border-color: var(--lc-primary);
+}
+
+.bot-tile[data-active] .bot-tile__label {
+  color: var(--lc-primary);
+}
+
+.bot-tile__label {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.bot-tile__count {
+  font-size: var(--lc-fz-metric);
+  font-weight: 600;
+  color: var(--lc-text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * ⚠ `overflow-x: auto`, А НЕ `hidden` (замер на стенде 08.09).
+ *
+ * Здесь стояло `overflow: hidden`, и стояло РАДИ СКРУГЛЕНИЯ УГЛОВ: без него
+ * прямые углы таблицы торчали из закруглённой рамки. Довод верен, но задача
+ * решалась чужим инструментом — `hidden` не только скругляет, он ещё и режет,
+ * причём молча. Замер при развёрнутой рельсе (218px — в бою она развёрнута по
+ * умолчанию, railStore.ts): 1020 — срез 1px, 1000 — 21, 960 — 61, 900 — 121,
+ * 800 — 221, 768 — 253, 390 — 461. Ни полосы прокрутки, ни карточного режима,
+ * ни намёка: столбцы «Реплик» и «Первый ответ» просто исчезали справа, а на
+ * телефоне слово в «Чем кончилось» обрывалось посреди.
+ *
+ * Скругление остаётся: любое значение `overflow`, кроме `visible`, обрезает
+ * содержимое по СКРУГЛЁННОЙ границе поля — углы держит `border-radius`, а не
+ * слово `hidden`. А `auto` вместо `hidden` меняет ровно одно: то, что не
+ * влезло, теперь доступно прокруткой, а не потеряно.
+ */
+.bot-table {
+  background: var(--lc-bg-1);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  overflow-x: auto;
+}
+
+/* Раскладка и шапка — у `.lc-table` (lc-base.css); своё — кегль тела. */
+.bot-table table {
+  font-size: var(--lc-fz-body);
+}
+
+.bot-table tr:last-child td {
+  border-bottom: none;
+}
+
+.bot-row {
+  cursor: pointer;
+}
+
+.bot-row:hover {
+  background: var(--lc-surface-hover);
+}
+
+.bot-row:focus-visible {
+  outline: 2px solid var(--lc-primary);
+  outline-offset: -2px;
+}
+
+.bot-row__name {
+  font-weight: 600;
+  color: var(--lc-text-1);
+}
+
+.bot-row__hint {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+  margin-top: 2px;
+}
+
+/*
+ * `min-width: 0` — на ячейку, а не только на текст внутри неё. 29 августа
+ * ровно этот пропуск сделал многоточие на «Аккаунтах Авито» мёртвым правилом:
+ * оно стояло, но не срабатывало ни разу, потому что рамка выше не умела
+ * сжиматься. Здесь ячейка таблицы, но урок тот же.
+ */
+.bot-row__outcome {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--lc-text-2);
+}
+
+/* Единственный тёплый цвет на экране — и только на этой паре. */
+.bot-row__nobody {
+  color: var(--lc-warning);
+}
+
+.bot-row__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--lc-text-2);
+}
+
+/*
+ * ПОЛОСА «СЕЙЧАС» — живая часть экрана.
+ *
+ * Стоит НАД разбором прошлого, потому что отвечает на более срочный вопрос:
+ * «кто у бота в руках сию минуту». Разбор случившегося подождёт, зависший
+ * прямо сейчас диалог — нет.
+ */
+.bot-live {
+  background: var(--lc-bg-1);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: var(--lc-space-3);
+  margin-bottom: var(--lc-space-4);
+}
+
+.bot-live__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lc-space-2);
+  margin-bottom: var(--lc-space-2);
+}
+
+.bot-live__title {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.bot-live__count {
+  font-size: var(--lc-fz-metric);
+  font-weight: 600;
+  color: var(--lc-text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.bot-live__hint {
+  margin-left: auto;
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+.bot-live__idle {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+.bot-live__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bot-live__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 72px 88px minmax(0, 2fr);
+  gap: var(--lc-space-2);
+  align-items: baseline;
+  width: 100%;
+  padding: var(--lc-space-2);
+  border: none;
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bot-live__row:hover {
+  background: var(--lc-surface-hover);
+}
+
+.bot-live__row:focus-visible {
+  outline: 2px solid var(--lc-primary);
+  outline-offset: -2px;
+}
+
+/*
+ * `min-width: 0` на каждой ячейке — иначе многоточие ниже мёртвое.
+ * 29 августа ровно этот пропуск сделал обрезку на «Аккаунтах Авито» немой:
+ * правило стояло, а срабатывать ему было нечем, потому что рамка не сжималась.
+ *
+ * ⚠ ИМЯ КЛИЕНТА ЗДЕСЬ ЖЕ, А БЫЛО В СТОРОНЕ (замер на стенде 08.09). У
+ * `.bot-live__who` не стояло ни `min-width: 0`, ни `overflow`, ни многоточия —
+ * в отличие от всех соседей по строке. Ячейка сетки свою колонку держала, а
+ * текст внутри неё рисовался во всю нужную ширину поверх соседа: 390 при
+ * свёрнутой рельсе — колонке дано 17px, имени нужно 86, то есть 69px букв
+ * поверх «7 ч 21 мин», да ещё в две строки (высота 42 вместо 21). При
+ * развёрнутой рельсе граница проходила по 880 (109 при 109 нужных), ниже —
+ * наезд. Пропуск был именно пропуском: довода держать имя без обрезки нет,
+ * а последствие ровно то же, что чинили 29 августа.
+ */
+.bot-live__who,
+.bot-live__meta,
+.bot-live__said {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bot-live__who {
+  font-weight: 600;
+  color: var(--lc-text-1);
+}
+
+.bot-live__meta,
+.bot-live__said {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+}
+
+.bot-live__said {
+  color: var(--lc-text-3);
+}
+
+/*
+ * «Не смог сам» — не плитка тревоги, а мерка охвата. Оформление подчёркнуто
+ * спокойное: одна строка во всю ширину, без рамки-плитки, чтобы её не
+ * прочитали как седьмой сбой.
+ */
+.bot-capacity {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lc-space-2);
+  width: 100%;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  margin-bottom: var(--lc-space-4);
+  border: 1px dashed var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bot-capacity:hover {
+  border-color: var(--lc-border-strong);
+}
+
+.bot-capacity[data-active] {
+  background: var(--lc-primary-subtle);
+  border-color: var(--lc-primary);
+  border-style: solid;
+}
+
+.bot-capacity__label {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+}
+
+.bot-capacity__count {
+  font-size: var(--lc-fz-card);
+  font-weight: 600;
+  color: var(--lc-text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.bot-capacity__hint {
+  margin-left: auto;
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+/* Загрузка и листание (проверка 24.09): тот же рецепт, что у «Разбора
+   диалогов» (`.dt__state`, `.dt__pager`). */
+.bot-dialogs__state {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--lc-space-6);
+}
+
+.bot-dialogs__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-4);
+  margin-top: var(--lc-space-3);
+}

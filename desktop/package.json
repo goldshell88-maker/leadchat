@@ -1,0 +1,21 @@
+{
+  "name": "leadchat-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LeadChat — десктоп-оболочка Tauri 2 над общим React-бандлом (см. docs/04-DESKTOP.md)",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:debug": "tauri build --debug",
+    "icons": "node scripts/gen-tray-icons.mjs",
+    "check": "cargo check --manifest-path src-tauri/Cargo.toml --all-targets",
+    "test": "cargo test --manifest-path src-tauri/Cargo.toml",
+    "fmt": "cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "lint": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

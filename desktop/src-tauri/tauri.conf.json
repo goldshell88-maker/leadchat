@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "LeadChat",
+  "version": "1.0.0",
+  "identifier": "ru.partner-lead-centre.leadchat",
+  "build": {
+    "beforeDevCommand": "npm --prefix ../../frontend run dev -- --mode desktop",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm --prefix ../../frontend run build -- --mode desktop",
+    "frontendDist": "../../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "LeadChat by Lead Partner",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "visible": true,
+        "backgroundColor": "#0B0F14",
+        "theme": "Dark",
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://chat.partner-lead-centre.ru https://188-225-34-82.sslip.io https://72-56-68-159.sslip.io; media-src 'self' blob: https://chat.partner-lead-centre.ru https://188-225-34-82.sslip.io https://72-56-68-159.sslip.io; connect-src ipc: http://ipc.localhost https://chat.partner-lead-centre.ru wss://chat.partner-lead-centre.ru https://188-225-34-82.sslip.io wss://188-225-34-82.sslip.io https://72-56-68-159.sslip.io wss://72-56-68-159.sslip.io; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'"
+    },
+    "trayIcon": {
+      "id": "main",
+      "iconPath": "icons/tray/tray_0.png",
+      "tooltip": "LeadChat"
+    },
+    "withGlobalTauri": false
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "publisher": "Lead Partner",
+    "copyright": "Lead Partner",
+    "category": "Business",
+    "shortDescription": "LeadChat — диалоги Авито в одном окне",
+    "longDescription": "Рабочее место менеджера: все диалоги Авито в одном окне, уведомления, офлайн-режим.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "Russian"
+        ],
+        "displayLanguageSelector": false,
+        "startMenuFolder": "Lead Partner"
+      },
+      "wix": {
+        "language": "ru-RU"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://188-225-34-82.sslip.io/download/latest.json",
+        "https://chat.partner-lead-centre.ru/download/latest.json",
+        "https://72-56-68-159.sslip.io/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERBQjE4OEY1Mzc4NUJCM0EKUldRNnU0VTM5WWl4MnRobjl5Q1k2ZWhSZThuQWJPdFdnaXZRZDlQMkZGeFR4OXBPQTdNQXphYnAK",
+      "windows": {
+        "installMode": "passive"
+      }
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "leadchat"
+        ]
+      }
+    }
+  }
+}

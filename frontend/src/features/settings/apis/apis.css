@@ -1,0 +1,44 @@
+/* Внешние сервисы — монитор API (16.09). Та же поверхность, что у журнала
+   аудита: карточка с рамкой, прокрутка своя, шапка прилипает. */
+
+.apis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-3);
+  flex: 1;
+  min-height: 0;
+}
+
+.apis__scroll {
+  background-color: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+  overflow: auto;
+  min-height: 0;
+}
+
+.apis__table {
+  font-size: var(--lc-fz-note);
+  width: 100%;
+}
+
+.apis__table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--lc-surface);
+}
+
+.apis__table td {
+  vertical-align: top;
+}
+
+.apis__link {
+  font-size: var(--lc-fz-note);
+  color: var(--lc-text-3);
+}
+
+/* Выключенный сервис — серым целиком: строка есть, но её не считают живой. */
+.apis__table tr[data-state="off"] td {
+  color: var(--lc-text-3);
+}

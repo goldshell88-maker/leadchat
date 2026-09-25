@@ -1,0 +1,46 @@
+# ============================================================================
+# Контекст сборки образов (docker/Dockerfile.api, docker/Dockerfile.web).
+# Контекст — КОРЕНЬ репозитория, поэтому без этого файла в демон уезжают
+# frontend/node_modules (сотни МБ, на macOS ещё и с arm64-бинарями esbuild)
+# и .venv — сборка api-образа замедляется на ровном месте.
+#
+# Dockerfile'ы копируют только то, что перечислено явно, поэтому исключения
+# ниже ничего не ломают: pyproject.toml / uv.lock / app / alembic.ini и
+# frontend/{index.html,tsconfig.json,vite.config.ts,src,public,package*.json}
+# остаются в контексте.
+# ============================================================================
+
+# --- VCS / CI ---
+.git
+.github
+.gitignore
+
+# --- Python ---
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+coverage.xml
+htmlcov
+
+# --- Node / фронтенд ---
+node_modules
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# --- Секреты: в образ не попадает ни один .env (ни реальный, ни шаблон) ---
+.env
+.env.*
+
+# --- Прочее, что образу не нужно ---
+tests
+docs
+deploy
+prototype
+.DS_Store
+.idea
+.vscode

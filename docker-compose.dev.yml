@@ -1,0 +1,184 @@
+# Dev-инфраструктура LeadChat (спринт 2).
+# Прод-compose описан в docs/05-DEPLOY-OPS.md §2.2 — этот файл только для разработки.
+#
+# Обычный dev-режим: `make dev` поднимает postgres + redis + fake-avito,
+# бэкенд/воркер/scheduler и фронтенд запускаются локально
+# (make api / make worker / make scheduler / make fe-dev).
+# Полностью контейнерный режим: `docker compose -f docker-compose.dev.yml up -d`
+# (сервисам api/worker/scheduler хосты БД/Redis/fake-avito переопределены
+# на имена сервисов; fake-avito доставляет вебхуки на http://api:8000).
+
+name: leadchat-dev
+
+# env для контейнеров api/worker/scheduler: внутри compose-сети сервисы
+# доступны по именам, не по localhost (в .env — localhost-значения для
+# локального запуска процессов через make).
+x-app-env: &app-env
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-leadchat}:${POSTGRES_PASSWORD:-leadchat}@postgres:5432/${POSTGRES_DB:-leadchat}
+  REDIS_URL: redis://redis:6379/0
+  AVITO_API_BASE: http://fake-avito:8020
+  AVITO_AUTH_URL: http://localhost:8020/oauth  # браузерный редирект — хостовый адрес; обмен токенов идёт на AVITO_API_BASE внутри сети
+  # база URL вебхука (DESIGN §8.3): fake-avito достаёт api по имени сервиса
+  PUBLIC_BASE_URL: http://api:8000
+  # база URL фронта: сюда уходит редирект OAuth-callback'а. Внутри compose
+  # это по-прежнему ХОСТОВЫЙ адрес — редирект отрабатывает браузер разработчика,
+  # а не контейнер (в проде — https://chat.partner-lead-centre.ru).
+  FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:5173}
+  # каталог вложений внутри контейнера (том leadchat_media ниже)
+  MEDIA_ROOT: /var/leadchat/media
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-leadchat}
+      POSTGRES_USER: ${POSTGRES_USER:-leadchat}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-leadchat}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    # AOF как в проде (05 §2.1): очередь и denylist должны переживать рестарт
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file: .env
+    environment: *app-env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/srv/app/app # hot-reload: uvicorn --reload видит правки кода
+      - leadchat_media:/var/leadchat/media # приём вложений, POST /api/v1/media (01 §6.5)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fake-avito:
+        condition: service_healthy
+    healthcheck:
+      # без curl в образе — проверяем питоном (как в проде, 05 §2.2)
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=3).status==200 else 1)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+
+  worker:
+    # тот же образ, что api (05 §2.3: один образ на api/worker/scheduler)
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    # runtime-образ кладёт .venv/bin в PATH — arq вызывается напрямую, как в проде (05 §2.2)
+    command: arq app.workers.main.WorkerSettings
+    env_file: .env
+    environment: *app-env
+    volumes:
+      - ./app:/srv/app/app # код монтируется: правки подхватываются рестартом контейнера
+      - leadchat_media:/var/leadchat/media # скачивание вложений из Авито (тот же том, что у api)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fake-avito:
+        condition: service_healthy
+    healthcheck:
+      # штатный health-check ARQ: читает health_check_key из Redis (05 §2.2)
+      test: ["CMD", "arq", "--check", "app.workers.main.WorkerSettings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    command: python -m app.scheduler.main
+    # Тот же init, что и в бою: без него python — PID 1 без обработчика
+    # SIGTERM, и `docker compose stop` ждёт 10 с до SIGKILL.
+    init: true
+    env_file: .env
+    environment: *app-env
+    volumes:
+      - ./app:/srv/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # scheduler раз в 30 c обновляет Redis-ключ scheduler:alive (SET ... EX 120);
+      # тот же ключ проверяет деплой-smoke SM-7 (05 §2.2, 07 §6)
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os,sys,redis; sys.exit(0 if redis.Redis.from_url(os.environ['REDIS_URL']).exists('scheduler:alive') else 1)",
+        ]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  fake-avito:
+    build: ./fake_avito
+    environment:
+      # дефолтный redirect для страницы /oauth (браузерный 302 — поэтому localhost,
+      # а не имя compose-сервиса); backend может передать свой redirect_uri в query
+      AVITO_REDIRECT_URI: ${AVITO_REDIRECT_URI:-http://localhost:8000/api/v1/avito/callback}
+    extra_hosts:
+      # доставка вебхуков на локально запущенный `make api` (Linux-хосты;
+      # на Docker Desktop host.docker.internal есть из коробки)
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8020:8020"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8020/health', timeout=3).status==200 else 1)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  pgdata:
+  redisdata:
+  # вложения: общий том api и worker. Владелец каталога внутри образа —
+  # leadchat (docker/Dockerfile.api), поэтому named volume наследует права
+  # от точки монтирования и запись работает без chown с хоста.
+  leadchat_media:

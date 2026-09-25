@@ -1,0 +1,453 @@
+# ============================================================================
+# LeadChat — продовый compose (реализация docs/05-DEPLOY-OPS.md §2.2).
+#
+# Живёт на VPS как /opt/leadchat/docker-compose.yml (кладёт CI, см.
+# .github/workflows/deploy.yml). Рядом — .env (chmod 600, из .env.prod.example).
+#
+# Образы НЕ собираются здесь: тянутся из GHCR по тегу (IMAGE_TAG).
+# Локальная сборка тех же образов — `make prod-build` (docker/Dockerfile.api,
+# docker/Dockerfile.web).
+#
+# Запуск вручную (обычно всё делает deploy/deploy.sh):
+#   docker compose -f docker-compose.yml up -d
+# ============================================================================
+
+name: leadchat
+
+# ⚠ ЖУРНАЛ КОНТЕЙНЕРА УМИРАЕТ ВМЕСТЕ С КОНТЕЙНЕРОМ, И ЭТО НЕ ЛЕЧИТСЯ ЗДЕСЬ.
+#
+# json-file держит файл в /var/lib/docker/containers/<id>/, где <id> — id
+# КОНТЕЙНЕРА, а не сервиса. Выкатка пересоздаёт контейнер (новый id) — старый
+# каталог docker удаляет вместе с журналом. Никакая настройка драйвера этого
+# не меняет: том сюда не подставить, путь не задать.
+#
+# Поэтому журналы снимает на диск хоста `deploy/archive-logs.sh` — до
+# пересоздания (шаг 5 ship.sh) и раз в сутки по cron. Здесь остаётся кольцевой
+# буфер: запас на случай, если снимок один раз не сняли.
+#
+# ПОЧЕМУ НЕ journald (рассматривался первым, отвергнут по замеру 08.09).
+# Драйвер journald пережил бы пересоздание сам, без скриптов, и `docker logs`
+# с ним работает. Но на боевом journal'е замерено: 573 455 записей занимают
+# 562 МБ на диске при 73 байтах полезного текста в записи — 980 байт на
+# запись, в 13,4 раза больше самого сообщения. У нас коротких строк много:
+# api 2 201 стр./10 мин, nginx 4 339 стр./21 мин, — это ~680 тыс. строк в
+# сутки, то есть ~650 МБ журнала в день и ~20 ГБ за месяц хранения при 46 ГБ
+# свободных. Те же строки, снятые в gzip, сжимаются в 11,8 раза (nginx) и
+# 12,1 (api) — 16 МБ в сутки, 0,5 ГБ за месяц. Разница в сорок раз решила дело.
+#
+# РАЗМЕР БУФЕРА. 50 МБ × 6 = 300 МБ на контейнер. При замеренном 08.09 потоке
+# (nginx 108 МБ/сут, api 76 МБ/сут) это 2,8 и 3,9 суток соответственно — то
+# есть пропущенный снимок не теряет ничего. Прежние 20 МБ × 5 = 100 МБ давали
+# nginx меньше суток: журнал за нужный день исчезал сам, даже без выкатки.
+# Потолок по диску: 7 контейнеров × 300 МБ = 2,1 ГБ в /var/lib/docker
+# (там сейчас 3,9 ГБ, свободно 46 ГБ).
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "50m"
+    max-file: "6"
+
+# Один образ на три процесса (05 §2.1): различие только в команде запуска.
+# ⚠ ОТБИРАЕМ ПРИВИЛЕГИИ У ПРИКЛАДНЫХ КОНТЕЙНЕРОВ (01.09).
+#
+# `no-new-privileges` запрещает повышение прав внутри контейнера: даже найдя в
+# образе setuid-программу, чужой код не станет root'ом. Стоит ноль, ломать
+# нечего — приложение и так запускается ОТ ПОЛЬЗОВАТЕЛЯ `leadchat`
+# (docker/Dockerfile.api: `USER leadchat`), а не от root.
+#
+# `cap_drop: ALL` — все возможности ядра. Именно этим трём службам не нужна ни
+# одна: они слушают порт 8000 (выше 1024, привилегия не требуется), пишут в
+# свой том и ходят в сеть. Postgres, Redis и nginx НЕ ТРОГАЕМ намеренно: их
+# штатные entrypoint'ы стартуют root'ом и меняют владельца файлов, там снятие
+# возможностей — отдельная работа с отдельной проверкой, а цена ошибки — не
+# поднявшаяся база.
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+x-app-common: &app-common
+  <<: *hardening
+  image: ${GHCR_NAMESPACE:-ghcr.io/lead-partner}/leadchat-api:${IMAGE_TAG:-latest}
+  env_file: .env
+  restart: unless-stopped
+  logging: *default-logging
+  networks: [internal]
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  # --------------------------------------------------------------------------
+  # API (uvicorn, WEB_CONCURRENCY воркеров внутри контейнера)
+  # --------------------------------------------------------------------------
+  api:
+    <<: *app-common
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000
+      --workers ${WEB_CONCURRENCY:-2} --proxy-headers --forwarded-allow-ips "*"
+      --no-access-log
+    # edge — чтобы дотягивался nginx; наружу порт 8000 НЕ публикуется,
+    # поэтому --forwarded-allow-ips "*" безопасен (05 §2.2).
+    #
+    # --no-access-log — НЕ экономия строк, а требование 07 §4.6 S1. Access-лог
+    # uvicorn печатает путь ВМЕСТЕ С query-string, а у нас в query лежат секреты:
+    #   POST /api/hooks/avito/{id}?secret=<вебхук-секрет аккаунта>   (01 §5)
+    #   GET  /api/v1/ws?ticket=<одноразовый тикет>                   (01 §11.1)
+    # Проверено на проде: `docker logs leadchat-api-1` отдавал секрет вебхука
+    # открытым текстом. Доступ логируется nginx'ом (json_combined пишет $uri
+    # без query), сквозная корреляция — по X-Request-Id/структурным логам app.
+    networks: [internal, edge]
+    # Единственный опубликованный порт — на loopback хоста. Наружу его не видно
+    # (это по-прежнему не «публикация порта в интернет»), но скрипты на хосте —
+    # backup.sh, restore-check.sh, healthcheck-alert.sh — получают адрес
+    # INTERNAL_NOTIFY_URL=http://127.0.0.1:8000/api/v1/internal/notify, минуя
+    # публичный edge. Тогда nginx может честно отдавать 404 на /api/v1/internal/
+    # (14 §4: токен — основная защита, сеть — вторая).
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      # В бою планировщик есть всегда, и его смерть — «degraded», а не «ok»
+      # (05 §7.2). Строки в .env не было: /api/health/deep отвечал ok при
+      # мёртвом планировщике (проверка 24.09). Здесь, а не в .env, — чтобы
+      # правило ехало выкаткой и не зависело от ручной правки сервера.
+      HEALTH_DEEP_CHECK_SCHEDULER: "true"
+    volumes:
+      - /var/leadchat/media:/var/leadchat/media # приём вложений (rw)
+    healthcheck:
+      # curl в образе нет — проверяем питоном (как в dev-compose)
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=3).status==200 else 1)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+    stop_grace_period: 20s # дать доиграть открытым WS-соединениям
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 1024M }
+
+  # --------------------------------------------------------------------------
+  # Worker (ARQ): inbound-конвейер, доставка, backfill, reconciliation
+  # --------------------------------------------------------------------------
+  worker:
+    <<: *app-common
+    command: arq app.workers.main.WorkerSettings
+    volumes:
+      # Тот же каталог, что у api: воркер УБИРАЕТ отсюда брошенные загрузки
+      # (#22). Здесь стояло «скачивание вложений из Авито» — этого не
+      # происходит: вложения клиента лежат на стороне Авито, у нас хранится
+      # только ссылка, и ни строчки кода, которая бы их качала, нет.
+      #
+      # ⚠ С РАСШИФРОВКОЙ ГОЛОСОВЫХ ОДНА ОГОВОРКА К СТРОКЕ ВЫШЕ. Запись из Авито
+      # ВСЁ-ТАКИ качается — но во ВРЕМЕННЫЙ файл (/tmp контейнера) и удаляется
+      # сразу после расшифровки, в `finally` (просьба владельца «пусть он потом
+      # их удаляет»). В этот том она не попадает ни на секунду.
+      - /var/leadchat/media:/var/leadchat/media
+      # ⚠ ВЕСА WHISPER — ТОМ, А НЕ СЛОЙ ОБРАЗА. Модель small весит 464 МБ
+      # (замер). Положи её в образ — и эти 464 МБ поедут на сервер через
+      # тоннель на КАЖДОЙ выкатке, а тоннель уже рвался на середине. Меняются
+      # они при этом никогда.
+      #
+      # Качаются один раз, при первом голосовом после чистой установки: та
+      # расшифровка будет дольше на время скачивания, дальнейшие — 0,5 с на
+      # загрузку из тома (замер). Приём вебхуков это не задерживает: счёт живёт
+      # в ARQ-задаче, а не в цикле приёма.
+      #
+      # ⚠ КАТАЛОГ НА ХОСТЕ ЗАВЕСТИ ЗАРАНЕЕ И ОТДАТЬ ЕГО ПОЛЬЗОВАТЕЛЮ КОНТЕЙНЕРА —
+      # тем же способом, что и /var/leadchat/media (RUNBOOK-DEPLOY §4.4 и §4.7,
+      # uid:gid берётся из самого образа, а не пишется числом):
+      #     mkdir -p /var/leadchat/whisper && chown -R "$UIDGID" /var/leadchat/whisper
+      # Иначе bind-mount приедет от root, контейнер работает не от root, и
+      # первая же расшифровка ляжет на правах записи — молча, одной строкой в
+      # журнале, при живом на вид воркере.
+      #
+      # Только воркеру: ни api, ни планировщик модель не грузят.
+      - /var/leadchat/whisper:/var/leadchat/whisper
+    healthcheck:
+      # штатный health-check ARQ: читает health_check_key из Redis
+      test: ["CMD", "arq", "--check", "app.workers.main.WorkerSettings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    # дать текущим задачам доработать перед SIGKILL (доставка в Авито ≤ 30 с)
+    stop_grace_period: 45s
+    deploy:
+      resources:
+        # ⚠ ПАМЯТЬ ПОДНЯТА С 768M ИЗ-ЗА WHISPER, И ЭТО НЕ ЗАПАС «НА ВСЯКИЙ».
+        #
+        # Замер RSS процесса приложения (small, int8, 2 потока, речь 19,4 с):
+        # 82 МБ до модели -> 1039 МБ на пике счёта -> 640 МБ после выгрузки.
+        # То есть на время расшифровки воркеру нужно около гигабайта.
+        # При прежних 768M контейнер получал бы OOMKilled на ПЕРВОМ голосовом,
+        # docker поднимал бы его заново, а вместе с воркером умирал бы цикл
+        # приёма вебхуков Авито: сообщения живых клиентов копились бы в потоке.
+        # То есть расшифровка глушила бы приём — ровно то, чего делать нельзя.
+        #
+        # Пик недолгий: модель выгружается, как только за ней никто не стоит в
+        # очереди (app/workers/transcribe.py), а голосовых по замеру боя около
+        # десяти в сутки. Остальное время воркер живёт в прежних 300-400 МБ.
+        #
+        # Арифметика по машине (7 ГБ, из них 5 свободно): api 1024 + worker
+        # 1536 + scheduler 384 + postgres 2048 + redis 640 + nginx 256 +
+        # certbot 128 = 6016M ПОТОЛКОВ, а не занятой памяти; одновременно на
+        # своих потолках эти службы не бывают.
+        limits: { cpus: "2.0", memory: 1536M }
+    # при росте нагрузки: docker compose up -d --scale worker=3 --no-recreate
+    #
+    # ⚠ И ТОГДА РАСШИФРОВОК СТАНЕТ СТОЛЬКО ЖЕ, СКОЛЬКО РЕПЛИК. Ограничение «одна
+    # за раз» живёт в процессе (asyncio-замок), а не в Redis: три реплики дадут
+    # три параллельных счёта по два потока каждый — шесть потоков на четырёх
+    # ядрах машины. Масштабируя воркер, выключайте расшифровку на лишних
+    # репликах (WHISPER_ENABLED=0) или переносите замок в Redis.
+    # (consumer group Redis Streams сама разделит поток между репликами;
+    #  следить за пулом: 3×DB_POOL_SIZE + api + scheduler < max_connections=120)
+
+  # --------------------------------------------------------------------------
+  # Scheduler (APScheduler): refresh токенов, партиции, reconcile, heartbeat
+  # --------------------------------------------------------------------------
+  scheduler:
+    <<: *app-common
+    command: python -m app.scheduler.main
+    # ⚠ init: true — PID 1 в контейнере tini, а не python. Ядро не доставляет
+    # PID 1 сигнал без обработчика, и до 05.09 КАЖДЫЙ docker stop планировщика
+    # кончался десятью секундами ожидания и SIGKILL (exit 137) — на каждой
+    # выкатке. Обработчик SIGTERM теперь есть в самом процессе
+    # (app/scheduler/main.py), но он появляется только после старта: пока
+    # процесс ждёт базу или строит партиции, SIGTERM без tini снова уходил бы
+    # в никуда. tini пересылает его дочернему python, а не-PID-1 умирает от
+    # SIGTERM сам. У api и worker этой беды нет: uvicorn и arq обработчики
+    # ставят сами.
+    init: true
+    volumes:
+      # Сторож (14 §2.1) читает срок действия сертификата прямо из файла: без
+      # этого тома проверка молчит и пишет info-строку watchdog.cert_file_absent,
+      # то есть о протухающем сертификате никто не узнает. ro — сторожу нужно
+      # только прочитать дату.
+      #
+      # ТОМА МАЛО, НУЖНЫ ЕЩЁ И ПРАВА. Проверено на боевой системе 12 августа:
+      # том смонтирован, путь верный, а `ls /etc/letsencrypt/live` внутри
+      # контейнера отвечает `Permission denied`. Let's Encrypt держит `live/` и
+      # `archive/` в режиме 0700 для root, контейнер работает не от root — и
+      # сторож был слеп с самого начала, молча.
+      #
+      # Чинится один раз на хосте:
+      #     sudo chmod 755 /etc/letsencrypt/live /etc/letsencrypt/archive
+      # Приватный ключ при этом остаётся 600, а `fullchain.pem` публичен по
+      # своей природе — его отдаёт любой браузер при заходе на сайт.
+      #
+      # Пока права не выданы, сторож пишет предупреждение
+      # `watchdog.cert_unreadable_permissions` с этой же подсказкой — раньше
+      # он маскировал нехватку прав под «файла нет» строкой уровня info.
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Диск он меряет по shutil.disk_usage(MEDIA_ROOT): без этого тома в
+      # контейнере смотрел бы на «/» — раздел docker'а, а не тот, что кончится
+      # первым. Если /var/backups живёт отдельно — смонтировать и его и задать
+      # WATCHDOG_DISK_PATH.
+      #
+      # ⚠ НА ЗАПИСЬ, А НЕ `:ro` (24.09). Здесь же работают две ночные уборки:
+      # выгрузки статистики старше 7 суток (в них имена и телефоны) и брошенные
+      # вложения. С `:ro` каждое удаление получало EROFS, уборка писала
+      # предупреждение и `removed=0` — с 05.08 не удалила ни одного файла.
+      - /var/leadchat/media:/var/leadchat/media
+    healthcheck:
+      # scheduler раз в 30 c обновляет Redis-ключ scheduler:alive (SET ... EX 120);
+      # тот же ключ проверяет деплой-smoke SM-7 (07 §6)
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os,sys,redis; sys.exit(0 if redis.Redis.from_url(os.environ['REDIS_URL']).exists('scheduler:alive') else 1)",
+        ]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 384M }
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL 16 — наружу не торчит, только сеть internal
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+    # /dev/shm по умолчанию у Docker 64 МБ: параллельные воркеры Postgres
+    # (хеш-соединения по messages при догоне переписки, work_mem=16MB × воркеры)
+    # упирались в «could not resize shared memory segment … No space left on
+    # device» (19.09, два прогона backfill-cards разом). 512 МБ — из лимита 2 ГБ.
+    shm_size: 512m
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # тюнинг под 8 GB VPS (05 §2.2); log_min_duration_statement=500 —
+    # медленные запросы попадают в логи, это вход в диагностику 8.3
+    command: >
+      postgres
+      -c shared_buffers=1GB
+      -c effective_cache_size=3GB
+      -c maintenance_work_mem=256MB
+      -c work_mem=16MB
+      -c max_connections=120
+      -c wal_compression=on
+      -c log_min_duration_statement=500
+      -c timezone=UTC
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ${BACKUP_DIR:-/var/backups/leadchat}:/backups # сюда пишет pg_dump из backup.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 2048M }
+
+  # --------------------------------------------------------------------------
+  # Redis 7 — очередь (Streams), Pub/Sub, кэш, denylist. AOF обязателен.
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [internal]
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy noeviction
+    # noeviction обязателен: в Redis лежит ОЧЕРЕДЬ (Streams) и denylist refresh-токенов —
+    # молча выкидывать ключи нельзя. Кэши держим с явным TTL и укладываемся в лимит.
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 640M }
+
+  # --------------------------------------------------------------------------
+  # nginx + собранная React-статика (образ leadchat-web, docker/Dockerfile.web)
+  # Единственный сервис, смотрящий наружу.
+  # --------------------------------------------------------------------------
+  nginx:
+    image: ${GHCR_NAMESPACE:-ghcr.io/lead-partner}/leadchat-web:${IMAGE_TAG:-latest}
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [edge]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # подставляются в шаблон конфига при старте контейнера (envsubst из
+      # штатного entrypoint nginx; фильтр — NGINX_ENVSUBST_FILTER в Dockerfile.web).
+      # Ключ подписи в ОБРАЗ не зашивается — только в runtime-окружение.
+      DOMAIN: ${DOMAIN:-chat.partner-lead-centre.ru}
+      # без ключа nginx не сможет проверить подпись — падаем громко на старте
+      MEDIA_SIGN_KEY: "${MEDIA_SIGN_KEY:?не задан MEDIA_SIGN_KEY — им подписываются ссылки на вложения}"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/leadchat/certbot:/var/www/certbot:ro
+      - /var/leadchat/media:/var/leadchat/media:ro
+      - /var/leadchat/download:/var/leadchat/download:ro
+      # кэш снимков с CDN Авито (nginx.conf proxy_cache_path): named volume,
+      # чтобы выкатка не сбрасывала неделю кэша вместе с контейнером
+      - imgcache:/var/cache/nginx/avito
+    healthcheck:
+      # реальная проверка, что nginx отдаёт ответы (не только валиден конфиг);
+      # /healthz открыт только с 127.0.0.1 (см. conf.d/leadchat.conf)
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      api:
+        condition: service_healthy
+    # ⚠ 3 с, а не 10 по умолчанию — и сигнал остаётся штатным SIGQUIT образа
+    # (graceful: новые соединения не принимаются, открытым дают закрыться).
+    # Открытые здесь — WebSocket'ы диспетчеров, у них proxy_read_timeout 90 с
+    # (docker/nginx/snippets/proxy-ws.conf): за 10 с они не закрываются,
+    # docker шлёт SIGKILL, и КАЖДАЯ выкатка длиннее на десять секунд (замер
+    # боя 05.09). Ждать нечего: та же выкатка пересоздаёт api за nginx, и эти
+    # соединения рвутся в любом случае. Клиент переподключается сам —
+    # backoff 1 → 30 с с джиттером и докачка хвоста по курсору
+    # (frontend/src/shared/realtime/WsClient.ts, cursorRegistry.ts). Трёх
+    # секунд хватает обычным HTTP-запросам в полёте: они миллисекундные.
+    # Исключение одно — приём вложений (proxy_read_timeout 120s в
+    # leadchat.conf.template): при перезапуске ОДНОГО nginx без выкатки
+    # (`up -d --no-deps nginx` после правки конфига) загрузка в полёте
+    # умрёт через 3 с вместо шанса доиграть за 10. Цена принята: такой
+    # перезапуск редок, а выкатка идёт каждый день.
+    stop_grace_period: 3s
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 256M }
+
+  # --------------------------------------------------------------------------
+  # certbot: продление сертификата через webroot (nginx перечитывает его
+  # сам — reload каждые 6 ч, /docker-entrypoint.d/40-reload-loop.sh)
+  # --------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot:latest
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [edge] # нужен только исходящий доступ к ACME-серверу
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/leadchat/certbot:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c "trap exit TERM;
+      while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
+    deploy:
+      resources:
+        limits: { cpus: "0.2", memory: 128M }
+
+networks:
+  edge: # nginx <-> api <-> интернет; наружу торчит только nginx
+  internal: # api/worker/scheduler <-> postgres/redis
+    # ВНИМАНИЕ: internal: true здесь ставить нельзя — worker и scheduler ходят
+    # в api.avito.ru, Sentry и Telegram. Изоляция БД обеспечена тем, что
+    # postgres/redis не публикуют порты и не подключены к edge.
+
+volumes:
+  pgdata:
+  redisdata:
+  imgcache:
+# media / download / certbot / letsencrypt — bind-mount'ы (раскладка 05 §1):
+#   /var/leadchat/media     вложения       (api,worker,scheduler rw; nginx ro)
+#   /var/leadchat/whisper   веса Whisper   (worker rw) — качаются сами, в образе их нет
+#   /var/leadchat/download  инсталляторы   (CI кладёт; nginx ro)
+#   /var/leadchat/logs      снимки журналов (никуда НЕ монтируется: пишет
+#                           deploy/archive-logs.sh с хоста; читать —
+#                           `zgrep -h … /var/leadchat/logs/api/*.log.gz`)
+#   /var/leadchat/certbot   ACME-webroot   (certbot rw; nginx ro)
+#   /etc/letsencrypt        сертификаты    (certbot rw; nginx ro)
+#   ${BACKUP_DIR}           дампы pg_dump  (postgres rw)

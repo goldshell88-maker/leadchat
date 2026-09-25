@@ -1,0 +1,675 @@
+/*
+ * ПАНЕЛЬ ВВОДА (docs/16-DESIGN-SYSTEM-2026.md §4.5).
+ *
+ * Поле и кнопки — один блок с общей рамкой, инструменты внутри (бриф).
+ * Минимальная высота блока 56px: строка текста плюс ряд кнопок.
+ * Режим заметки перекрашивает панель целиком: перепутать его с сообщением
+ * клиенту нельзя, цена ошибки здесь максимальная.
+ */
+
+/*
+ * ⚠ ПОЛЕ ВВОДА ПРИЛИПАЕТ К НИЗУ ПАНЕЛИ ЛЕНТЫ (замер стенда 08.09).
+ *
+ * Было `position: relative` — точка отсчёта для всплывающих списков внутри
+ * (`.quick-replies`, `.tpl-popover`). `sticky` эту роль сохраняет полностью:
+ * он тоже позиционированный, и абсолютные потомки по-прежнему считаются от
+ * него. Довод про точку отсчёта не отменён, к нему добавлен второй.
+ *
+ * Второй такой. Панель ленты — флекс-колонка, и при нехватке высоты композер,
+ * стоящий в ней последним, уезжал под нижний край окна: замер 768×700 дал его
+ * низ на 37px ниже окна, а 768×627 — на 110px, то есть поля «Напишите
+ * сообщение» и кнопки отправки на экране не оставалось вовсе. Прокрутки у
+ * панели тогда не было (`overflow: hidden`), и добраться до поля было нечем —
+ * отвечать клиенту нечем.
+ *
+ * Панель научили прокручиваться (chat-thread.css), но одной прокрутки мало:
+ * поле ввода не должно ТРЕБОВАТЬ прокрутки. `sticky` держит его у нижнего края
+ * панели, пока содержимое не влезает, и ничего не делает, когда влезает, —
+ * замер после правки: низ композера 687 при панели 688 на 768×700 и та же
+ * раскладка без изменений на 1920.
+ *
+ * `flex: none` — та же болезнь, что у шапки: без него колонка отбирала бы у
+ * композера высоту и рубила бы его содержимое. Слой — `--lc-z-sticky`, ступень
+ * «прилипшего» из общей шкалы (lc-vars.css): выше ленты и полос, под которыми
+ * он проезжает, и ниже карточки-оверлея (80) и модальных окон.
+ */
+.composer {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--lc-z-sticky);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  /*
+   * Поле по кругу одно — 16, как у ленты над ним (`.thread-scroll`) и как у
+   * шапки. Было 12 по вертикали при 16 по горизонтали: подвал панели стоял на
+   * своей паре чисел, и линия его верхней рамки шла ближе к полю ввода, чем
+   * край панели к самому полю. Прибавка вертикали (12 → 16, по 4 сверху и
+   * снизу) целиком уходит в воздух вокруг поля, размеров не меняя.
+   */
+  padding: var(--lc-space-4) var(--lc-space-4)
+    calc(var(--lc-space-4) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-bg-0);
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.composer[data-note="true"] {
+  background: var(--lc-bubble-note);
+}
+
+.composer--blocked {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--lc-space-3);
+  justify-content: center;
+  padding: var(--lc-space-4);
+  background: var(--lc-bg-1);
+}
+
+/*
+ * БЫСТРЫЕ ОТВЕТЫ — КОРОТКИЙ СПИСОК НАД ПОЛЕМ (28.08).
+ *
+ * ⚠ ПЕРВАЯ РЕДАКЦИЯ БЫЛА РЯДОМ ЧИПОВ И ПОКАЗЫВАЛА ВСЕ ЗАГОТОВКИ. У диспетчера
+ * их полтора десятка: ряд переносился на три строки, отнимал у переписки
+ * заметный кусок экрана, и найти нужную было не быстрее, чем набрать руками.
+ * «По факту он вываливает все ответы, которые были».
+ *
+ * Теперь список: не больше пяти строк, у каждой название и начало текста —
+ * различить похожие заготовки («Выезд сегодня» / «Выезд завтра») можно не
+ * открывая. Строка одна на элемент, потому что читают их сверху вниз, а не
+ * шарят глазами по ряду.
+ */
+.quick-replies {
+  /* ⚠ СЛОЙ, А НЕ СТРОКА В ПОТОКЕ (разбор дизайна 28.08).
+     Первая редакция стояла обычным элементом колонки композера — и отнимала у
+     ленты около 180px, а при наборе список сужается с пяти строк до нуля, то
+     есть высота композера менялась НА КАЖДУЮ БУКВУ и лента дёргалась вверх-вниз
+     под пальцами. Компенсировать это нечем: прижимание к низу висит на смене
+     диалога, а наблюдатель размера следит только за шириной поля.
+     Привязка та же, что у пикера шаблонов (`.tpl-popover`), слой ниже его:
+     одновременно они не показываются (`visible={!pickerOpen}`), но порядок
+     задан явно, чтобы это не зависело от порядка правил. */
+  position: absolute;
+  left: var(--lc-space-4);
+  right: var(--lc-space-4);
+  bottom: calc(100% - var(--lc-space-2));
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-0);
+  padding: var(--lc-space-1);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-surface);
+  /* Тень отделяет подсказку от ленты за ней: список висит НАД перепиской. */
+  box-shadow: var(--lc-shadow-2);
+}
+
+.quick-replies__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lc-space-2);
+  width: 100%;
+  /* min-width: 0 — иначе длинный текст распирает строку и рвёт список. */
+  min-width: 0;
+  padding: var(--lc-space-1) var(--lc-space-2);
+  border: 0;
+  border-radius: var(--lc-radius-sm);
+  background: none;
+  color: var(--lc-text-1);
+  font-size: var(--lc-fz-caption);
+  text-align: start;
+  cursor: pointer;
+}
+
+.quick-replies__item[data-active] {
+  background: var(--lc-bg-2);
+}
+
+.quick-replies__title {
+  flex: 0 0 auto;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--lc-fw-semibold);
+}
+
+/* Начало текста — приглушённо: это подсказка «та ли это заготовка», а не сам
+   ответ. Обрезается многоточием, потому что заготовки бывают в абзац. */
+.quick-replies__preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--lc-text-3);
+}
+
+.quick-replies__item:focus-visible {
+  outline: 2px solid var(--lc-accent);
+  outline-offset: -2px;
+}
+
+/* Подсказка про клавиши — самым мелким и только один раз на список. Поля
+   симметричны: было 2 / 8 / 1, и строка сидела на пиксель выше своего места. */
+.quick-replies__hint {
+  padding: var(--lc-space-0) var(--lc-space-2);
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-micro);
+}
+
+/* ─────────────────────────────────────────── поле с инструментами ───── */
+
+/*
+ * ⚠ ПОЛЕ СТОИТ ПОД СООБЩЕНИЯМИ, А НЕ ПОД ВСЕЙ ПАНЕЛЬЮ (05.09).
+ *
+ * Потолок ширины ленты (`--thread-col`, chat-thread.css) держал только
+ * сообщения. Замер стенда на 2560: колонка ленты 1646, сообщения 1100 и по
+ * центру — первый пузырь начинается на x = 750, — а поле ввода 1646 от
+ * x = 445. Триста пикселей между тем, что читают, и тем, куда отвечают; ряд
+ * под полем при этом растягивался на всю ту же ширину, и подсказка про Enter
+ * оказывалась в дальнем углу экрана, за полметра от переключателя «Клиенту /
+ * Заметка», с которым она в паре.
+ *
+ * Рамка и линия сверху остаются во всю панель — граница подвала это граница
+ * панели. Ограничивается СОДЕРЖИМОЕ, и тем же числом, что у сообщений: одно
+ * число на колонку чтения, объявленное один раз.
+ *
+ * Имя местное и без запасного значения намеренно: за пределами ленты оно не
+ * объявлено, и `max-width` там честно вычисляется в `none` — витрина UiKit и
+ * прочие места, где композер показывают отдельно, остаются как были.
+ */
+.composer__field,
+.composer__footer {
+  width: 100%;
+  max-width: var(--thread-col);
+  margin-inline: auto;
+}
+
+.composer__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+  min-height: 56px;
+  /* Поле по кругу. Было 8 / 8 / 4: низ короче верха на шаг, и плашка
+     «Напишите сообщение» садилась выше оптического центра рамки — при пустом
+     поле это единственное, что в нём есть, и перекос виден на нём же. */
+  padding: var(--lc-space-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-bg-0);
+  transition:
+    border-color var(--lc-dur-fast) var(--lc-ease),
+    box-shadow var(--lc-dur-fast) var(--lc-ease);
+}
+
+/* Фокус подсвечивает ВЕСЬ блок, а не одну текстовую область: иначе поле и
+   его же кнопки выглядят как два случайно соседствующих элемента. */
+.composer__field:focus-within {
+  border-color: var(--lc-focus-border);
+  box-shadow: 0 0 0 3px var(--lc-focus-ring);
+}
+
+.composer[data-note="true"] .composer__field {
+  background: var(--lc-bubble-note);
+  border-color: var(--lc-bubble-note-accent);
+}
+
+.composer__input {
+  width: 100%;
+  min-height: 24px;
+  max-height: 128px; /* MAX_ROWS(6)*LINE_HEIGHT(20) + TEXTAREA_PADDING(8) */
+  padding: var(--lc-space-1) var(--lc-space-2);
+  border: none;
+  background: transparent;
+  color: var(--lc-text-1);
+  font: inherit;
+  font-size: var(--lc-fz-body);
+  line-height: 20px;
+  resize: none;
+  /*
+   * `auto`, а не `hidden`. Высоту поля считает JS (Composer, autoSize) и он же
+   * ставит нужное значение инлайном; это правило работает только до первого
+   * пересчёта. И именно в этом промежутке оператор однажды остался с полем в
+   * одну строку, двумя строками черновика внутри и запретом прокрутки: хвост
+   * фразы был на экране физически, но добраться до него было нельзя. Пусть
+   * страховкой будет прокрутка, а не обрезка: когда высота верна, прокручивать
+   * всё равно нечего и полоса не появляется.
+   */
+  overflow-y: auto;
+}
+
+/* Рамку рисует .composer__field — второе кольцо внутри первого выглядит
+   как ошибка вёрстки. */
+.composer__input:focus {
+  outline: none;
+}
+
+.composer__input::placeholder {
+  color: var(--lc-text-3);
+}
+
+.composer[data-note="true"] .composer__input {
+  color: var(--lc-bubble-note-text);
+}
+
+/* Свой токен вместо прозрачности: opacity 0.7 на жёлтой подложке роняла
+   светлую тему до 3.54:1 при кегле 14px. */
+.composer[data-note="true"] .composer__input::placeholder {
+  color: var(--lc-note-placeholder);
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────── ряд инструментов ───── */
+
+.composer__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+.composer__spacer {
+  flex: 1;
+}
+
+/*
+ * Геометрия — из общей шкалы контролов (`--lc-btn-*`, разбор в lc-vars.css).
+ * Своё число здесь означало бы ещё одну высоту на экране: их было десять.
+ */
+.composer__tool {
+  width: var(--lc-btn-h-sm);
+  height: var(--lc-btn-h-sm);
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--lc-btn-radius);
+  background: transparent;
+  color: var(--lc-text-3);
+  cursor: pointer;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.composer__tool:hover {
+  background: var(--lc-surface-hover);
+  color: var(--lc-text-1);
+}
+
+.composer__tool[aria-expanded="true"] {
+  background: var(--lc-primary-subtle);
+  color: var(--lc-primary-text);
+}
+
+.composer__counter {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+  font-variant-numeric: var(--lc-num);
+  padding-right: var(--lc-space-1);
+}
+
+.composer__counter[data-danger="true"] {
+  color: var(--lc-danger-text);
+  font-weight: var(--lc-fw-semibold);
+}
+
+/*
+ * КВАДРАТ, А НЕ ПРЯМОУГОЛЬНИК. Было 36 в ширину при высоте от `size` кнопки —
+ * то есть 36×30, при том что соседние `.composer__tool` квадратные 32×32.
+ * Кнопка отправки стояла в одном ряду с ними и выбивалась и шириной, и
+ * высотой сразу.
+ */
+.composer__send {
+  flex: none;
+  width: var(--lc-btn-h-sm);
+  padding: 0;
+}
+
+/* Жёлтая кнопка отправки в режиме заметки — вместе с фоном панели это второй
+   независимый признак режима. Один можно не заметить, два — уже трудно. */
+.composer__send[data-note="true"] {
+  background: var(--lc-warning-solid);
+  color: var(--lc-on-warning);
+}
+
+/* ──────────────────────────────────────────── подвал под полем ──────── */
+
+.composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-3);
+  flex-wrap: wrap;
+  /*
+   * СВОЕГО БОКОВОГО ПОЛЯ У ПОДВАЛА НЕТ. Стояло `0 var(--lc-space-1)` при поле
+   * композера 16: переключатель «Сообщение / Заметка» начинался на 4px правее
+   * рамки поля ввода, а подсказка про клавиши на столько же не доходила до её
+   * правого края — две кромки вместо одной на высоте в один шаг. Ширину подвал
+   * и так делит с полем (`max-width: var(--thread-col)` выше), поэтому обе
+   * кромки теперь идут от одного поля панели.
+   */
+}
+
+/*
+ * ⚠ ПЕРЕКЛЮЧАТЕЛЬ «СООБЩЕНИЕ / ЗАМЕТКА» ОБРУБАЛСЯ ПОСРЕДИ СЛОВА (замер 08.09).
+ *
+ * Подвал (`.composer__footer` выше) переносит переключатель на свою строку —
+ * но перенос помогает, только если перенесённому есть куда встать. Замер при
+ * окне 768×700 (рельса 218, ленте достаётся 174, подвалу 140): переключателю
+ * нужно 189,5px, и он рисовался на 53,5px правее подвала — слово «Заметка»
+ * обрывалось посреди буквы, и переключиться в режим заметки было нечем.
+ * Грязно с 768 по 800, с 820 чисто; с полосами и без — одинаково.
+ *
+ * Потолок по родителю плюс собственный перенос: кнопки встают одна под другой
+ * и остаются целыми (замер после: 132px в 132px, обе подписи полностью).
+ * `min-width: 0` — чтобы потолок действовал: у флекс-элемента автоминимум
+ * равен содержимому и `max-width` без него ничего не решает.
+ */
+.composer__modes {
+  display: inline-flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+  gap: var(--lc-space-0);
+  padding: var(--lc-space-0);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-bg-2);
+}
+
+.composer__mode {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  border: none;
+  border-radius: var(--lc-radius-pill);
+  background: transparent;
+  padding: var(--lc-space-1) var(--lc-space-3);
+  font-family: inherit;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+  cursor: pointer;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.composer__mode:hover {
+  color: var(--lc-text-1);
+}
+
+.composer__mode[data-active="true"] {
+  background: var(--lc-surface);
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-medium);
+  box-shadow: var(--lc-shadow-0);
+}
+
+.composer[data-note="true"] .composer__mode[data-active="true"] {
+  background: var(--lc-warning-solid);
+  color: var(--lc-on-warning);
+}
+
+.composer__hint {
+  margin-left: auto;
+}
+
+/* Клавиши в подсказке — капсулы, чтобы «Enter» читался как клавиша, а не как
+   слово в предложении. */
+.composer__hint kbd {
+  font-family: inherit;
+  font-size: var(--lc-fz-micro);
+  background: var(--lc-bg-2);
+  border: 1px solid var(--lc-border);
+  /* Радиус 8, как у всех мелких вложенных форм (строка быстрого ответа, чип
+     вложения). Шестёрка была здесь единственной на весь подвал. */
+  border-radius: var(--lc-radius-sm);
+  /* Поля со шкалы и симметричные: было 1 / 5 — оба мимо шкалы, а верх и низ
+     не совпадали, из-за чего капсула сидела на пиксель выше строки. */
+  padding: var(--lc-space-0) var(--lc-space-1);
+  color: var(--lc-text-2);
+}
+
+/* ──────────────────────────────────────────── вложения и плашки ─────── */
+
+.composer__banner {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border-radius: var(--lc-radius-sm);
+  font-size: var(--lc-fz-caption);
+}
+
+.composer__banner--danger {
+  background: var(--lc-danger-subtle);
+  color: var(--lc-danger-text);
+}
+
+/* Незаменённый плейсхолдер шаблона — предупреждение, а не отказ: отправку оно
+   не блокирует, поэтому янтарный, а не красный. */
+.composer__banner--warn {
+  background: var(--lc-warning-subtle);
+  color: var(--lc-warning-text);
+}
+
+.composer__banner-link {
+  color: inherit;
+  font-weight: var(--lc-fw-semibold);
+}
+
+.composer__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lc-space-2);
+}
+
+.composer__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  height: 26px;
+  padding: 0 var(--lc-space-2);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-bg-2);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+  max-width: 240px;
+}
+
+.composer__chip[data-state="error"] {
+  border-color: var(--lc-danger);
+  color: var(--lc-danger-text);
+}
+
+.composer__chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer__chip-hint {
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+  /* ⚠ ПОДПИСЬ НЕ УСТУПАЕТ И НЕ РВЁТСЯ (разбор дизайна 28.08).
+     У соседнего имени файла есть `overflow: hidden`, а он обнуляет автоминимум
+     флекс-элемента — пол у имени нулевой, а у подписи равен слову
+     «загрузилось». Дележ шёл пропорционально базам, а не «сначала имя»: подпись
+     переносилась на вторую строку и срезалась высотой чипа в 26px. Весь дефицит
+     обязан уходить в имя, у которого многоточие уже настроено. */
+  flex: none;
+  white-space: nowrap;
+}
+
+.composer__chip-remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  font-size: var(--lc-fz-caption);
+  line-height: 1;
+}
+
+/* Плашка «Режим просмотра» руководителя (11 §2.5.2) */
+.read-only-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2) var(--lc-space-4);
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-info-subtle);
+  color: var(--lc-info-text);
+  font-size: var(--lc-fz-caption);
+}
+
+.read-only-banner + .composer {
+  border-top: none;
+}
+
+/*
+ * SAFARI НА IPHONE УВЕЛИЧИВАЕТ СТРАНИЦУ, ЕСЛИ КЕГЛЬ ПОЛЯ МЕНЬШЕ 16px.
+ *
+ * Это не настройка и не баг вёрстки — так устроен сам браузер: он «помогает»
+ * прочитать мелкое поле, раздувая всю страницу, и обратно она сама не
+ * возвращается. Каждое касание поля ввода уводило раскладку, и после первого
+ * же ответа клиенту список диалогов оказывался за краем экрана.
+ *
+ * Поднимаем кегль только там, где палец: на настольном виде 14px остаётся.
+ */
+@media (pointer: coarse) {
+  .composer__input,
+  .composer__input textarea {
+    font-size: 16px;
+  }
+
+  /*
+   * ⚠ ЦЕЛЬ ПОД ПАЛЕЦ (замер 05.09, окно 375): «Клиенту» и «Заметка» — 74×22 и
+   * 73×22, то есть на два пикселя ниже нижней границы нормы (24).
+   *
+   * Из всех мелких целей экрана эта дороже прочих: переключатель решает, уйдёт
+   * набранное КЛИЕНТУ или останется внутренней заметкой. Промах здесь стоит
+   * отправленной клиенту служебной записи — цена ошибки максимальная, о чём
+   * сказано в шапке этого же файла.
+   */
+  .composer__mode {
+    min-height: 24px;
+  }
+}
+
+/*
+ * ПРИЗРАЧНОЕ ПРОДОЛЖЕНИЕ В ПОЛЕ (просьба владельца 28.08: «чтобы быстрые
+ * сообщения сами автоматически заполнялись»).
+ *
+ * Зеркало лежит ПОД полем и повторяет его раскладку до пикселя: тот же кегль,
+ * та же высота строки, те же отступы и тот же перенос. Набранное в зеркале
+ * прозрачное — оно только двигает хвост на нужное место, а видно из зеркала
+ * ровно продолжение.
+ *
+ * ⚠ ЛЮБОЕ РАСХОЖДЕНИЕ С `.composer__input` ВИДНО СРАЗУ: серые буквы уезжают от
+ * каретки, и подсказка превращается в мусор на экране. Поэтому свойства здесь
+ * повторены явно, а не унаследованы: наследование молча разошлось бы при первой
+ * правке поля.
+ */
+/* Коробка вокруг поля: только она задаёт систему координат призраку. Без неё
+   зеркало легло бы на весь блок вместе с рядом кнопок. */
+.composer__input-box {
+  position: relative;
+}
+
+.composer__ghost {
+  position: absolute;
+  inset: 0;
+  padding: var(--lc-space-1) var(--lc-space-2);
+  font-size: var(--lc-fz-body);
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  /* Ни нажатий, ни выделения: поле сверху, зеркало только рисует. */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Набранное невидимо — оно здесь вместо линейки, а не вместо текста. */
+.composer__ghost-typed {
+  color: transparent;
+}
+
+.composer__ghost-tail {
+  color: var(--lc-text-4);
+}
+
+/* ------------------------------------------- чужой диалог: «Войти» -- */
+
+/*
+ * Полоса вместо поля ввода в чужом рабочем диалоге (просьба владельца 04.09:
+ * «кнопку „Войти в диалог" сделай по аналогии, как сделано „Принять диалог"»).
+ *
+ * ⚠ ТЕ ЖЕ ПРАВИЛА, ЧТО У ПОЛОСЫ ОЧЕРЕДИ (`.inbox-decision`, inbox.css), и это
+ * намеренный повтор, а не забытая общая основа: задача у них одна — «писать
+ * пока нельзя, одно нажатие это меняет», — и выглядеть они обязаны одинаково.
+ * Сводить их в один класс значит связать очередь и участие в диалоге, которые
+ * меняются по разным причинам; восемь строк раскладки этого не стоят.
+ *
+ * ⚠ ОТСТУП СНИЗУ СЧИТАЕТСЯ С СИСТЕМНОЙ ПОЛОСОЙ. Прежний заслон (снят 03.09)
+ * переопределял `padding` композера целиком и терял `env(safe-area-inset-bottom)`
+ * — на телефоне полоса налезала на системную.
+ */
+.foreign-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-3);
+  flex-wrap: wrap;
+  padding: var(--lc-space-3) var(--lc-space-4)
+    calc(var(--lc-space-3) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--lc-border);
+  background: var(--lc-bg-1);
+}
+
+.foreign-bar__hint {
+  min-width: 0;
+  flex: 1;
+}
+
+.foreign-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+}
+
+/* ──────────────────────────────── перетаскивание файла в панель ─────── */
+
+/*
+ * ПОДСВЕТКА ЗОНЫ, ПОКА ФАЙЛ НАД ПАНЕЛЬЮ (07.09).
+ *
+ * ⚠ СЛОЙ ПОВЕРХ, А НЕ РАМКА НА САМОЙ ПАНЕЛИ. Рамка у `.composer` занята —
+ * верхняя линия отделяет подвал от ленты, — а двухпиксельная рамка сверх неё
+ * сдвинула бы всё содержимое: панель дёргалась бы под курсором с файлом,
+ * ровно в тот момент, когда человек целится.
+ *
+ * ⚠ `pointer-events: none` ОБЯЗАТЕЛЕН. Слой лежит поверх поля, и без этого он
+ * сам получал бы `dragleave` при наведении на себя же: подсветка мигала бы, а
+ * `drop` уходил бы не в панель.
+ */
+.composer__drop {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--lc-accent);
+  border-radius: var(--lc-radius-md);
+  /* Подложка полупрозрачная: под ней должно быть видно, куда именно ляжет
+     файл — в сообщение клиенту или в жёлтую заметку. */
+  background: color-mix(in srgb, var(--lc-accent) 12%, transparent);
+  color: var(--lc-text-1);
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-semibold);
+  pointer-events: none;
+}

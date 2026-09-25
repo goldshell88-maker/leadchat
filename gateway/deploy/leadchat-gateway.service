@@ -1,0 +1,27 @@
+# Шлюз внешних API LeadChat на Амстердаме (docs/46-ШЛЮЗ-API.md).
+# Ставится gateway/deploy.sh в /etc/systemd/system/. Ключи провайдеров и
+# GATEWAY_TOKEN — в /opt/leadchat-gateway/.env (root:root 0600); systemd читает
+# файл до сброса привилегий, сам процесс работает под временным пользователем.
+[Unit]
+Description=LeadChat gateway (внешние API за мостом WireGuard)
+After=network-online.target wg-quick@wg0.service
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+WorkingDirectory=/opt/leadchat-gateway/src
+EnvironmentFile=/opt/leadchat-gateway/.env
+# Только адрес внутри WireGuard: из интернета шлюза нет (как у моста 8791).
+ExecStart=/opt/leadchat-gateway/.venv/bin/uvicorn leadchat_gateway.main:app --host 10.10.0.2 --port 8792 --proxy-headers --no-server-header
+Restart=always
+RestartSec=3
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadOnlyPaths=/opt/leadchat-gateway
+# Если wg0 поднялся позже — uvicorn не сможет забиндиться и перезапустится через 3 с.
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,1028 @@
+<!-- @dsCard group="Настройки" -->
+<meta charset="utf-8">
+<title>Быстрые ответы</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.4 акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 синий, §1.3 красный, §1.5 янтарь, §1.6 фиолетовый */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-red-950: #2c1113;
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bubble-in: #181f1c;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+    --lc-disabled-bg: var(--lc-bg-raise);
+    --lc-disabled-edge: #505a55;
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-empty-art: #6f7a73;
+    --lc-disabled-text: var(--lc-text-4);
+
+    /* роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-primary-solid-hover: var(--lc-a-400);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+    --lc-focus-border: var(--lc-a-500);
+
+    /* состояния */
+    --lc-success-text: var(--lc-a-300);
+    --lc-warn: var(--lc-amber-500);
+    --lc-warn-text: #d9a94e;
+    --lc-warning-subtle: #241a05;
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-note-placeholder: var(--lc-amber-400);
+    --lc-danger: #e5484d;
+    --lc-danger-solid: #dc2626;
+    --lc-danger-subtle: var(--lc-red-950);
+    --lc-danger-text: #ff9ea1;
+    --lc-info: var(--lc-blue-500);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+    --lc-link: var(--lc-blue-400);
+    --lc-accent: var(--lc-purple-500);
+    --lc-accent-text: var(--lc-purple-300);
+    --lc-accent-subtle: var(--lc-purple-950);
+
+    /* палитра аватаров (§5) */
+    --lc-avatar-0-bg: #14343f;
+    --lc-avatar-0-ink: #7dd3fc;
+    --lc-avatar-4-bg: #2a1f45;
+    --lc-avatar-4-ink: #c4b5fd;
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+    --lc-space-9: 64px;
+    --lc-prose-max: 68ch;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-pill: 999px;
+
+    /* §2.3 колонки */
+    --lc-rail-w: 72px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-font-mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+    --lc-shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ═══════════════════════════════════════ КАРКАС МАКЕТА ══════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    width: 1600px;
+    display: grid;
+    grid-template-columns: var(--lc-rail-w) 216px 1fr;
+    align-items: stretch;
+  }
+
+  /* ─── рельс разделов ─────────────────────────────────────────────────── */
+  .rail {
+    background: var(--lc-bg-panel);
+    border-right: 1px solid var(--lc-border);
+    padding: var(--lc-space-4) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .rail__mark {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-primary);
+    color: var(--lc-on-primary);
+    display: grid;
+    place-items: center;
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .rail__item {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--lc-radius-md);
+    display: grid;
+    place-items: center;
+    color: var(--lc-text-3);
+  }
+
+  .rail__item[data-active] {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-primary-text);
+  }
+
+  .rail__me { margin-top: auto; }
+
+  /* ─── вторая колонка: разделы настроек ───────────────────────────────── */
+  .snav {
+    background: var(--lc-bg-panel);
+    border-right: 1px solid var(--lc-border);
+    padding: var(--lc-space-5) var(--lc-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-0);
+  }
+
+  .snav__title {
+    font-size: var(--lc-fz-micro);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--lc-text-4);
+    padding: 0 var(--lc-space-3) var(--lc-space-2);
+  }
+
+  .snav__item {
+    height: var(--lc-btn-h-sm);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--lc-space-3);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-note);
+  }
+
+  .snav__item[data-active] {
+    background: var(--lc-selected);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+    box-shadow: inset 2px 0 0 var(--lc-primary);
+  }
+
+  /* ─── содержимое ─────────────────────────────────────────────────────── */
+  .content { padding: var(--lc-space-6); }
+
+  .phead__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+  }
+
+  .phead__desc {
+    margin: var(--lc-space-2) 0 0;
+    max-width: var(--lc-prose-max);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-body);
+  }
+
+  /* ─── единственная строка контролов ──────────────────────────────────── */
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    margin: var(--lc-space-5) 0 var(--lc-space-4);
+  }
+
+  .tabs {
+    display: inline-flex;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-sm);
+    overflow: hidden;
+    height: var(--lc-btn-h-sm);
+  }
+
+  .tabs button {
+    border: 0;
+    background: transparent;
+    padding: 0 var(--lc-space-3);
+    font-family: inherit;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-2);
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .tabs button[data-active] {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .tabs .n {
+    font-variant-numeric: var(--lc-num);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+  }
+
+  .tabs button[data-active] .n { color: var(--lc-primary-text); }
+
+  .search {
+    width: 320px;
+    height: var(--lc-btn-h-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    padding: 0 var(--lc-space-3);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    color: var(--lc-text-4);
+    font-size: var(--lc-fz-note);
+  }
+
+  .spacer { flex: 1; }
+
+  .btn {
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border-radius: var(--lc-btn-radius);
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-btn-gap);
+    font-family: inherit;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    white-space: nowrap;
+  }
+
+  .btn--primary {
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .btn--default {
+    background: var(--lc-bg-2);
+    border-color: var(--lc-border);
+    color: var(--lc-text-1);
+  }
+
+  .btn--subtle { background: transparent; color: var(--lc-text-2); }
+  .btn--danger { background: transparent; color: var(--lc-danger-text); }
+  .btn--md { height: var(--lc-btn-h-md); padding: 0 var(--lc-btn-px-md); font-size: var(--lc-fz-body); }
+
+  /* ─── две колонки: список и правка ───────────────────────────────────── */
+  .cols {
+    display: grid;
+    grid-template-columns: 452px 772px;
+    gap: var(--lc-space-5);
+    height: 948px;
+  }
+
+  .panel {
+    background: var(--lc-bg-panel);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    overflow: hidden;
+  }
+
+  /* ─── список заготовок ───────────────────────────────────────────────── */
+  .list { display: flex; flex-direction: column; }
+  .list__body { flex: 1; overflow: hidden; }
+
+  .grp {
+    font-size: var(--lc-fz-micro);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--lc-text-4);
+    padding: var(--lc-space-3) var(--lc-space-4) var(--lc-space-1);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 108px 1fr 44px;
+    column-gap: var(--lc-space-3);
+    align-items: baseline;
+    padding: var(--lc-space-2) var(--lc-space-4);
+    border-left: 2px solid transparent;
+  }
+
+  .row[data-selected] {
+    background: var(--lc-selected);
+    border-left-color: var(--lc-primary);
+  }
+
+  .cmd {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-primary-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row__title {
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row[data-selected] .row__title { font-weight: var(--lc-fw-semibold); }
+
+  .row__n {
+    font-size: var(--lc-fz-caption);
+    font-variant-numeric: var(--lc-num);
+    color: var(--lc-text-4);
+    text-align: right;
+  }
+
+  .row__body {
+    grid-column: 2 / 4;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .list__foot {
+    border-top: 1px solid var(--lc-border);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ─── правка выбранной ───────────────────────────────────────────────── */
+  .editor { display: flex; flex-direction: column; padding: var(--lc-space-5); }
+
+  .editor__head {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+  }
+
+  .editor__cmd {
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-card);
+    color: var(--lc-primary-text);
+  }
+
+  .editor__title {
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-1);
+  }
+
+  .editor__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    margin-top: var(--lc-space-3);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .ava {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--lc-radius-pill);
+    display: grid;
+    place-items: center;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-semibold);
+    letter-spacing: 0.02em;
+  }
+
+  .ava--0 { background: var(--lc-avatar-0-bg); color: var(--lc-avatar-0-ink); }
+  .ava--4 { background: var(--lc-avatar-4-bg); color: var(--lc-avatar-4-ink); }
+
+  .rule {
+    height: 1px;
+    background: var(--lc-border);
+    margin: var(--lc-space-4) 0;
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--lc-space-4) var(--lc-space-5);
+  }
+
+  .f--wide { grid-column: 1 / 3; }
+
+  .lbl {
+    display: block;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-2);
+    margin-bottom: var(--lc-space-1);
+  }
+
+  .inp {
+    height: var(--lc-btn-h-md);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--lc-space-3);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-1);
+  }
+
+  .inp--focus {
+    border-color: var(--lc-focus-border);
+    box-shadow: 0 0 0 3px var(--lc-focus-ring);
+  }
+
+  .inp__slash {
+    font-family: var(--lc-font-mono);
+    color: var(--lc-text-4);
+    margin-right: 1px;
+  }
+
+  .inp__cmd { font-family: var(--lc-font-mono); color: var(--lc-text-1); }
+
+  .hint {
+    margin-top: var(--lc-space-1);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+  }
+
+  .area {
+    min-height: 132px;
+    padding: var(--lc-space-3);
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    color: var(--lc-text-1);
+  }
+
+  /* Подстановка — янтарём: тот же токен, что и у заглушки в заметке. */
+  .ph {
+    color: var(--lc-note-placeholder);
+    background: var(--lc-warning-subtle);
+    border-radius: var(--lc-radius-xs);
+    padding: 1px 4px;
+    font-size: var(--lc-fz-note);
+  }
+
+  .vars {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    margin-top: 6px;
+  }
+
+  .vars__count {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .var {
+    height: 24px;
+    padding: 0 var(--lc-space-2);
+    border-radius: var(--lc-radius-xs);
+    border: 1px solid var(--lc-border);
+    background: transparent;
+    font-family: var(--lc-font-mono);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-2);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .seg {
+    display: inline-flex;
+    height: var(--lc-btn-h-md);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    overflow: hidden;
+  }
+
+  .seg > span {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    padding: 0 var(--lc-space-4);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  .seg > span[data-active] {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-medium);
+  }
+
+  .seg > span[data-locked] { color: var(--lc-disabled-text); }
+
+  .dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-primary);
+  }
+
+  .dot--muted { background: var(--lc-text-5); }
+
+  .editor__foot {
+    margin-top: auto;
+    padding-top: var(--lc-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--lc-space-2);
+  }
+
+  /* ─── как это выглядит в диалоге ─────────────────────────────────────── */
+  .demo { padding: var(--lc-space-4) var(--lc-space-5) var(--lc-space-5); }
+
+  .demo__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--lc-space-3);
+    margin-bottom: var(--lc-space-3);
+  }
+
+  .demo__title {
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-2);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .demo__note { font-size: var(--lc-fz-caption); color: var(--lc-text-4); }
+
+  .pop {
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border-strong);
+    border-radius: var(--lc-radius-md);
+    box-shadow: var(--lc-shadow-2);
+    overflow: hidden;
+    max-width: 560px;
+  }
+
+  .pop__grp {
+    font-size: var(--lc-fz-micro);
+    letter-spacing: 0.06em;
+    color: var(--lc-text-4);
+    padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-1);
+  }
+
+  .pop__row {
+    display: grid;
+    grid-template-columns: 108px 1fr;
+    column-gap: var(--lc-space-3);
+    align-items: baseline;
+    padding: 6px var(--lc-space-3);
+    border-left: 2px solid transparent;
+  }
+
+  .pop__row[data-active] {
+    background: var(--lc-selected);
+    border-left-color: var(--lc-primary);
+  }
+
+  .pop__title { font-size: var(--lc-fz-note); color: var(--lc-text-1); }
+
+  .pop__body {
+    grid-column: 2;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pop__foot {
+    border-top: 1px solid var(--lc-border);
+    padding: 6px var(--lc-space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-4);
+  }
+
+  .composer {
+    margin-top: var(--lc-space-2);
+    max-width: 560px;
+    background: var(--lc-bg-2);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-2);
+  }
+
+  .composer__text {
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-1);
+    display: flex;
+    align-items: center;
+    min-height: 26px;
+  }
+
+  .composer__cmd {
+    font-family: var(--lc-font-mono);
+    color: var(--lc-primary-text);
+    background: var(--lc-primary-subtle);
+    border-radius: var(--lc-radius-xs);
+    padding: 1px 3px;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 16px;
+    background: var(--lc-text-1);
+    margin-left: 2px;
+  }
+
+  .composer__row {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    margin-top: var(--lc-space-1);
+  }
+
+  .icobtn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--lc-radius-sm);
+    display: grid;
+    place-items: center;
+    color: var(--lc-text-3);
+    border: 1px solid transparent;
+  }
+
+  .icobtn[data-active] {
+    color: var(--lc-primary-text);
+    background: var(--lc-primary-subtle);
+  }
+</style>
+
+<div class="app">
+
+  <!-- рельс разделов -->
+  <aside class="rail">
+    <div class="rail__mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.2 1 3.4 8.6h3.3L6.2 15l6.4-8.2H9z"/>
+      </svg>
+    </div>
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <rect x="3" y="4" width="14" height="10" rx="2"/><path d="M7 14v3l4-3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="rail__item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 16V9M10 16V4M16 16v-5"/>
+      </svg>
+    </div>
+    <div class="rail__item" data-active>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M3 6h4M11 6h6M3 14h6M13 14h4"/><circle cx="9" cy="6" r="2"/><circle cx="11" cy="14" r="2"/>
+      </svg>
+    </div>
+    <div class="rail__me">
+      <div class="ava ava--4" style="width:32px;height:32px;font-size:var(--lc-fz-caption)">АС</div>
+    </div>
+  </aside>
+
+  <!-- разделы настроек -->
+  <nav class="snav">
+    <div class="snav__title">Настройки</div>
+    <div class="snav__item">Аккаунты Авито</div>
+    <div class="snav__item">Люди и каналы</div>
+    <div class="snav__item" data-active>Быстрые ответы</div>
+    <div class="snav__item">Боты</div>
+    <div class="snav__item">Лид-бот</div>
+    <div class="snav__item">Автозаявки</div>
+    <div class="snav__item">Распределение</div>
+    <div class="snav__item">Команда</div>
+    <div class="snav__item">Профиль</div>
+  </nav>
+
+  <!-- сам экран -->
+  <main class="content">
+    <header>
+      <h1 class="phead__title">Быстрые ответы</h1>
+      <p class="phead__desc">Общие видит вся команда, личные — только вы. В диалоге вставляются по «/»</p>
+    </header>
+
+    <div class="bar">
+      <div class="tabs">
+        <button type="button" data-active>Общие <span class="n">39</span></button>
+        <button type="button">Мои <span class="n">26</span></button>
+      </div>
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14" stroke-linecap="round"/>
+        </svg>
+        Поиск по названию и тексту
+      </div>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn--primary">Создать быстрый ответ</button>
+    </div>
+
+    <div class="cols">
+
+      <!-- ЛЕВО: список с командами -->
+      <section class="panel list">
+        <div class="list__body">
+
+          <div class="grp">Открытие</div>
+          <div class="row">
+            <span class="cmd">/привет</span>
+            <span class="row__title">Здравствуйте</span>
+            <span class="row__n">615</span>
+            <span class="row__body">Здравствуйте! Меня зовут {менеджер}, компания «Лид Партнёр». Подскажу по ремонту</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/работаем</span>
+            <span class="row__title">Да, занимаемся</span>
+            <span class="row__n">402</span>
+            <span class="row__body">Да, с такой техникой работаем. Опишите, что случилось, и приложите фото</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/перезвон</span>
+            <span class="row__title">Перезвоним</span>
+            <span class="row__n">231</span>
+            <span class="row__body">Оставьте номер — мастер перезвонит в течение 15 минут и уточнит детали</span>
+          </div>
+
+          <div class="grp">Цена и гарантия</div>
+          <div class="row">
+            <span class="cmd">/цена</span>
+            <span class="row__title">Цена по диагностике</span>
+            <span class="row__n">388</span>
+            <span class="row__body">Точную цену назовёт мастер после диагностики, она бесплатная при ремонте</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/выезд</span>
+            <span class="row__title">Выезд мастера</span>
+            <span class="row__n">214</span>
+            <span class="row__body">Выезд по городу 1000 ₽, при согласии на ремонт — бесплатно</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/гарантия</span>
+            <span class="row__title">Гарантия 12 месяцев</span>
+            <span class="row__n">176</span>
+            <span class="row__body">На работу и запчасти даём гарантию 12 месяцев, талон выдаём на месте</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/предоплата</span>
+            <span class="row__title">Без предоплаты</span>
+            <span class="row__n">118</span>
+            <span class="row__body">Предоплату не берём: оплата после ремонта, когда всё проверите сами</span>
+          </div>
+
+          <div class="grp">Сроки</div>
+          <div class="row">
+            <span class="cmd">/сегодня</span>
+            <span class="row__title">Мастер сегодня</span>
+            <span class="row__n">149</span>
+            <span class="row__body">Свободное окно сегодня с 14:00 до 18:00. Записать вас на это время?</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/завтра</span>
+            <span class="row__title">Перенос на завтра</span>
+            <span class="row__n">96</span>
+            <span class="row__body">Сегодня окон уже нет, ближайшее — завтра с 09:00. Записать?</span>
+          </div>
+
+          <div class="grp">Отказы</div>
+          <div class="row" data-selected>
+            <span class="cmd">/далеко</span>
+            <span class="row__title">Территориально не подходит</span>
+            <span class="row__n">143</span>
+            <span class="row__body">Здравствуйте, {имя}! К сожалению, по этому адресу мы не выезжаем</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/непрофиль</span>
+            <span class="row__title">Этим не занимаемся</span>
+            <span class="row__n">87</span>
+            <span class="row__body">К сожалению, такую технику мы не ремонтируем. Подскажу, к кому обратиться</span>
+          </div>
+
+          <div class="grp">Без папки</div>
+          <div class="row">
+            <span class="cmd">/адрес</span>
+            <span class="row__title">Уточнить адрес</span>
+            <span class="row__n">61</span>
+            <span class="row__body">Подскажите адрес и удобное время — передам мастеру</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/запчасть</span>
+            <span class="row__title">Ждём запчасть</span>
+            <span class="row__n">47</span>
+            <span class="row__body">Запчасть заказана, привезут за 3–5 дней — сразу наберу и согласуем время</span>
+          </div>
+          <div class="row">
+            <span class="cmd">/фото</span>
+            <span class="row__title">Пришлите фото</span>
+            <span class="row__n">54</span>
+            <span class="row__body">Пришлите, пожалуйста, фото — так мастер поймёт, что взять с собой</span>
+          </div>
+
+        </div>
+        <div class="list__foot">39 общих заготовок · 3 940 вставок за 30 дней</div>
+      </section>
+
+      <!-- ПРАВО: правка выбранной + как она вызывается -->
+      <div style="display:flex;flex-direction:column;gap:var(--lc-space-5)">
+
+        <section class="panel editor" style="height:648px">
+          <div class="editor__head">
+            <span class="editor__cmd">/далеко</span>
+            <span class="editor__title">Территориально не подходит</span>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn--subtle">Дублировать</button>
+            <button type="button" class="btn btn--danger">Удалить</button>
+          </div>
+
+          <div class="editor__meta">
+            <span class="ava ava--0">НП</span>
+            Назар Полозов · создан 14 августа · 143 вставки за 30 дней
+          </div>
+
+          <div class="rule"></div>
+
+          <div class="fields">
+            <div>
+              <span class="lbl">Название</span>
+              <div class="inp">Территориально не подходит</div>
+              <div class="hint">Необязательно — можно оставить пустым, тогда возьмём начало текста</div>
+            </div>
+
+            <div>
+              <span class="lbl">Команда</span>
+              <div class="inp inp--focus">
+                <span class="inp__slash">/</span><span class="inp__cmd">далеко</span>
+              </div>
+              <div class="hint">Так её зовут в диалоге: наберите «/далеко» прямо в сообщении</div>
+            </div>
+
+            <div class="f--wide">
+              <span class="lbl">Текст</span>
+              <div class="area">Здравствуйте, <span class="ph">{имя}</span>! К сожалению, по этому адресу мы не выезжаем — он вне зоны обслуживания филиала. Если ремонт нужен по объявлению <span class="ph">{объявление}</span>, привезите технику к нам: Санкт-Петербург, Лесная 7/1, с 09:00 до 18:00 без выходных.</div>
+              <div class="vars">
+                <span class="vars__count">231 символ · вставить:</span>
+                <button type="button" class="var">{имя}</button>
+                <button type="button" class="var">{менеджер}</button>
+                <button type="button" class="var">{объявление}</button>
+              </div>
+            </div>
+
+            <div>
+              <span class="lbl">Папка</span>
+              <div class="inp">Отказы</div>
+              <div class="hint">Необязательно. В подсказке — все папки, которые уже есть</div>
+            </div>
+
+            <div>
+              <span class="lbl">Кто видит</span>
+              <div class="seg">
+                <span data-active><span class="dot"></span>Общий</span>
+                <span data-locked><span class="dot dot--muted"></span>Личный</span>
+              </div>
+              <div class="hint">Общий — его увидит вся команда. Область после создания не меняется</div>
+            </div>
+          </div>
+
+          <div class="editor__foot">
+            <button type="button" class="btn btn--subtle btn--md">Отмена</button>
+            <button type="button" class="btn btn--primary btn--md">Сохранить</button>
+          </div>
+        </section>
+
+        <section class="panel demo" style="height:276px">
+          <div class="demo__head">
+            <span class="demo__title">Как это выглядит в диалоге</span>
+            <span class="demo__note">Команду набирают прямо в сообщении — она видна, пока не выбрали строку</span>
+          </div>
+
+          <div class="pop">
+            <div class="pop__grp">ОБЩИЕ · Отказы</div>
+            <div class="pop__row" data-active>
+              <span class="cmd">/далеко</span>
+              <span class="pop__title">Территориально не подходит</span>
+              <span class="pop__body">Здравствуйте, {имя}! К сожалению, по этому адресу мы не выезжаем — он вне зоны</span>
+            </div>
+            <div class="pop__foot">
+              <span>↑↓ — выбрать · Enter — вставить · Esc — закрыть</span>
+              <span>Управлять шаблонами</span>
+            </div>
+          </div>
+
+          <div class="composer">
+            <div class="composer__text">Здравствуйте! <span class="composer__cmd" style="margin-left:4px">/да</span><span class="caret"></span></div>
+            <div class="composer__row">
+              <span class="icobtn" data-active>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path d="M9.2 1 3.4 8.6h3.3L6.2 15l6.4-8.2H9z"/>
+                </svg>
+              </span>
+              <span class="icobtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                  <path d="M8 3.5v9M3.5 8h9"/>
+                </svg>
+              </span>
+              <span class="spacer"></span>
+              <button type="button" class="btn btn--primary">Отправить</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+</div>

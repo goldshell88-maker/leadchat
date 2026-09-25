@@ -1,0 +1,198 @@
+# ============================================================================
+# LeadChat — сборка образов и выкладка на прод (docs/05-DEPLOY-OPS.md §5.2).
+#
+# Триггер: пуш тега v* (релиз) либо workflow_dispatch (hotfix из main).
+# Порядок: build-push (GHCR) -> deploy (ssh на VPS) -> smoke -> notify.
+# Красный smoke = автоматический откат на предыдущий тег.
+#
+# Секреты (Settings -> Secrets and variables -> Actions):
+#   VPS_HOST, VPS_USER, VPS_SSH_KEY      доступ на сервер деплоя
+#   SENTRY_DSN_FRONTEND                  инлайнится в бандл при сборке (VITE_*)
+#   SMOKE_EMAIL, SMOKE_PASSWORD          smoke@leadpartner.local, роль manager (07 §6)
+#   SMOKE_ADMIN_EMAIL, SMOKE_ADMIN_PASSWORD   smoke-admin@leadpartner.local, роль head — для SM-10
+# Пуш в GHCR идёт под стандартным GITHUB_TOKEN (permissions: packages: write).
+# ============================================================================
+name: Deploy
+
+# ⚠⚠ ЭТА ВЫКАТКА НЕ РАБОТАЕТ И ОТКЛЮЧЕНА (аудит 19.08, находка L-011).
+#
+# Она рассчитана на другую систему: образы из GHCR и каталог /opt/leadchat.
+# Боевая система живёт в /srv/leadchat, образы собираются НА СЕРВЕРЕ, а
+# выкатывает её `deploy/workstation/ship.sh` с машины владельца. Проверено на
+# бою: каталога /opt/leadchat не существует — значит шаг «Откат при красном
+# smoke» звал бы `/opt/leadchat/bin/rollback.sh`, которого нет, и красная
+# выкатка осталась бы БЕЗ отката.
+#
+# Опаснее другое: пуск был по пушу тега `v*`. Один тег — и этот процесс полез
+# бы на боевой сервер по ssh с чужой схемой каталогов. Поэтому пуск снят до
+# `workflow_dispatch` (только руками и осознанно). Чинить путь смысла нет:
+# чинить надо весь процесс целиком либо удалить его, и это решение владельца,
+# а не правка одной строки.
+on:
+  # push:
+  #   tags: ["v*"]      # СНЯТО: см. предупреждение выше
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Что деплоим (ветка/тег/SHA). По умолчанию — текущий ref"
+        required: false
+        default: ""
+
+concurrency: deploy-production # два деплоя одновременно не поедут
+
+env:
+  # Адрес, по которому система доступна снаружи.
+  #
+  # ЗДЕСЬ БЫЛ ЗАШИТ chat.partner-lead-centre.ru, а он ведёт НЕ СЮДА: A-запись
+  # указывает на <сторонний сервер>, где живёт FreeScout — чужой хелпдеск с
+  # собственным сертификатом на это же имя. Проверка после выкатки ходила бы к
+  # нему, не находила /api/health и откатывала совершенно исправный релиз.
+  #
+  # Значение по умолчанию — адрес, который РАБОТАЕТ сегодня. Когда домен
+  # направят на прод, достаточно завести переменную репозитория PUBLIC_DOMAIN,
+  # не трогая конвейер.
+  DOMAIN: ${{ vars.PUBLIC_DOMAIN || '188-225-34-82.sslip.io' }}
+
+jobs:
+  # --------------------------------------------------------------------------
+  build-push:
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - id: meta
+        run: |
+          # IMAGE_TAG = короткий SHA: тег иммутабелен и однозначно
+          # соответствует коду; его же отдаёт /api/health (05 §4).
+          echo "tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "release=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          # GHCR требует lowercase в пути образа
+          echo "namespace=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build & push api (api + worker + scheduler — один образ)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.namespace }}/leadchat-api:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.namespace }}/leadchat-api:${{ steps.meta.outputs.release }}
+            ${{ steps.meta.outputs.namespace }}/leadchat-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push web (React-статика внутри nginx)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.web
+          push: true
+          build-args: |
+            VITE_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONTEND }}
+            VITE_APP_VERSION=${{ steps.meta.outputs.tag }}
+          tags: |
+            ${{ steps.meta.outputs.namespace }}/leadchat-web:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.namespace }}/leadchat-web:${{ steps.meta.outputs.release }}
+            ${{ steps.meta.outputs.namespace }}/leadchat-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # --------------------------------------------------------------------------
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    environment: production # при желании — required reviewers
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      # Компоуз и скрипты живут в репозитории — на сервер они приезжают
+      # вместе с деплоем, чтобы /opt/leadchat никогда не расходился с git.
+      # .env на сервере скрипты НЕ трогают (кроме строки IMAGE_TAG).
+      - name: Синхронизировать compose и bin/ на VPS
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            'mkdir -p /opt/leadchat/bin'
+          scp -o StrictHostKeyChecking=accept-new docker-compose.prod.yml \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/leadchat/docker-compose.yml"
+          scp -o StrictHostKeyChecking=accept-new \
+            deploy/deploy.sh deploy/rollback.sh deploy/backup.sh deploy/backup-verify.sh \
+            deploy/restore-check.sh deploy/smoke.sh deploy/crontab.leadchat \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/leadchat/bin/"
+          ssh -o StrictHostKeyChecking=accept-new "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            'chmod +x /opt/leadchat/bin/*.sh'
+
+      # GHCR_NAMESPACE в команду НЕ передаём: единственный источник правды —
+      # /opt/leadchat/.env на сервере (deploy.sh экспортирует его перед
+      # вызовом compose). Иначе получилось бы два места с одним значением.
+      - name: Деплой
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "/opt/leadchat/bin/deploy.sh ${{ needs.build-push.outputs.tag }}"
+
+  # --------------------------------------------------------------------------
+  smoke:
+    needs: [build-push, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      # ключ нужен только шагу отката ниже, но подгружаем заранее —
+      # на упавшем smoke не место возне с ssh-agent
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      # --strict обязателен: без него проверка без заданных кредов помечается
+      # SKIP и на код возврата не влияет. Забыли секрет — из десяти проверок
+      # реально прошла одна (что снаружи вообще кто-то отвечает), а выкатка
+      # засчиталась удачной. Гейт, который пропускает при нехватке данных, —
+      # не гейт (07 §7).
+      - name: Smoke против боевого адреса (07 §6)
+        env:
+          SMOKE_BASE_URL: https://${{ env.DOMAIN }}
+          EXPECTED_VERSION: ${{ needs.build-push.outputs.tag }}
+          SMOKE_EMAIL: ${{ secrets.SMOKE_EMAIL }}
+          SMOKE_PASSWORD: ${{ secrets.SMOKE_PASSWORD }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+          SMOKE_CONVERSATION_ID: ${{ vars.SMOKE_CONVERSATION_ID }}
+        run: bash deploy/smoke.sh --strict
+
+      # smoke красный -> откат на предыдущий тег (deploy.sh хранит его в
+      # /opt/leadchat/.state/previous_tag)
+      - name: Откат при красном smoke
+        if: failure()
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "/opt/leadchat/bin/rollback.sh"   # ⚠ ПУТЬ МЁРТВ: каталога нет, см. предупреждение в шапке
+
+  # --------------------------------------------------------------------------
+  notify:
+    needs: [build-push, deploy, smoke]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:

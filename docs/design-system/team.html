@@ -1,0 +1,945 @@
+<!-- @dsCard group="Настройки" -->
+<meta charset="utf-8">
+<title>Команда — LeadChat</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.4 акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 синий, §1.3 красный, §1.5 янтарь, §1.6 фиолетовый */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-red-950: #2c1113;
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-500: #8b5cf6;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+    --lc-disabled-edge: #505a55;
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+    --lc-text-disabled: var(--lc-text-5);
+    --lc-disabled-text: var(--lc-text-4);
+
+    /* роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+    --lc-focus-border: var(--lc-a-500);
+
+    /* состояния */
+    --lc-warn: var(--lc-amber-500);
+    --lc-warn-text: #d9a94e;
+    --lc-warning-subtle: #241a05;
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-danger: #e5484d;
+    --lc-danger-text: #ff9ea1;
+    --lc-danger-subtle: var(--lc-red-950);
+    --lc-info: var(--lc-blue-500);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+    --lc-link: var(--lc-blue-400);
+
+    /* §3.11 статусы, §3.12 присутствие */
+    --lc-status-closed-bg: #1f2522;
+    --lc-status-closed-text: var(--lc-text-2);
+    --lc-presence-online: var(--lc-a-500);
+    --lc-presence-away: var(--lc-warn);
+    --lc-presence-offline: #6f7a73;
+
+    /* §5 палитра аватаров (тёмная тема) */
+    --lc-avatar-0-bg: #14343f; --lc-avatar-0-ink: #7dd3fc;
+    --lc-avatar-1-bg: #14312a; --lc-avatar-1-ink: #6ee7b7;
+    --lc-avatar-2-bg: #38300f; --lc-avatar-2-ink: #fcd34d;
+    --lc-avatar-3-bg: #3b1d20; --lc-avatar-3-ink: #fca5a5;
+    --lc-avatar-4-bg: #2a1f45; --lc-avatar-4-ink: #c4b5fd;
+    --lc-avatar-5-bg: #3a2417; --lc-avatar-5-ink: #fdba74;
+    --lc-avatar-6-bg: #17274a; --lc-avatar-6-ink: #93c5fd;
+    --lc-avatar-7-bg: #2f2440; --lc-avatar-7-ink: #f0abfc;
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+    --lc-gutter: 24px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-pill: 999px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-font-mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    --lc-fz-page: 28px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-h-md: 40px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-px-md: 16px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+    --lc-shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ═════════════════════════════════════ КАРКАС ЭКРАНА ═══════════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-app);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: 1600px;
+    padding: var(--lc-space-6) var(--lc-space-6) var(--lc-space-8);
+  }
+
+  /* — шапка страницы (shared/ui/PageHeader: h1, 28px/600, подпись без точки) — */
+  .page-header { margin-bottom: var(--lc-space-4); }
+
+  .page-header__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+  }
+
+  .page-header__desc {
+    margin: var(--lc-space-1) 0 0;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+  }
+
+  /* — вкладки (lc-base.css .lc-tabs) — */
+  .lc-tabs {
+    display: flex;
+    gap: var(--lc-space-1);
+    margin-bottom: var(--lc-space-4);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  .lc-tabs__tab {
+    flex: none;
+    padding: var(--lc-space-2) var(--lc-btn-px-sm);
+    min-height: var(--lc-btn-h-sm);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--lc-text-2);
+    font-family: inherit;
+    font-size: var(--lc-fz-body);
+    cursor: pointer;
+  }
+
+  .lc-tabs__tab[data-active] {
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+    border-bottom-color: var(--lc-primary);
+  }
+
+  /* — раскладка: таблица + справка по ролям — */
+  .layout {
+    display: grid;
+    grid-template-columns: 1240px 272px;
+    gap: var(--lc-gutter);
+    align-items: start;
+  }
+
+  /* ═════════════════════════════════════════ ТУЛБАР ══════════════════════ */
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    margin-bottom: var(--lc-space-3);
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-surface);
+    color: var(--lc-text-4);
+    font-size: var(--lc-fz-note);
+  }
+
+  .field--search { width: 240px; }
+  .field--select { width: 180px; justify-content: space-between; }
+  .field svg { flex: none; color: var(--lc-text-4); }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-space-1);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-note);
+  }
+
+  .check__box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border-radius: var(--lc-radius-xs);
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-btn-gap);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid transparent;
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-primary-solid);
+    color: var(--lc-on-primary);
+    font-family: inherit;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    cursor: pointer;
+  }
+
+  .btn--primary:hover { background: var(--lc-a-400); }
+  .toolbar__spacer { margin-left: auto; }
+
+  /* ═════════════════════════════════════════ ТАБЛИЦА ════════════════════ */
+
+  .table-card {
+    background: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--lc-fz-note);
+  }
+
+  th {
+    padding: var(--lc-space-2) var(--lc-space-3);
+    text-align: left;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-3);
+    white-space: nowrap;
+    background: var(--lc-surface);
+    border-bottom: 1px solid var(--lc-border);
+  }
+
+  td {
+    padding: var(--lc-space-2) var(--lc-space-3);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--lc-border);
+    color: var(--lc-text-2);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td,
+  tbody tr.is-hover td { background: var(--lc-selected); }
+
+  th:first-child, td:first-child { padding-left: var(--lc-space-4); }
+  th:last-child, td:last-child { padding-right: var(--lc-space-3); }
+
+  .col-person { width: 400px; }
+  .col-role { width: 200px; }
+  .col-presence { width: 180px; }
+  .col-channels { width: 180px; }
+  .col-seen { width: 224px; }
+  .col-actions { width: 56px; }
+
+  /* — сотрудник: аватар, имя, почта — */
+  .person {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+  }
+
+  .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: var(--lc-radius-pill);
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-semibold);
+    letter-spacing: 0.02em;
+  }
+
+  .person__name {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-medium);
+    line-height: 1.3;
+  }
+
+  .person__mail {
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+    line-height: 1.35;
+  }
+
+  /* — метки состояния учётной записи: пишутся только когда есть что сказать — */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 var(--lc-space-2);
+    flex: none;
+    border-radius: var(--lc-radius-pill);
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-regular);
+    white-space: nowrap;
+  }
+
+  .chip--me { background: var(--lc-status-closed-bg); color: var(--lc-text-3); }
+  .chip--invite { background: var(--lc-warning-subtle); color: var(--lc-warning-text); }
+  .chip--off { background: var(--lc-status-closed-bg); color: var(--lc-text-3); }
+
+  /* — роли — */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 var(--lc-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--lc-radius-pill);
+    font-size: var(--lc-fz-caption);
+    white-space: nowrap;
+  }
+
+  .pill--admin { background: var(--lc-primary-subtle); color: var(--lc-primary-text); }
+  .pill--head { background: var(--lc-info-subtle); color: var(--lc-info-text); }
+  .pill--manager { background: var(--lc-status-closed-bg); color: var(--lc-status-closed-text); }
+  .pill--observer { border-color: var(--lc-border-strong); color: var(--lc-text-3); }
+
+  /* Значение правится нажатием на само значение — рамка проступает по наведению
+     на строку, отдельной кнопки «Изменить» рядом со значением нет. */
+  tbody tr:hover .pill,
+  tbody tr.is-hover .pill { border-color: var(--lc-border-strong); }
+
+  /* — присутствие — */
+  .presence {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: var(--lc-radius-pill);
+  }
+
+  .dot--online { background: var(--lc-presence-online); }
+  .dot--away { background: var(--lc-presence-away); }
+  .dot--offline { background: var(--lc-presence-offline); }
+  .dot--muted { background: var(--lc-text-disabled); }
+
+  .presence--online { color: var(--lc-text-2); }
+  .presence--away { color: var(--lc-text-2); }
+  .presence--offline { color: var(--lc-text-3); }
+  .presence--muted { color: var(--lc-text-4); }
+
+  /* — каналы и время: цифры моноширинные — */
+  .num {
+    font-variant-numeric: var(--lc-num);
+    color: var(--lc-text-1);
+  }
+
+  .num--warn { color: var(--lc-warning-text); }
+  .num__of { color: var(--lc-text-3); }
+  .dash { color: var(--lc-text-4); }
+
+  .seen {
+    font-variant-numeric: var(--lc-num);
+    color: var(--lc-text-2);
+    white-space: nowrap;
+  }
+
+  .seen--never { color: var(--lc-text-3); }
+
+  /* — отключённый сотрудник — */
+  tr[data-inactive] td { color: var(--lc-text-3); }
+  tr[data-inactive] .person__name { color: var(--lc-text-3); }
+  tr[data-inactive] .avatar { opacity: 0.45; }
+  tr[data-inactive] .pill--manager { color: var(--lc-text-3); }
+
+  /* — действия — */
+  .actions { position: relative; }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: var(--lc-radius-md);
+    background: none;
+    color: var(--lc-text-2);
+    cursor: pointer;
+  }
+
+  .icon-btn:hover,
+  tr.is-hover .icon-btn { background: var(--lc-bg-panel); color: var(--lc-text-1); }
+
+  .menu {
+    position: absolute;
+    top: 34px;
+    right: var(--lc-space-3);
+    width: 232px;
+    padding: var(--lc-space-1);
+    z-index: 5;
+    border: 1px solid var(--lc-border-strong);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-bg-2);
+    box-shadow: var(--lc-shadow-2);
+    text-align: left;
+  }
+
+  .menu__item {
+    padding: var(--lc-space-2) var(--lc-space-3);
+    border-radius: var(--lc-radius-sm);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-note);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .menu__item:hover { background: var(--lc-selected); color: var(--lc-text-1); }
+  .menu__item--hover { background: var(--lc-selected); color: var(--lc-text-1); }
+  .menu__item--danger { color: var(--lc-danger-text); }
+
+  .menu__divider {
+    height: 1px;
+    margin: var(--lc-space-1) 0;
+    background: var(--lc-border);
+  }
+
+  /* — подвал списка (Pager: всего 35 при странице в 50 — страниц нет) — */
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--lc-space-3);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  /* ═════════════════════════════ СПРАВКА ПО РОЛЯМ ════════════════════════ */
+
+  .aside {
+    padding: var(--lc-space-4);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    background: var(--lc-surface);
+  }
+
+  .aside__title {
+    margin: 0 0 var(--lc-space-3);
+    font-size: var(--lc-fz-card);
+    font-weight: var(--lc-fw-medium);
+    line-height: var(--lc-lh-heading);
+  }
+
+  .aside__item + .aside__item {
+    margin-top: var(--lc-space-3);
+    padding-top: var(--lc-space-3);
+    border-top: 1px solid var(--lc-border);
+  }
+
+  .aside__hint {
+    margin: var(--lc-space-1) 0 0;
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+    line-height: 1.4;
+  }
+
+  .lc-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<div class="page">
+  <header class="page-header">
+    <h1 class="page-header__title">Команда</h1>
+    <p class="page-header__desc">Сотрудники, их роли и журнал действий</p>
+  </header>
+
+  <div class="lc-tabs" role="tablist" aria-label="Разделы команды">
+    <button type="button" class="lc-tabs__tab" role="tab" aria-selected="true" data-active>Сотрудники</button>
+    <button type="button" class="lc-tabs__tab" role="tab" aria-selected="false">Журнал аудита</button>
+  </div>
+
+  <div class="layout">
+    <section aria-label="Сотрудники">
+      <div class="toolbar">
+        <div class="field field--search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Имя или email
+        </div>
+
+        <div class="field field--select">
+          Роль: любая
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+
+        <label class="check">
+          <span class="check__box">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 13 4 4 10-10"/></svg>
+          </span>
+          Показывать отключённых
+        </label>
+
+        <button type="button" class="btn btn--primary toolbar__spacer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Пригласить
+        </button>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" class="col-person">Сотрудник</th>
+              <th scope="col" class="col-role">Роль</th>
+              <th scope="col" class="col-presence">Присутствие</th>
+              <th scope="col" class="col-channels">Каналы</th>
+              <th scope="col" class="col-seen">Последняя активность</th>
+              <th scope="col" class="col-actions"><span class="lc-visually-hidden">Действия</span></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-1-bg); color: var(--lc-avatar-1-ink);" aria-hidden="true">АБ</span>
+                  <span>
+                    <span class="person__name">Анастасия Беляева <span class="chip chip--me">вы</span></span>
+                    <span class="person__mail">a.belyaeva@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--admin">Администратор</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="num">35</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">14:02</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Анастасия Беляева">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-6-bg); color: var(--lc-avatar-6-ink);" aria-hidden="true">ПЖ</span>
+                  <span>
+                    <span class="person__name">Платон Журавлёв</span>
+                    <span class="person__mail">p.zhuravlev@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--head">Руководитель</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="dash">—</span></td>
+              <td><span class="seen">13:58</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Платон Журавлёв">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-2-bg); color: var(--lc-avatar-2-ink);" aria-hidden="true">АС</span>
+                  <span>
+                    <span class="person__name">Альбина Сомова</span>
+                    <span class="person__mail">a.somova@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--away"><span class="dot dot--away"></span>отошёл</span></td>
+              <td><span class="num">31</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">13:47</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Альбина Сомова">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-5-bg); color: var(--lc-avatar-5-ink);" aria-hidden="true">ВБ</span>
+                  <span>
+                    <span class="person__name">Владислав Бурцев</span>
+                    <span class="person__mail">v.burtsev@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="num">29</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">14:01</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Владислав Бурцев">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-7-bg); color: var(--lc-avatar-7-ink);" aria-hidden="true">ВЕ</span>
+                  <span>
+                    <span class="person__name">Виктория Ерохина</span>
+                    <span class="person__mail">v.erokhina@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--offline"><span class="dot dot--offline"></span>не в сети</span></td>
+              <td><span class="num">34</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">вчера, 21:10</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Виктория Ерохина">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-3-bg); color: var(--lc-avatar-3-ink);" aria-hidden="true">СД</span>
+                  <span>
+                    <span class="person__name">Святослав Дымов <span class="chip chip--invite">ждёт пароля</span></span>
+                    <span class="person__mail">s.dymov@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--offline"><span class="dot dot--offline"></span>не в сети</span></td>
+              <td><span class="num num--warn">0</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen seen--never">не заходил</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Святослав Дымов">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-0-bg); color: var(--lc-avatar-0-ink);" aria-hidden="true">ЯТ</span>
+                  <span>
+                    <span class="person__name">Ярослава Толмачёва</span>
+                    <span class="person__mail">ya.tolmacheva@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--observer">Наблюдатель</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="dash">—</span></td>
+              <td><span class="seen">12:30</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Ярослава Толмачёва">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-4-bg); color: var(--lc-avatar-4-ink);" aria-hidden="true">ДМ</span>
+                  <span>
+                    <span class="person__name">Давид Мохов</span>
+                    <span class="person__mail">d.mokhov@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--offline"><span class="dot dot--offline"></span>не в сети</span></td>
+              <td><span class="num">33</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">вчера, 19:47</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Давид Мохов">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr class="is-hover">
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-1-bg); color: var(--lc-avatar-1-ink);" aria-hidden="true">ИС</span>
+                  <span>
+                    <span class="person__name">Ильдар Сабиров</span>
+                    <span class="person__mail">i.sabirov@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="num">30</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">13:52</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Ильдар Сабиров" aria-expanded="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+                <div class="menu" role="menu">
+                  <div class="menu__item menu__item--hover" role="menuitem">Сбросить пароль</div>
+                  <div class="menu__item" role="menuitem">Изменить имя и почту</div>
+                  <div class="menu__item" role="menuitem">Задать пароль</div>
+                  <div class="menu__item menu__item--danger" role="menuitem">Отключить</div>
+                  <div class="menu__divider"></div>
+                  <div class="menu__item menu__item--danger" role="menuitem">Удалить</div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-2-bg); color: var(--lc-avatar-2-ink);" aria-hidden="true">КЗ</span>
+                  <span>
+                    <span class="person__name">Карина Звягина</span>
+                    <span class="person__mail">k.zvyagina@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--away"><span class="dot dot--away"></span>отошёл</span></td>
+              <td><span class="num">35</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">13:39</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Карина Звягина">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-5-bg); color: var(--lc-avatar-5-ink);" aria-hidden="true">РК</span>
+                  <span>
+                    <span class="person__name">Ростислав Карасёв</span>
+                    <span class="person__mail">r.karasev@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="num">27</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">14:00</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Ростислав Карасёв">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr data-inactive>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-6-bg); color: var(--lc-avatar-6-ink);" aria-hidden="true">МЛ</span>
+                  <span>
+                    <span class="person__name">Майя Логинова <span class="chip chip--off">отключён</span></span>
+                    <span class="person__mail">m.loginova@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--muted"><span class="dot dot--muted"></span>—</span></td>
+              <td><span class="dash">—</span></td>
+              <td><span class="seen">28 авг</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Майя Логинова">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-3-bg); color: var(--lc-avatar-3-ink);" aria-hidden="true">ТБ</span>
+                  <span>
+                    <span class="person__name">Тарас Бочаров</span>
+                    <span class="person__mail">t.bocharov@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--manager">Менеджер</span></td>
+              <td><span class="presence presence--offline"><span class="dot dot--offline"></span>не в сети</span></td>
+              <td><span class="num">32</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">вчера, 20:35</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Тарас Бочаров">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="avatar" style="background: var(--lc-avatar-0-bg); color: var(--lc-avatar-0-ink);" aria-hidden="true">ЗР</span>
+                  <span>
+                    <span class="person__name">Злата Рудакова</span>
+                    <span class="person__mail">z.rudakova@leadpartner.ru</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="pill pill--admin">Администратор</span></td>
+              <td><span class="presence presence--online"><span class="dot dot--online"></span>в сети</span></td>
+              <td><span class="num">35</span> <span class="num__of">из 35</span></td>
+              <td><span class="seen">13:55</span></td>
+              <td class="actions">
+                <button type="button" class="icon-btn" aria-label="Действия: Злата Рудакова">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <span>35 сотрудников</span>
+      </div>
+    </section>
+
+    <aside class="aside" aria-label="Что может каждая роль">
+      <h2 class="aside__title">Что может роль</h2>
+
+      <div class="aside__item">
+        <span class="pill pill--admin">Администратор</span>
+        <p class="aside__hint">Весь интерфейс: сотрудники, аккаунты Авито, боты, статистика, журнал</p>
+      </div>
+
+      <div class="aside__item">
+        <span class="pill pill--head">Руководитель</span>
+        <p class="aside__hint">Все диалоги без отправки, статистика всех сотрудников, журнал аудита</p>
+      </div>
+
+      <div class="aside__item">
+        <span class="pill pill--manager">Менеджер</span>
+        <p class="aside__hint">Переписка с клиентами, личные быстрые ответы и своя статистика за день</p>
+      </div>
+
+      <div class="aside__item">
+        <span class="pill pill--observer">Наблюдатель</span>
+        <p class="aside__hint">Только чтение диалогов: без ответов, заметок и смены статусов</p>
+      </div>
+    </aside>
+  </div>
+</div>

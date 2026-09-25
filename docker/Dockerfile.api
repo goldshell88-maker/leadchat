@@ -1,0 +1,74 @@
+# Dev-образ API (multi-stage на uv, по мотивам прод-Dockerfile из docs/05-DEPLOY-OPS.md §2.3).
+# Отличия от прода: WORKDIR /srv/app (в compose код монтируется в /srv/app/app
+# для hot-reload) и fallback-сборка без uv.lock, пока лок ещё не закоммичен.
+
+# ---------- builder ----------
+FROM python:3.12-slim AS builder
+
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /usr/local/bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
+
+WORKDIR /srv/app
+
+# uv.lock может ещё не существовать (ранние спринты): глоб не роняет COPY,
+# а RUN откатывается на обычный resolve без --frozen.
+# Переопределить: docker build --build-arg UV_SYNC_ARGS="" ...
+ARG UV_SYNC_ARGS="--frozen"
+
+# слой зависимостей кэшируется отдельно от кода
+COPY pyproject.toml uv.lock* ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ -f uv.lock ]; then uv sync ${UV_SYNC_ARGS} --no-install-project --no-dev; \
+    else echo "uv.lock отсутствует — резолвим из pyproject.toml" \
+      && uv sync --no-install-project --no-dev; fi
+
+# миграции лежат внутри пакета: app/db/migrations (alembic.ini: %(here)s/app/db/migrations)
+COPY app ./app
+COPY alembic.ini ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ -f uv.lock ]; then uv sync ${UV_SYNC_ARGS} --no-dev; \
+    else uv sync --no-dev; fi
+
+# ---------- runtime ----------
+FROM python:3.12-slim
+
+# ⚠ ДОМАШНИЙ КАТАЛОГ ОТДЕЛЬНО ОТ КАТАЛОГА КОДА, И ЭТО НЕ КОСМЕТИКА.
+# Раньше здесь стояло `-d /srv/app`: домом пользователя был каталог кода,
+# принадлежащий root, — то есть $HOME, в который нельзя писать. Любая
+# библиотека, кладущая своё в $HOME, падала на правах, и первой упала
+# расшифровка голосовых: `hf_xet` пишет кэш в `$HOME/.cache/huggingface/xet/`,
+# и в бою она не отработала НИ РАЗУ.
+#
+# Каталог кода при этом остаётся за root намеренно: приложение не должно уметь
+# переписывать собственные исходники. Дом — отдельный, свой, пустой.
+RUN groupadd -r leadchat \
+    && useradd -r -g leadchat -d /home/leadchat -m leadchat
+
+WORKDIR /srv/app
+COPY --from=builder --chown=leadchat:leadchat /srv/app /srv/app
+
+# MEDIA_ROOT (05 §2.3): каталог обязан существовать и принадлежать leadchat,
+# иначе POST /api/v1/media падает на правах записи. На bind-mount владелец
+# приезжает с хоста (RUNBOOK §4.7 выставляет uid:gid), но для named volume в
+# dev и для запуска без монтирования эта строка — единственная гарантия.
+RUN mkdir -p /var/leadchat/media && chown leadchat:leadchat /var/leadchat/media
+
+# WHISPER_MODEL_DIR: сюда воркер качает веса модели при первой расшифровке
+# голосового. Каталог, а не сами веса: 464 МБ в слое образа поехали бы на
+# сервер через тоннель на КАЖДОЙ выкатке, а тоннель уже рвался на середине.
+# На проде поверх монтируется постоянный том (docker-compose.prod.yml), но
+# без этой строки dev и запуск без монтирования упирались бы в права записи.
+RUN mkdir -p /var/leadchat/whisper && chown leadchat:leadchat /var/leadchat/whisper
+
+ENV PATH="/srv/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    TZ=UTC
+
+USER leadchat
+EXPOSE 8000
+
+# команда задаётся в compose (dev: uvicorn --reload)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

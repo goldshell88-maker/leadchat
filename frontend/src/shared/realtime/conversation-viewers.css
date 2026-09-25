@@ -1,0 +1,46 @@
+/*
+ * Признак «диалог открыт не только у вас» (SCEN-48).
+ *
+ * Предупреждающий, но не тревожный: двое в одном диалоге — это не поломка, а
+ * повод договориться. Красный здесь занят настоящими бедами («ответ не ушёл»,
+ * «канал отобрали»), и разбавлять его рабочей ситуацией нельзя — обесценится
+ * ровно в тот день, когда понадобится.
+ */
+
+.conv-viewers {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  min-width: 0;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  background: var(--lc-warning-subtle);
+  border: 1px solid var(--lc-warning);
+  border-radius: var(--lc-radius-md);
+  color: var(--lc-warning-text);
+  /* ⚠ ЗДЕСЬ СТОЯЛ ЦВЕТОВОЙ ТОКЕН В КЕГЛЕ: `font-size: var(--lc-text-2)`. Токен
+     разрешается в HEX, кегль из него не получается, и браузер молча отбрасывал
+     объявление — размер наследовался откуда придётся. Поймано сводом кеглей 13.08:
+     значение не подошло ни под одну ступень шкалы именно потому, что размером
+     не было. */
+  font-size: var(--lc-fz-caption);
+  line-height: 1.3;
+}
+
+.conv-viewers__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-warning-solid);
+}
+
+/*
+ * Длинное имя обязано ужиматься, а не растягивать шапку: строка стоит рядом с
+ * названием диалога, и распирающая её подпись увезла бы кнопки за край окна.
+ */
+.conv-viewers__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,76 @@
+.login-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-5);
+  background: var(--lc-bg-1);
+  padding: var(--lc-space-5);
+}
+
+.login-card {
+  width: 100%;
+  /*
+   * ⚠ 460, А НЕ 400 — ИЗ-ЗА ЗАГОЛОВКА НА ШКАЛЕ. Заголовок входа переведён с
+   * кегля числом (24) на ступень страницы (--lc-fz-page: 28px, 32 от 1800),
+   * и в прежних 400px (336 на текст при поле 32) «LeadChat by Lead Partner»
+   * и «Здравствуйте, Александра!» ломались на две строки — замер в браузере
+   * при 1440×900. Ступени 24 в шкале нет, «метрика» — чужая ступень, а
+   * уронить заголовок до секции (20) значило бы сделать его мельче, чем был.
+   * Шире карточка — единственный способ оставить заголовок на своей ступени
+   * и в одну строку. На телефоне width: 100% всё равно главнее.
+   */
+  max-width: 460px;
+  background: var(--lc-bg-0);
+}
+
+/* Длинное имя в приветствии всё-таки переносится — тогда пусть строки будут
+   ровными, а не «Здравствуйте, Александра / Владимировна!» с хвостом. */
+.login-card h1 {
+  text-wrap: balance;
+}
+
+.login-card[data-shake="true"] {
+  animation: lc-login-shake 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes lc-login-shake {
+  25% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-card[data-shake="true"] {
+    animation: none;
+  }
+}
+
+/* Пояснение «почему вы здесь» (SHELL-03). Тон информационный: это не отказ,
+   а рассказ о том, что случилось до появления этой страницы. */
+.login-note {
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-info-subtle);
+  border: 1px solid var(--lc-info);
+}
+
+.login-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lc-space-2);
+  align-items: center;
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-body);
+}
+
+.login-footer a {
+  color: var(--lc-link);
+}

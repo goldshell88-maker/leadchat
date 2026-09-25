@@ -1,0 +1,1053 @@
+<!-- @dsCard group="Экраны" -->
+<meta charset="utf-8">
+<title>Статистика</title>
+<style>
+  /* ═══ ТОКЕНЫ ТЁМНОЙ ТЕМЫ — дословно из frontend/src/app/lc-vars.css ═══ */
+  :root {
+    /* §1.4 акцент */
+    --lc-a-300: #7ed77c;
+    --lc-a-400: #57ca55;
+    --lc-a-500: #3cc13b;
+    --lc-a-500-rgb: 60 193 59;
+    --lc-a-600: #2c9c2b;
+    --lc-a-700: #217b20;
+    --lc-a-800: #1b631a;
+    --lc-ink-on-accent: #04160a;
+
+    /* §1.2 синий, §1.3 красный, §1.5 янтарь, §1.6 фиолетовый */
+    --lc-blue-300: #93c5fd;
+    --lc-blue-400: #60a5fa;
+    --lc-blue-500: #3b82f6;
+    --lc-blue-950: #0d1b33;
+    --lc-red-500: #ef4444;
+    --lc-red-950: #2c1113;
+    --lc-amber-300: #fcd34d;
+    --lc-amber-400: #fbbf24;
+    --lc-amber-500: #f59e0b;
+    --lc-purple-300: #c4b5fd;
+    --lc-purple-600: #7c3aed;
+    --lc-purple-950: #1e1439;
+
+    /* §3 поверхности */
+    --lc-bg-app: #080a09;
+    --lc-bg-panel: #0b0e0d;
+    --lc-bg-raise: #1a221e;
+    --lc-bg-selected: #141b18;
+    --lc-selected: #1e2c24;
+    --lc-bg-0: var(--lc-bg-app);
+    --lc-bg-1: var(--lc-bg-panel);
+    --lc-bg-2: var(--lc-bg-raise);
+    --lc-surface: var(--lc-bg-raise);
+    --lc-surface-hover: var(--lc-bg-selected);
+
+    /* границы */
+    --lc-line: #333c37;
+    --lc-line-strong: #39433d;
+    --lc-border: var(--lc-line);
+    --lc-border-strong: var(--lc-line-strong);
+
+    /* текст */
+    --lc-text-1: #e7ede9;
+    --lc-text-2: #c7d2c9;
+    --lc-text-3: #949e97;
+    --lc-text-4: #7c877f;
+    --lc-text-5: #5a645e;
+
+    /* роли акцента */
+    --lc-primary: var(--lc-a-500);
+    --lc-primary-solid: var(--lc-a-600);
+    --lc-on-primary: var(--lc-ink-on-accent);
+    --lc-primary-subtle: #10240f;
+    --lc-primary-text: var(--lc-a-300);
+    --lc-focus-ring: rgb(var(--lc-a-500-rgb) / 0.45);
+
+    /* состояния */
+    --lc-success-text: var(--lc-a-300);
+    --lc-warn: var(--lc-amber-500);
+    --lc-warning: var(--lc-warn);
+    --lc-warning-subtle: #241a05;
+    --lc-warn-text: #d9a94e;
+    --lc-warning-text: var(--lc-warn-text);
+    --lc-danger-text: #ff9ea1;
+    --lc-danger-subtle: var(--lc-red-950);
+    --lc-info-subtle: var(--lc-blue-950);
+    --lc-info-text: var(--lc-blue-300);
+    --lc-link: var(--lc-blue-400);
+    --lc-accent-subtle: var(--lc-purple-950);
+    --lc-accent-text: var(--lc-purple-300);
+    --lc-status-closed-bg: #1f2522;
+    --lc-presence-offline: #6f7a73;
+
+    /* §3.14 график и тепловая карта */
+    --lc-chart-1: var(--lc-a-500);
+    --lc-chart-1-hover: var(--lc-a-300);
+    --lc-heat-1: #1c4a2b;
+    --lc-heat-2: #24693a;
+    --lc-heat-3: #2c8a3a;
+    --lc-heat-4: #34ab35;
+    --lc-heat-5: var(--lc-a-400);
+
+    /* §2.1 сетка */
+    --lc-space-0: 2px;
+    --lc-space-1: 4px;
+    --lc-space-2: 8px;
+    --lc-space-3: 12px;
+    --lc-space-4: 16px;
+    --lc-space-5: 24px;
+    --lc-space-6: 32px;
+    --lc-space-7: 40px;
+    --lc-space-8: 48px;
+
+    /* §2.2 радиусы */
+    --lc-radius-xs: 6px;
+    --lc-radius-sm: 8px;
+    --lc-radius-md: 12px;
+    --lc-radius-lg: 16px;
+    --lc-radius-pill: 999px;
+
+    /* §2.4 типографика */
+    --lc-font: "Inter Variable", "Inter", "SF Pro Display", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --lc-fz-page: 28px;
+    --lc-fz-metric: 24px;
+    --lc-fz-section: 20px;
+    --lc-fz-card: 16px;
+    --lc-fz-body: 14px;
+    --lc-fz-note: 13px;
+    --lc-fz-caption: 12px;
+    --lc-fz-micro: 11px;
+    --lc-fw-regular: 400;
+    --lc-fw-medium: 500;
+    --lc-fw-semibold: 600;
+    --lc-lh-body: 1.5;
+    --lc-lh-heading: 1.25;
+    --lc-num: tabular-nums;
+
+    /* шкала контролов */
+    --lc-btn-h-sm: 32px;
+    --lc-btn-px-sm: 12px;
+    --lc-btn-radius: var(--lc-radius-md);
+    --lc-btn-gap: var(--lc-space-2);
+
+    /* §3.9 тени */
+    --lc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+    --lc-shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ═══════════════════════════════ КАРКАС ЭКРАНА ═══════════════════════ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--lc-bg-0);
+    color: var(--lc-text-1);
+    font-family: var(--lc-font);
+    font-size: var(--lc-fz-body);
+    line-height: var(--lc-lh-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Экран /stats: фон панели, как у `.stats-page` в stats.css. */
+  .page {
+    width: 1600px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-4);
+    padding: var(--lc-space-4) var(--lc-space-5) var(--lc-space-6);
+    background: var(--lc-bg-1);
+  }
+
+  /* ── шапка: заголовок и фильтры в ОДНОЙ строке ───────────────────────── */
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lc-space-5);
+  }
+
+  .head__title {
+    margin: 0;
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: var(--lc-lh-heading);
+    letter-spacing: -0.01em;
+  }
+
+  .head__descr {
+    margin: 2px 0 0;
+    font-size: var(--lc-fz-body);
+    color: var(--lc-text-3);
+  }
+
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .ctl {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lc-space-2);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-bg-0);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-caption);
+    white-space: nowrap;
+  }
+
+  .ctl--muted { color: var(--lc-text-3); }
+  .ctl svg { flex: none; color: var(--lc-text-3); }
+
+  .filters__period {
+    padding: 0 var(--lc-space-2);
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    white-space: nowrap;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .filters__tail {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-3);
+    margin-left: var(--lc-space-4);
+    padding-left: var(--lc-space-4);
+    border-left: 1px solid var(--lc-border);
+  }
+
+  .filters__fresh {
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+    white-space: nowrap;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-btn-gap);
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-btn-radius);
+    background: var(--lc-bg-2);
+    color: var(--lc-text-1);
+    font-size: var(--lc-fz-caption);
+    white-space: nowrap;
+  }
+
+  /* ── группы показателей ──────────────────────────────────────────────── */
+
+  .group__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--lc-space-2);
+    margin: 0 0 var(--lc-space-3);
+    font-size: var(--lc-fz-body);
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-2);
+  }
+
+  .group__hint {
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-regular);
+    color: var(--lc-text-3);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--lc-space-3);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--lc-space-3);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    background: var(--lc-surface);
+    box-shadow: var(--lc-shadow-1);
+  }
+
+  .card__title {
+    margin: 0;
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    letter-spacing: 0.02em;
+    color: var(--lc-text-3);
+  }
+
+  .card__value {
+    font-size: var(--lc-fz-page);
+    font-weight: var(--lc-fw-semibold);
+    line-height: 1.2;
+    color: var(--lc-text-1);
+    font-variant-numeric: var(--lc-num);
+    margin-top: var(--lc-space-1);
+  }
+
+  .card__delta,
+  .card__caption {
+    font-size: var(--lc-fz-caption);
+    min-height: 16px;
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .card__delta[data-tone="good"] { color: var(--lc-success-text); }
+  .card__delta[data-tone="bad"] { color: var(--lc-danger-text); }
+  .card__delta-tail { color: var(--lc-text-3); }
+
+  /* ── полоса «Прямо сейчас»: плоская, не карточки ─────────────────────── */
+
+  /* Величины «сейчас» и «за период» складывать нельзя, поэтому они и по
+     форме разные: карточка на поднятой поверхности против плоской полосы. */
+  .now {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    overflow: hidden;
+  }
+
+  .now__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-1);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    border-left: 1px solid var(--lc-border);
+  }
+
+  .now__item:first-child { border-left: none; }
+  .now__item[data-accent="warning"] { background: var(--lc-warning-subtle); }
+
+  .now__label {
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    letter-spacing: 0.02em;
+    color: var(--lc-text-3);
+  }
+
+  .now__value {
+    font-size: var(--lc-fz-metric);
+    font-weight: var(--lc-fw-semibold);
+    line-height: 1.2;
+    color: var(--lc-text-1);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .now__item[data-accent="warning"] .now__value { color: var(--lc-warning-text); }
+
+  /* ── панели ──────────────────────────────────────────────────────────── */
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--lc-space-4);
+    align-items: start;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lc-space-3);
+    padding: var(--lc-space-4);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    background: var(--lc-surface);
+    box-shadow: var(--lc-shadow-1);
+    min-width: 0;
+  }
+
+  .panel__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lc-space-3);
+  }
+
+  .panel__title {
+    margin: 0;
+    font-size: var(--lc-fz-note);
+    font-weight: var(--lc-fw-semibold);
+    letter-spacing: 0.02em;
+    color: var(--lc-text-2);
+  }
+
+  .panel__sub {
+    margin: 2px 0 0;
+    font-size: var(--lc-fz-caption);
+    color: var(--lc-text-3);
+  }
+
+  /* ── график ──────────────────────────────────────────────────────────── */
+
+  .chart-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .toggle {
+    display: inline-flex;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-sm);
+    overflow: hidden;
+    flex: none;
+  }
+
+  .toggle__btn {
+    height: var(--lc-btn-h-sm);
+    padding: 0 var(--lc-btn-px-sm);
+    display: inline-flex;
+    align-items: center;
+    background: var(--lc-bg-0);
+    color: var(--lc-text-2);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .toggle__btn + .toggle__btn { border-left: 1px solid var(--lc-border); }
+
+  .toggle__btn[data-active] {
+    background: var(--lc-primary-subtle);
+    color: var(--lc-text-1);
+    font-weight: var(--lc-fw-semibold);
+  }
+
+  .toggle__hint { opacity: 0.65; font-weight: var(--lc-fw-regular); }
+
+  .chart { display: grid; grid-template-columns: 48px minmax(0, 1fr); }
+
+  .chart__yaxis { position: relative; height: 210px; }
+
+  .chart__yaxis span {
+    position: absolute;
+    right: var(--lc-space-2);
+    transform: translateY(-50%);
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .chart__plot { position: relative; height: 210px; }
+
+  .chart__grid { position: absolute; inset: 0; }
+
+  .chart__grid i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--lc-border);
+  }
+
+  .chart__bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--lc-space-2);
+  }
+
+  /* 2px — форма ДАННЫХ, а не элемента: столбику нельзя превращаться в таблетку. */
+  .chart__bars b {
+    flex: 1;
+    height: calc(var(--v) * 1%);
+    background: var(--lc-chart-1);
+    border-radius: 2px 2px 0 0;
+  }
+
+  .chart__bars b[data-hovered] { background: var(--lc-chart-1-hover); }
+
+  .chart__x {
+    display: flex;
+    gap: var(--lc-space-2);
+    margin-top: var(--lc-space-1);
+  }
+
+  .chart__x span {
+    flex: 1;
+    text-align: center;
+    font-size: var(--lc-fz-note);
+    color: var(--lc-text-3);
+    white-space: nowrap;
+    overflow: visible;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px var(--lc-space-2);
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-bg-0);
+    border: 1px solid var(--lc-border);
+    box-shadow: var(--lc-shadow-2);
+    font-size: var(--lc-fz-caption);
+    white-space: nowrap;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  .tooltip__ts { color: var(--lc-text-3); }
+  .tooltip__value { color: var(--lc-text-1); font-weight: var(--lc-fw-semibold); }
+
+  /* ── тепловая карта ──────────────────────────────────────────────────── */
+
+  .heat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+  .heat__row {
+    display: grid;
+    grid-template-columns: 26px repeat(24, minmax(0, 1fr));
+    gap: 2px;
+    align-items: center;
+  }
+
+  .heat__day,
+  .heat__hour {
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+    text-align: center;
+    font-variant-numeric: var(--lc-num);
+    /* Подписаны только каждые три часа, но подчёркивание рабочего окна должно
+       идти сплошь: без высоты у пустой ячейки линии под ней не будет. */
+    min-height: 16px;
+  }
+
+  /* Рабочее окно 10:00–20:00 подчёркнуто на шкале часов: видно, сколько
+     спроса приходит за его границами, где дежурного нет. Черта — одним
+     элементом на десять колонок, иначе её резали бы зазоры сетки. */
+  .heat__hour[data-work] { color: var(--lc-text-2); }
+
+  .heat__band { margin-bottom: 2px; }
+
+  .heat__band i {
+    height: 2px;
+    border-radius: 2px;
+    background: var(--lc-text-4);
+  }
+
+  /* ⚠ ПУСТОЙ ЧАС ОБЯЗАН БЫТЬ ВИДЕН. `--lc-bg-2` — это ровно та же краска,
+     что и `--lc-surface` под картой: нулевые ячейки сливались с панелью, и
+     сетка 7×24 теряла форму там, где данных нет. Фон приложения темнее
+     панели, и «посчитано, но пусто» отличается от «сюда карта не доходит». */
+  .heat__cell {
+    aspect-ratio: 1 / 1;
+    min-height: 12px;
+    border-radius: 2px;
+    background: var(--lc-bg-0);
+  }
+
+  .heat__cell[data-l="1"] { background: var(--lc-heat-1); }
+  .heat__cell[data-l="2"] { background: var(--lc-heat-2); }
+  .heat__cell[data-l="3"] { background: var(--lc-heat-3); }
+  .heat__cell[data-l="4"] { background: var(--lc-heat-4); }
+  .heat__cell[data-l="5"] { background: var(--lc-heat-5); }
+
+  .heat__legend {
+    display: flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    font-size: var(--lc-fz-micro);
+    color: var(--lc-text-3);
+  }
+
+  .heat__legend .heat__cell {
+    width: 14px;
+    height: 14px;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .heat__legend-note { margin-left: auto; color: var(--lc-text-4); }
+
+  /* ── таблица по людям ────────────────────────────────────────────────── */
+
+  .tbl-wrap { max-height: 430px; overflow: hidden; }
+
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--lc-fz-note);
+  }
+
+  th, td {
+    padding: 8px var(--lc-space-2);
+    text-align: left;
+    border-bottom: 1px solid var(--lc-border);
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: var(--lc-fz-caption);
+    font-weight: var(--lc-fw-medium);
+    color: var(--lc-text-3);
+  }
+
+  th[data-num], td[data-num] {
+    text-align: right;
+    font-variant-numeric: var(--lc-num);
+  }
+
+  th[data-active] { color: var(--lc-text-1); font-weight: var(--lc-fw-semibold); }
+  th .caret { color: var(--lc-primary-text); margin-left: 4px; }
+
+  .tr:hover { background: var(--lc-surface-hover); }
+
+  .tr[data-inactive] td { color: var(--lc-text-3); }
+
+  .who { display: flex; align-items: center; gap: var(--lc-space-2); }
+
+  .ava {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--lc-radius-pill);
+    display: grid;
+    place-items: center;
+    font-size: var(--lc-fz-micro);
+    font-weight: var(--lc-fw-semibold);
+    letter-spacing: 0.02em;
+  }
+
+  .ava[data-c="1"] { background: var(--lc-primary-subtle); color: var(--lc-a-300); }
+  .ava[data-c="2"] { background: var(--lc-info-subtle); color: var(--lc-blue-300); }
+  .ava[data-c="3"] { background: var(--lc-accent-subtle); color: var(--lc-purple-300); }
+  .ava[data-c="4"] { background: var(--lc-warning-subtle); color: var(--lc-amber-300); }
+  .ava[data-c="5"] { background: var(--lc-danger-subtle); color: var(--lc-danger-text); }
+  .ava[data-c="6"] { background: var(--lc-status-closed-bg); color: var(--lc-text-2); }
+
+  .who__name { color: var(--lc-text-1); }
+  .tr[data-inactive] .who__name { color: var(--lc-text-3); }
+  .tr[data-inactive] .ava { opacity: 0.6; }
+
+  .badge {
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: var(--lc-radius-pill);
+    background: var(--lc-bg-2);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-micro);
+  }
+
+  /* Полоска под числом сообщений: нагрузку смены видно формой, без чтения. */
+  .load { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+
+  .load__bar {
+    width: 96px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--lc-bg-2);
+    overflow: hidden;
+  }
+
+  .load__bar i {
+    display: block;
+    height: 100%;
+    background: var(--lc-heat-3);
+  }
+
+  .tr[data-inactive] .load__bar i { background: var(--lc-text-5); }
+
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lc-space-1);
+    color: var(--lc-text-3);
+    font-size: var(--lc-fz-caption);
+  }
+
+  .tr:hover .go { color: var(--lc-primary-text); }
+
+  .totals td {
+    font-weight: var(--lc-fw-semibold);
+    color: var(--lc-text-1);
+    border-bottom: none;
+    border-top: 2px solid var(--lc-border);
+  }
+</style>
+
+<div class="page">
+
+  <!-- ═══ шапка: заголовок и весь срез одной строкой ═══ -->
+  <header class="head">
+    <div>
+      <h1 class="head__title">Статистика</h1>
+      <p class="head__descr">Обращения, скорость ответа и нагрузка по операторам</p>
+    </div>
+
+    <div class="filters">
+      <span class="ctl" style="width:150px">30 дней
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+      <span class="filters__period">6 авг. – 4 сент.</span>
+      <span class="ctl ctl--muted" style="width:220px">Менеджеры: все
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+      <span class="ctl ctl--muted" style="width:190px">Канал: все
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+
+      <span class="filters__tail">
+        <span class="filters__fresh">Данные на 14:05 по Москве</span>
+        <span class="btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+          Выгрузить CSV
+        </span>
+      </span>
+    </div>
+  </header>
+
+  <!-- ═══ показатели за период ═══ -->
+  <section>
+    <h2 class="group__title">За период
+      <span class="group__hint">на момент открытия страницы</span>
+    </h2>
+
+    <div class="cards">
+      <article class="card">
+        <h3 class="card__title">Новые диалоги</h3>
+        <span class="card__value">68 490</span>
+        <span class="card__delta" data-tone="good">▲ +8,4 % <span class="card__delta-tail">к пред.</span></span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Отвечено</h3>
+        <span class="card__value">66 190</span>
+        <span class="card__delta" data-tone="good">▲ +9,1 % <span class="card__delta-tail">к пред.</span></span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Первый ответ (медиана)</h3>
+        <span class="card__value">1 м 47 с</span>
+        <span class="card__delta" data-tone="good">▼ −12,3 % (быстрее) <span class="card__delta-tail">к пред.</span></span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Повторные</h3>
+        <span class="card__value">4 612</span>
+        <span class="card__caption">↩ вернулись · за прошлый период 4 015</span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Закрыто</h3>
+        <span class="card__value">65 118</span>
+        <span class="card__delta" data-tone="good">▲ +7,1 % <span class="card__delta-tail">к пред.</span></span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Закрыто ботом</h3>
+        <span class="card__value">18,6 %</span>
+        <span class="card__delta" data-tone="good">▲ +2,4 пп <span class="card__delta-tail">к пред.</span></span>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Телефонов</h3>
+        <span class="card__value">9 184</span>
+        <span class="card__delta" data-tone="bad">▼ −3,7 % <span class="card__delta-tail">к пред.</span></span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══ снимок «сейчас»: другая природа величин — другая форма ═══ -->
+  <section>
+    <h2 class="group__title">Прямо сейчас
+      <span class="group__hint">не зависит от выбранного периода</span>
+    </h2>
+
+    <div class="now">
+      <div class="now__item">
+        <span class="now__label">В работе</span>
+        <span class="now__value">1 842</span>
+      </div>
+      <div class="now__item" data-accent="warning">
+        <span class="now__label">Ждут ответа</span>
+        <span class="now__value">37</span>
+      </div>
+      <div class="now__item">
+        <span class="now__label">В очереди</span>
+        <span class="now__value">214</span>
+      </div>
+      <div class="now__item">
+        <span class="now__label">Ждут клиента</span>
+        <span class="now__value">1 209</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ график и тепловая карта ═══ -->
+  <div class="row">
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">График</h2>
+        <div class="chart-controls">
+          <span class="ctl" style="width:210px">Новые диалоги
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+          <span class="toggle">
+            <span class="toggle__btn" data-active>по дням</span>
+            <span class="toggle__btn">по часам<span class="toggle__hint"> · неделя</span></span>
+          </span>
+        </div>
+      </header>
+
+      <div class="chart">
+        <div class="chart__yaxis">
+          <span style="top:0">3 000</span>
+          <span style="top:33.3%">2 000</span>
+          <span style="top:66.6%">1 000</span>
+          <span style="top:100%">0</span>
+        </div>
+
+        <div>
+          <div class="chart__plot">
+            <div class="chart__grid">
+              <i style="top:0"></i><i style="top:33.3%"></i><i style="top:66.6%"></i><i style="bottom:0"></i>
+            </div>
+            <div class="chart__bars">
+              <b style="--v:84.7"></b><b style="--v:82.7"></b><b style="--v:47.3"></b><b style="--v:39.3"></b>
+              <b style="--v:90.7"></b><b style="--v:88.7"></b><b style="--v:86.3"></b><b style="--v:87"></b>
+              <b style="--v:82.7"></b><b style="--v:48.7"></b><b style="--v:40.3"></b><b style="--v:92.7"></b>
+              <b style="--v:90"></b><b style="--v:88"></b><b style="--v:86"></b><b style="--v:83.7"></b>
+              <b style="--v:50"></b><b style="--v:41.3"></b><b style="--v:93.7"></b><b style="--v:92"></b>
+              <b style="--v:89.7"></b><b style="--v:87.3"></b><b style="--v:85"></b><b style="--v:51"></b>
+              <b style="--v:42"></b><b style="--v:94.7" data-hovered></b><b style="--v:93"></b><b style="--v:90.3"></b>
+              <b style="--v:88.3"></b><b style="--v:66"></b>
+            </div>
+            <div class="tooltip" style="left:85%">
+              <span class="tooltip__ts">31 авг.</span>
+              <span class="tooltip__value">2 840</span>
+            </div>
+          </div>
+
+          <div class="chart__x">
+            <span>6 авг.</span><span></span><span></span>
+            <span>9 авг.</span><span></span><span></span>
+            <span>12 авг.</span><span></span><span></span>
+            <span>15 авг.</span><span></span><span></span>
+            <span>18 авг.</span><span></span><span></span>
+            <span>21 авг.</span><span></span><span></span>
+            <span>24 авг.</span><span></span><span></span>
+            <span>27 авг.</span><span></span><span></span>
+            <span>30 авг.</span><span></span><span></span>
+            <span>2 сент.</span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Когда пишут клиенты</h2>
+          <p class="panel__sub">Входящие сообщения, день недели × час — видно, когда нужен дежурный</p>
+        </div>
+      </header>
+
+      <div class="heat">
+        <div class="heat__row">
+          <span class="heat__day"></span>
+          <span class="heat__hour">0</span><span class="heat__hour"></span><span class="heat__hour"></span>
+          <span class="heat__hour">3</span><span class="heat__hour"></span><span class="heat__hour"></span>
+          <span class="heat__hour">6</span><span class="heat__hour"></span><span class="heat__hour"></span>
+          <span class="heat__hour">9</span><span class="heat__hour" data-work></span><span class="heat__hour" data-work></span>
+          <span class="heat__hour" data-work>12</span><span class="heat__hour" data-work></span><span class="heat__hour" data-work></span>
+          <span class="heat__hour" data-work>15</span><span class="heat__hour" data-work></span><span class="heat__hour" data-work></span>
+          <span class="heat__hour" data-work>18</span><span class="heat__hour" data-work></span><span class="heat__hour"></span>
+          <span class="heat__hour">21</span><span class="heat__hour"></span><span class="heat__hour"></span>
+        </div>
+
+        <div class="heat__row heat__band"><span></span><i style="grid-column: 12 / span 10"></i></div>
+
+        <div class="heat__row"><span class="heat__day">пн</span><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i></div>
+
+        <div class="heat__row"><span class="heat__day">вт</span><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i></div>
+
+        <div class="heat__row"><span class="heat__day">ср</span><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i></div>
+
+        <div class="heat__row"><span class="heat__day">чт</span><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i></div>
+
+        <div class="heat__row"><span class="heat__day">пт</span><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="5"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="4"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i></div>
+
+        <div class="heat__row"><span class="heat__day">сб</span><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i></div>
+
+        <div class="heat__row"><span class="heat__day">вс</span><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="3"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="2"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="1"></i><i class="heat__cell" data-l="0"></i><i class="heat__cell" data-l="0"></i></div>
+      </div>
+
+      <div class="heat__legend">
+        <span>меньше</span>
+        <i class="heat__cell" data-l="1"></i>
+        <i class="heat__cell" data-l="2"></i>
+        <i class="heat__cell" data-l="3"></i>
+        <i class="heat__cell" data-l="4"></i>
+        <i class="heat__cell" data-l="5"></i>
+        <span>больше</span>
+        <span class="heat__legend-note">подчёркнуты рабочие часы 10:00–20:00</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══ таблица по людям ═══ -->
+  <section class="panel">
+    <h2 class="panel__title">Менеджеры</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:380px"><col style="width:150px"><col style="width:150px"><col style="width:150px">
+          <col style="width:170px"><col style="width:180px"><col style="width:200px"><col style="width:140px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Менеджер</th>
+            <th data-num>Принято</th>
+            <th data-num>Отвечено</th>
+            <th data-num>Закрыто</th>
+            <th data-num>Первый ответ</th>
+            <th data-num>В рабочие часы</th>
+            <th data-num data-active>Сообщений <span class="caret">▼</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="1">АБ</span><span class="who__name">Анастасия Беляева</span></span></td>
+            <td data-num>3 118</td><td data-num>3 042</td><td data-num>2 894</td>
+            <td data-num>1 м 12 с</td><td data-num>58 с</td>
+            <td data-num><span class="load">12 480<span class="load__bar"><i style="width:100%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="2">ПЖ</span><span class="who__name">Платон Журавлёв</span></span></td>
+            <td data-num>2 946</td><td data-num>2 871</td><td data-num>2 703</td>
+            <td data-num>1 м 21 с</td><td data-num>1 м 4 с</td>
+            <td data-num><span class="load">11 735<span class="load__bar"><i style="width:94%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="3">ИС</span><span class="who__name">Инга Самарина</span></span></td>
+            <td data-num>2 812</td><td data-num>2 750</td><td data-num>2 618</td>
+            <td data-num>1 м 33 с</td><td data-num>1 м 9 с</td>
+            <td data-num><span class="load">11 042<span class="load__bar"><i style="width:88%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="4">БЛ</span><span class="who__name">Богдан Лосев</span></span></td>
+            <td data-num>2 704</td><td data-num>2 615</td><td data-num>2 480</td>
+            <td data-num>1 м 44 с</td><td data-num>1 м 18 с</td>
+            <td data-num><span class="load">10 516<span class="load__bar"><i style="width:84%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="5">АР</span><span class="who__name">Алиса Ремизова</span></span></td>
+            <td data-num>2 588</td><td data-num>2 519</td><td data-num>2 377</td>
+            <td data-num>1 м 39 с</td><td data-num>1 м 11 с</td>
+            <td data-num><span class="load">10 073<span class="load__bar"><i style="width:81%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="6">ДР</span><span class="who__name">Демьян Рогов</span></span></td>
+            <td data-num>2 461</td><td data-num>2 380</td><td data-num>2 244</td>
+            <td data-num>2 м 3 с</td><td data-num>1 м 27 с</td>
+            <td data-num><span class="load">9 618<span class="load__bar"><i style="width:77%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="1">СК</span><span class="who__name">Снежана Кулагина</span></span></td>
+            <td data-num>2 355</td><td data-num>2 288</td><td data-num>2 150</td>
+            <td data-num>1 м 58 с</td><td data-num>1 м 22 с</td>
+            <td data-num><span class="load">9 204<span class="load__bar"><i style="width:74%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="2">СЗ</span><span class="who__name">Савва Зуев</span></span></td>
+            <td data-num>2 216</td><td data-num>2 130</td><td data-num>2 008</td>
+            <td data-num>2 м 14 с</td><td data-num>1 м 35 с</td>
+            <td data-num><span class="load">8 761<span class="load__bar"><i style="width:70%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="3">АТ</span><span class="who__name">Алёна Туманова</span></span></td>
+            <td data-num>2 104</td><td data-num>2 041</td><td data-num>1 923</td>
+            <td data-num>1 м 47 с</td><td data-num>1 м 15 с</td>
+            <td data-num><span class="load">8 330<span class="load__bar"><i style="width:67%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="4">ЯЩ</span><span class="who__name">Яков Щербаков</span></span></td>
+            <td data-num>1 987</td><td data-num>1 902</td><td data-num>1 788</td>
+            <td data-num>2 м 26 с</td><td data-num>1 м 41 с</td>
+            <td data-num><span class="load">7 915<span class="load__bar"><i style="width:63%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="5">ВЧ</span><span class="who__name">Василиса Чернова</span></span></td>
+            <td data-num>1 862</td><td data-num>1 804</td><td data-num>1 690</td>
+            <td data-num>1 м 51 с</td><td data-num>1 м 19 с</td>
+            <td data-num><span class="load">7 468<span class="load__bar"><i style="width:60%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="6">МВ</span><span class="who__name">Макар Воронов</span></span></td>
+            <td data-num>1 743</td><td data-num>1 668</td><td data-num>1 562</td>
+            <td data-num>2 м 38 с</td><td data-num>1 м 52 с</td>
+            <td data-num><span class="load">7 021<span class="load__bar"><i style="width:56%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr">
+            <td><span class="who"><span class="ava" data-c="1">АЮ</span><span class="who__name">Антонина Юдина</span></span></td>
+            <td data-num>1 610</td><td data-num>1 559</td><td data-num>1 468</td>
+            <td data-num>2 м 9 с</td><td data-num>1 м 30 с</td>
+            <td data-num><span class="load">6 584<span class="load__bar"><i style="width:53%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+          <tr class="tr" data-inactive>
+            <td><span class="who"><span class="ava" data-c="6">ГЛ</span><span class="who__name">Герман Ладыгин<span class="badge">отключён</span></span></span></td>
+            <td data-num>1 204</td><td data-num>1 166</td><td data-num>1 093</td>
+            <td data-num>3 м 12 с</td><td data-num>2 м 8 с</td>
+            <td data-num><span class="load">4 902<span class="load__bar"><i style="width:39%"></i></span></span></td>
+            <td data-num><span class="go">Диалоги <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ИТОГО вынесено из прокрутки: с 35 сотрудниками итог иначе виден
+         только тому, кто долистал до конца. -->
+    <table>
+      <colgroup>
+        <col style="width:380px"><col style="width:150px"><col style="width:150px"><col style="width:150px">
+        <col style="width:170px"><col style="width:180px"><col style="width:200px"><col style="width:140px">
+      </colgroup>
+      <tbody>
+        <tr class="totals">
+          <td>ИТОГО</td>
+          <td data-num>68 214</td>
+          <td data-num>66 190</td>
+          <td data-num>65 118</td>
+          <td data-num>1 м 47 с</td>
+          <td data-num>1 м 12 с</td>
+          <td data-num>214 336</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>

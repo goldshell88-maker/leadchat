@@ -1,0 +1,62 @@
+/*
+ * Шапка страницы — одна на все разделы. Разбор, зачем она появилась и какой
+ * канон закрепляет, — в PageHeader.tsx.
+ *
+ * Отступ снизу живёт ЗДЕСЬ, а не у страниц: раньше каждая задавала свой
+ * (у аккаунтов space-5, у ботов space-4), и шов между разделами был виден
+ * при переходе.
+ */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lc-space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--lc-space-4);
+}
+
+.page-header__text {
+  /* Иначе длинный заголовок распирает шапку и уводит кнопки за край. */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+.page-header__title {
+  font-size: var(--lc-fz-page);
+  font-weight: var(--lc-fw-semibold);
+  line-height: 1.25;
+  color: var(--lc-text-1);
+  /* Заголовок не должен разрываться посреди пары слов. */
+  text-wrap: balance;
+}
+
+.page-header__description {
+  font-size: var(--lc-fz-body);
+  line-height: 1.5;
+  color: var(--lc-text-2);
+  /* Длинная строка описания читается плохо: глаз теряет начало следующей. */
+  max-width: 64ch;
+}
+
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  flex: none;
+}
+
+/*
+ * На узком экране кнопки уходят под заголовок и растягиваются на всю ширину:
+ * кнопка в 40 пикселей у правого края телефона попадается пальцем через раз.
+ */
+@media (max-width: 767px) {
+  .page-header__actions {
+    width: 100%;
+  }
+
+  .page-header__actions > * {
+    flex: 1;
+  }
+}

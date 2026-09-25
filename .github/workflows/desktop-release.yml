@@ -1,0 +1,352 @@
+# ============================================================================
+# LeadChat — сборка, подпись и публикация десктопа (docs/04-DESKTOP.md §7,
+# docs/05-DEPLOY-OPS.md §3, регламент — docs/12-DESKTOP-RELEASE.md).
+#
+# Релиз десктопа ОТВЯЗАН от релизов бэкенда: свой тег `desktop-v*`
+# (бэкенд едет по тегу `v*` через deploy.yml).
+#
+# Порядок: build (windows-latest, подпись minisign) -> publish-vps (выкладка
+# на /var/leadchat/download) -> publish-github (архив артефактов в Release).
+#
+# АТОМАРНОСТЬ ВЫКЛАДКИ (04 §6.1): сначала бинарники и подписи, только потом
+# манифест latest.json. Клиент никогда не должен увидеть манифест, который
+# ссылается на ещё не выложенный файл, — иначе апдейтер словит 404 и покажет
+# ошибку обновления. Саму выкладку делает deploy/publish-desktop.sh — тот же
+# скрипт, что и при ручном релизе с локальной Windows-машины: одна реализация,
+# нечему разъезжаться.
+#
+# Секреты (Settings -> Environments -> desktop-release):
+#   TAURI_SIGNING_PRIVATE_KEY           приватный ключ minisign (12 §1)
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  парольная фраза к нему
+#   DEPLOY_SSH_KEY                      ключ пользователя deploy на VPS
+#   DEPLOY_SSH_KNOWN_HOSTS              (опц.) содержимое known_hosts; если
+#                                       не задан — ssh-keyscan (TOFU)
+#   VPS_HOST / VPS_USER                 (опц.) переопределяют домен/пользователя
+# Переменные (Settings -> Variables):
+#   DESKTOP_PUBLIC_BASE_URL             (опц.) публичный origin, если не прод-домен
+#
+# В репозитории ключей нет и быть не должно: только выражения secrets.
+# Публичный ключ (pubkey) — наоборот, коммитится в tauri.conf.json, это не секрет.
+# ============================================================================
+name: desktop-release
+
+on:
+  push:
+    tags: ["desktop-v*"] # desktop-v1.4.2
+  workflow_dispatch: # ручная проверка сборки: собирает, НО НЕ публикует
+
+# Два релиза десктопа одновременно не поедут: они пишут в один каталог на VPS.
+concurrency: desktop-release
+
+permissions:
+  contents: read
+
+env:
+  # Публичный origin, от которого строятся ссылки в latest.json и по которому
+  # идёт проверка после выкладки.
+  #
+  # Умолчание — адрес, который РАБОТАЕТ. chat.partner-lead-centre.ru ведёт не
+  # сюда: там FreeScout, другой хелпдеск. Ссылка на обновление, собранная от
+  # чужого адреса, увела бы установленные приложения качать чужой файл.
+  DESKTOP_PUBLIC_BASE_URL: ${{ vars.DESKTOP_PUBLIC_BASE_URL || 'https://188-225-34-82.sslip.io' }}
+  DOWNLOAD_DIR: /var/leadchat/download
+  # Флаг для tree-shaking десктоп-модулей из веб-бандла (04 §1.1)
+  VITE_IS_DESKTOP: "1"
+
+jobs:
+  # ==========================================================================
+  # 1. Сборка и подпись — только на Windows.
+  # ==========================================================================
+  build:
+    runs-on: windows-latest
+    environment: desktop-release # секреты подписи доступны только этому окружению
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash # git-bash есть на windows-раннере; один диалект на весь job
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      setup_name: ${{ steps.stage.outputs.setup_name }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # нужен объект тега: из его аннотации берём release notes
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+
+      # ----------------------------------------------------------------------
+      # Версия обязана совпадать в ТРЁХ местах и с тегом (12 §2). Разъезд ловим
+      # ДО получасовой сборки: собранный инсталлятор с чужой версией — это
+      # клиенты, которые либо не увидят обновление, либо получат его дважды.
+      - name: Проверить версию (tauri.conf.json / package.json / Cargo.toml / тег)
+        id: version
+        run: |
+          set -euo pipefail
+          CONF_VER=$(node -p "require('./desktop/src-tauri/tauri.conf.json').version")
+          PKG_VER=$(node -p "require('./desktop/package.json').version")
+          # версия из секции [package] Cargo.toml (в зависимостях version тоже есть)
+          CARGO_VER=$(awk -F'"' '
+            /^\[package\]/ { in_pkg = 1; next }
+            /^\[/          { in_pkg = 0 }
+            in_pkg && /^[[:space:]]*version[[:space:]]*=/ { print $2; exit }
+          ' desktop/src-tauri/Cargo.toml)
+
+          echo "tauri.conf.json : ${CONF_VER}"
+          echo "package.json    : ${PKG_VER}"
+          echo "Cargo.toml      : ${CARGO_VER}"
+
+          rc=0
+          [ -n "$CONF_VER" ] || { echo "::error::не прочитал version из tauri.conf.json"; rc=1; }
+          [ "$PKG_VER" = "$CONF_VER" ] || {
+            echo "::error::desktop/package.json version=${PKG_VER} != tauri.conf.json ${CONF_VER}"; rc=1; }
+          [ "$CARGO_VER" = "$CONF_VER" ] || {
+            echo "::error::desktop/src-tauri/Cargo.toml version=${CARGO_VER} != tauri.conf.json ${CONF_VER}"; rc=1; }
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG_VER="${GITHUB_REF_NAME#desktop-v}"
+            case "$TAG_VER" in
+              [0-9]*.[0-9]*.[0-9]*) : ;;
+              *) echo "::error::тег ${GITHUB_REF_NAME} не вида desktop-vX.Y.Z"; rc=1 ;;
+            esac
+            [ "$TAG_VER" = "$CONF_VER" ] || {
+              echo "::error::тег ${GITHUB_REF_NAME} != version ${CONF_VER} в конфигах"; rc=1; }
+          fi
+          [ "$rc" = 0 ] || exit 1
+
+          echo "version=${CONF_VER}" >> "$GITHUB_OUTPUT"
+
+      # Проверяем ВСЕГДА, а не только на теге: при createUpdaterArtifacts=true
+      # и пустом ключе tauri build падает сам, но глубоко внутри и невнятно.
+      # Лучше понятная ошибка за полчаса до этого.
+      - name: Ключ подписи обязателен
+        env:
+          SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          [ -n "${SIGNING_KEY}" ] || {
+            echo "::error::секрет TAURI_SIGNING_PRIVATE_KEY пуст в environment desktop-release (см. docs/12-DESKTOP-RELEASE.md §1)"
+            exit 1
+          }
+
+      - name: Установить зависимости
+        run: |
+          set -euo pipefail
+          npm ci --prefix frontend
+          npm ci --prefix desktop
+
+      # tauri build сам вызывает beforeBuildCommand (сборку React-бандла
+      # с --mode desktop, 04 §1.3) — второй фронтенд не собираем.
+      - name: Сборка NSIS + MSI с подписью
+        working-directory: desktop
+        env:
+          VITE_API_BASE: ${{ env.DESKTOP_PUBLIC_BASE_URL }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri -- build
+
+      # ----------------------------------------------------------------------
+      - name: Собрать dist-release (плоский каталог артефактов)
+        id: stage
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          BUNDLE=desktop/src-tauri/target/release/bundle
+
+          setups=("$BUNDLE"/nsis/*-setup.exe)
+          [ ${#setups[@]} -eq 1 ] || {
+            echo "::error::ожидал ровно один NSIS setup.exe в ${BUNDLE}/nsis, нашёл ${#setups[@]}"
+            ls -la "$BUNDLE"/nsis 2>/dev/null || true
+            exit 1
+          }
+          SETUP="${setups[0]}"
+          [ -f "${SETUP}.sig" ] || {
+            echo "::error::нет ${SETUP}.sig — проверьте bundle.createUpdaterArtifacts=true и секреты подписи"
+            exit 1
+          }
+
+          mkdir -p dist-release
+          cp "$SETUP" "${SETUP}.sig" dist-release/
+
+          # MSI — канал для GPO/Intune, в автообновлении не участвует (04 §6.1).
+          # Его отсутствие релиз не рушит, но молчать об этом нельзя.
+          msis=("$BUNDLE"/msi/*.msi)
+          if [ ${#msis[@]} -gt 0 ]; then
+            for msi in "${msis[@]}"; do
+              cp "$msi" dist-release/
+              if [ -f "${msi}.sig" ]; then
+                cp "${msi}.sig" dist-release/
+              else
+                echo "::warning::нет подписи для $(basename "$msi") — MSI обновляется через GPO, апдейтер его не трогает"
+              fi
+            done
+          else
+            echo "::warning::MSI не собран — развёртывание через GPO этим релизом не покрыто"
+          fi
+
+          SETUP_NAME="$(basename "$SETUP")"
+          # Приёмка 04 §10: инсталлятор ≤ 10 МБ (webviewInstallMode=downloadBootstrapper)
+          SIZE_KB=$(( $(wc -c < "$SETUP") / 1024 ))
+          echo "NSIS ${SETUP_NAME}: ${SIZE_KB} КБ"
+          [ "$SIZE_KB" -le 10240 ] || echo "::warning::инсталлятор ${SIZE_KB} КБ > 10 МБ (04 §10) — проверьте webviewInstallMode"
+
+          echo "setup_name=${SETUP_NAME}" >> "$GITHUB_OUTPUT"
+
+      # Манифест генерирует скрипт из desktop/ (04 §7): версия, подпись и URL
+      # берутся из собранных артефактов, руками ничего не переписывается.
+      - name: Сгенерировать и проверить latest.json
+        env:
+          # имя переменной задаёт сам скрипт (desktop/scripts/make-latest-json.mjs):
+          # это база ссылок ВМЕСТЕ с /download/, а не голый origin
+          DOWNLOAD_BASE_URL: ${{ format('{0}/download/', env.DESKTOP_PUBLIC_BASE_URL) }}
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+          SETUP_NAME: ${{ steps.stage.outputs.setup_name }}
+        run: |
+          set -euo pipefail
+          # notes для баннера обновления — из аннотации тега; для dispatch пусто
+          NOTES=""
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            NOTES=$(git for-each-ref "refs/tags/${GITHUB_REF_NAME}" \
+                      --format='%(contents:subject)' 2>/dev/null || true)
+          fi
+          [ -n "$NOTES" ] || NOTES="LeadChat ${EXPECTED_VERSION}"
+          RELEASE_NOTES="$NOTES" node desktop/scripts/make-latest-json.mjs
+
+          # Манифест — единственное, что читает клиент при обновлении.
+          # Проверяем его здесь, на раннере, где упасть ещё дёшево.
+          node -e '
+            const fs = require("fs");
+            const m = JSON.parse(fs.readFileSync("dist-release/latest.json", "utf8"));
+            const setup = process.env.SETUP_NAME;
+            const p = (m.platforms || {})["windows-x86_64"] || {};
+            const errs = [];
+            if (m.version !== process.env.EXPECTED_VERSION)
+              errs.push("version=" + m.version + " != " + process.env.EXPECTED_VERSION);
+            if (!p.signature) errs.push("нет platforms.windows-x86_64.signature");
+            if (!p.url) errs.push("нет platforms.windows-x86_64.url");
+            // имя в url percent-encoded — сравниваем декодированное
+            else if (decodeURIComponent(p.url.split("/").pop()) !== setup)
+              errs.push("url " + p.url + " не указывает на " + setup);
+            const sig = fs.readFileSync("dist-release/" + setup + ".sig", "utf8").trim();
+            if (p.signature && p.signature.trim() !== sig)
+              errs.push("signature в манифесте не совпадает с " + setup + ".sig");
+            if (errs.length) {
+              console.error("::error::latest.json: " + errs.join("; "));
+              process.exit(1);
+            }
+            console.log("latest.json ok:", m.version, p.url);
+          '
+          ls -la dist-release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leadchat-desktop-${{ steps.version.outputs.version }}
+          path: dist-release/
+          if-no-files-found: error
+          retention-days: 90
+
+  # ==========================================================================
+  # 2. Выкладка на VPS. Только по тегу: workflow_dispatch — проверка сборки.
+  # ==========================================================================
+  publish-vps:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    runs-on: ubuntu-latest # ssh/rsync с linux-раннера проще и быстрее
+    environment: desktop-release
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4 # ради deploy/publish-desktop.sh
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: leadchat-desktop-${{ needs.build.outputs.version }}
+          path: out
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: known_hosts
+        env:
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          HOST: ${{ secrets.VPS_HOST || '188-225-34-82.sslip.io' }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          if [ -n "${KNOWN_HOSTS}" ]; then
+            printf '%s\n' "${KNOWN_HOSTS}" >> ~/.ssh/known_hosts
+          else
+            # TOFU: ключ сервера не закреплён. Задайте секрет
+            # DEPLOY_SSH_KNOWN_HOSTS, чтобы закрыть окно MITM (12 §1).
+            echo "::warning::DEPLOY_SSH_KNOWN_HOSTS не задан — доверяем ssh-keyscan"
+            ssh-keyscan -H "${HOST}" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      # Тот же скрипт, что и при ручном релизе, — он и обеспечивает порядок
+      # «бинарники -> симлинк -> манифест» и проверку по HTTPS после выкладки.
+      - name: Выложить в /var/leadchat/download
+        env:
+          DEPLOY_HOST: ${{ secrets.VPS_HOST || '188-225-34-82.sslip.io' }}
+          DEPLOY_USER: ${{ secrets.VPS_USER || 'deploy' }}
+          DOWNLOAD_DIR: ${{ env.DOWNLOAD_DIR }}
+          PUBLIC_BASE_URL: ${{ env.DESKTOP_PUBLIC_BASE_URL }}
+        run: bash deploy/publish-desktop.sh --yes out
+
+  # ==========================================================================
+  # 3. GitHub Release — архив артефактов релиза.
+  #
+  # Не зависит от publish-vps намеренно: если выкладка на VPS упала, файлы
+  # уже лежат в Release, и релиз-менеджер доводит его руками тем же
+  # publish-desktop.sh (12 §6), не пересобирая (и не переподписывая) заново.
+  # ==========================================================================
+  publish-github:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: leadchat-desktop-${{ needs.build.outputs.version }}
+          path: out
+
+      - name: Опубликовать Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.build.outputs.version }}
+          SETUP_NAME: ${{ needs.build.outputs.setup_name }}
+        run: |
+          set -euo pipefail
+          NOTES=$(jq -r '.notes // ""' out/latest.json)
+          [ -n "$NOTES" ] || NOTES="LeadChat ${VERSION}"
+          BODY=$(printf '%s\n\n---\nУстановщик: `%s` (NSIS, ставится без прав администратора).\nMSI — только для развёртывания через GPO/Intune.\nАвтообновление берёт файлы с %s/download/.\n' \
+                 "$NOTES" "$SETUP_NAME" "$DESKTOP_PUBLIC_BASE_URL")
+
+          # Перезапуск workflow не должен падать на «release already exists»
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" out/* --clobber
+            gh release edit "$TAG" --notes "$BODY"
+          else
+            gh release create "$TAG" out/* --title "LeadChat ${VERSION}" --notes "$BODY"
+          fi

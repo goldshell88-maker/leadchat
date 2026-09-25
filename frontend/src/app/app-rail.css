@@ -1,0 +1,712 @@
+/*
+ * ЛЕВАЯ ПАНЕЛЬ (макет владельца от 12 августа).
+ *
+ * ДВА СОСТОЯНИЯ ДЕРЖАТСЯ НА ДВУХ АТРИБУТАХ КОРНЯ, и это не приём ради
+ * краткости. `data-expanded` — ширина и подписи, `data-away` — янтарная
+ * полоса, точка на аватаре и слово под именем. Пока признак один, он не может
+ * разъехаться сам с собой: в прежней шапке «отошёл» жил в трёх местах —
+ * пометке на аватаре, строке меню и блоке профиля, — и однажды они уже
+ * разошлись между собой.
+ *
+ * ЦВЕТА — ТОЛЬКО ТОКЕНАМИ. Макет пришёл с собственными HEX (#0a0c0b, #3ddc84);
+ * они близки к нашей тёмной теме, но своих значений здесь нет ни одного:
+ * панель обязана работать и в светлой теме, а зашитый #0a0c0b дал бы в ней
+ * чёрный столб слева.
+ */
+
+.lc-rail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Было 5 — единственное число рельса мимо шкалы --lc-space-*. */
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-3) 0;
+  background: var(--lc-bg-1);
+  border-right: 1px solid var(--lc-border);
+  /* ⚠ СТРОКИ НЕ СЖИМАЮТСЯ ПРИ НИЗКОМ ОКНЕ (разбор дизайна 28.08).
+     Без этого группы рельса давились по высоте, и порог, с которого значки
+     начинают наезжать друг на друга, зависел от РОЛИ: у администратора пунктов
+     больше, значит у него ломается раньше. Ровно та жалоба, что «по-разному
+     открывается у разных пользователей». */
+  min-height: 0;
+}
+
+/*
+ * ПРОКРУТКА — ТОЛЬКО У РАЗВЁРНУТОГО РЕЛЬСА, И ЭТО НЕ ЛЕНЬ.
+ *
+ * У свёрнутого подписи пунктов сделаны через `::after` и вынесены ВПРАВО ЗА
+ * пределы рельса. `overflow-y: auto` вычисляет `overflow-x` тоже в `auto` —
+ * и срезал бы все подсказки разом, то есть свёрнутый рельс стал бы набором
+ * безымянных значков. У развёрнутого подписи внутри, резать нечего.
+ */
+.lc-rail[data-expanded] {
+  overflow-y: auto;
+}
+
+/*
+ * ⚠ КОРОТКОЕ ОКНО: СВЁРНУТЫЙ РЕЛЬС ТОЖЕ ОБЯЗАН ПРОКРУЧИВАТЬСЯ (замер на
+ * стенде 05.09).
+ *
+ * ЧТО НАШЛОСЬ. Довод выше верен для обычного окна, но у него есть цена, и до
+ * сих пор её никто не платил вслух. Свёрнутому рельсу администратора нужно
+ * 619 пикселей высоты: девять строк по 44, разделитель, знак и кнопка «это я».
+ * При окне 667×375 — телефон, повёрнутый набок, — рельс не помещается на 244
+ * пикселя, а прокрутки у него нет: колокольчик и собственная кнопка
+ * сотрудника оказываются ЗА нижним краем экрана, и достать их нечем. Ни
+ * уведомлений, ни «отошёл», ни выхода.
+ *
+ * ПОЧЕМУ ПЛАТИМ ПОДСКАЗКАМИ. `overflow-y: auto` вычисляет `overflow-x` в
+ * `auto` и срезает подписи свёрнутого рельса — обойти это нельзя: пара
+ * `overflow-x: clip` + `overflow-clip-margin` в браузере вырождается обратно
+ * в `hidden` (проверено на стенде), а подпись рисуется `::after` внутри
+ * прокручиваемого блока. Размен очевиден: недостижимая кнопка стоит дороже
+ * спрятанной подсказки, тем более что имя строки остаётся в `aria-label`, а
+ * окно такой высоты — это почти всегда телефон набок, где наведения вообще
+ * не бывает.
+ *
+ * ПОЧЕМУ 640, А НЕ БОЛЬШЕ. Порог обязан пропускать типовой ноутбук 1366×768:
+ * там на окно остаётся 660–700 пикселей, рельс со своими 619 помещается, и
+ * отбирать у диспетчера подсказки не за что. 640 — первое число ниже этой
+ * полосы и выше требуемых 619.
+ *
+ * ⚠ ОТСЮДА ЖЕ ЗАПРЕТ: высоту строки рельса нельзя пересаживать на токен
+ * кнопки. От 1800 пикселей ширины шкала поднимается (lc-vars.css), 44
+ * превратилось бы в 46, требуемая высота — в 640, и порог перестал бы
+ * покрывать сам себя.
+ */
+@media (max-height: 640px) {
+  .lc-rail:not([data-expanded]) {
+    overflow-y: auto;
+  }
+}
+
+.lc-rail[data-expanded] {
+  align-items: stretch;
+  /* Было 10 по бокам при 12 сверху и снизу; теперь поле рельса одно по кругу
+     и на ступени шкалы. */
+  padding: var(--lc-space-3);
+}
+
+/* «Отошёл» виден с любого экрана и не требует ничего открывать. Полоса —
+   вдоль всей панели: пометка на аватаре одна теряется среди значков. */
+.lc-rail[data-away] {
+  box-shadow: inset 3px 0 0 var(--lc-presence-away);
+}
+
+.lc-rail:not([data-expanded]) .lc-rail__label,
+.lc-rail:not([data-expanded]) .lc-rail__section,
+.lc-rail:not([data-expanded]) .lc-rail__key,
+.lc-rail:not([data-expanded]) .lc-rail__wordmark,
+.lc-rail:not([data-expanded]) .lc-rail__collapse,
+.lc-rail:not([data-expanded]) .lc-rail__who {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────── знак и переключатель ── */
+
+.lc-rail__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-2);
+  /*
+   * ⚠ ЯЧЕЙКА 44, КАК У ПУНКТОВ РАЗДЕЛОВ — САМ ЗНАК НЕ ТРОНУТ (огранка 08.09).
+   * Было 38 при 44 у `.lc-rail__item`: знак центрировался по своей ячейке, а не
+   * по колонке пунктов, и стоял на 3px выше их вертикальной оси — единственный
+   * житель рельса мимо неё. Изменилась ячейка, а не то, что в ней нарисовано.
+   */
+  height: 44px;
+  margin-bottom: var(--lc-space-3);
+  border-radius: var(--lc-radius-md);
+  color: var(--lc-text-1);
+  font-weight: var(--lc-fw-semibold);
+  white-space: nowrap;
+}
+
+.lc-rail[data-expanded] .lc-rail__logo {
+  justify-content: flex-start;
+  padding: 0 var(--lc-space-2);
+}
+
+.lc-rail__logo:hover {
+  background: var(--lc-surface-hover);
+}
+
+.lc-rail__wordmark {
+  flex: 1;
+  text-align: left;
+}
+
+.lc-rail__collapse {
+  color: var(--lc-text-4);
+}
+
+/* ───────────────────────────────────────────────────── группы и строки ── */
+
+.lc-rail__section {
+  padding: var(--lc-space-2) var(--lc-space-3) var(--lc-space-1);
+  font-size: var(--lc-fz-micro);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  /* Было --lc-text-5: 2,91:1 к фону панели — заголовки групп на ноутбучной
+     матрице исчезали (аудит 15.09). --lc-text-3 держит ≥ 4,5:1 в обеих темах. */
+  color: var(--lc-text-3);
+}
+
+.lc-rail__zone {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lc-space-1);
+  /* Группа держит свою высоту — иначе при низком окне строки давятся, и порог
+     поломки зависит от роли (см. довод у `.lc-rail`). */
+  flex: none;
+}
+
+.lc-rail__divider {
+  /*
+   * ⚠ 24, А НЕ 28 (огранка 08.09). Двадцать восемь не равнялись ни ширине
+   * пункта (44), ни ширине его значка (20) — число ниоткуда. 24 — ступень
+   * шкалы и оптическое ядро пункта: линия читается как принадлежащая столбцу.
+   */
+  width: var(--lc-space-5);
+  height: 1px;
+  margin: var(--lc-space-3) auto;
+  background: var(--lc-border);
+}
+
+/*
+ * ⚠ У РАЗВЁРНУТОГО РЕЛЬСА ЛИНИИ НЕТ — ГРУППУ ДЕРЖИТ ЗАГОЛОВОК И ВОЗДУХ.
+ *
+ * Здесь линия шла во всю ширину и делила ровно то же, что уже поделено
+ * словом: сразу под ней стоит «ПОД РУКОЙ». Две границы одной группы читаются
+ * как две группы, и глазу приходится проверять, не значит ли линия чего-то
+ * ещё. В свёрнутом виде заголовки спрятаны (`display: none`), и там линия —
+ * единственный делитель; поэтому она остаётся, но только там.
+ */
+.lc-rail[data-expanded] .lc-rail__divider {
+  display: none;
+}
+
+/*
+ * Воздух над заголовком группы — вместо линии. 16 пикселей сверху против 4
+ * снизу (правило выше даёт 8 сверху и 4 снизу, здесь верх поднят до 16):
+ * разрыв между группами обязан быть заметно больше, чем между заголовком и
+ * его первой строкой, иначе заголовок «плавает» посередине и непонятно, к
+ * чему он относится.
+ */
+.lc-rail[data-expanded] .lc-rail__section {
+  padding-top: var(--lc-space-4);
+}
+
+.lc-rail__spacer {
+  flex: 1;
+}
+
+.lc-rail__item {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  border-radius: var(--lc-radius-md);
+  /*
+   * ⚠ СТУПЕНЬ ВЫШЕ, ЧЕМ БЫЛО (`--lc-text-3`). Разделы — это НЕ служебная
+   * подпись, а главное содержимое столбца; на одной ступени с ними стояли
+   * буквы клавиш («Ctrl K», «вкл») и заголовки групп. Когда всё в столбце
+   * одного тона, разница между «куда идти» и «чем это открывается» ищется
+   * вглядыванием. Теперь три ступени вместо двух: строка — `text-2`,
+   * клавиша — `text-5`, заголовок группы — `text-5`.
+   */
+  color: var(--lc-text-2);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.lc-rail[data-expanded] .lc-rail__item {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-3);
+  padding: 0 var(--lc-space-2);
+  border-radius: var(--lc-radius-md);
+  font-size: var(--lc-fz-body);
+  text-align: left;
+}
+
+.lc-rail__item:hover {
+  background: var(--lc-surface-hover);
+  color: var(--lc-text-1);
+}
+
+/*
+ * ⚠ ТЕКУЩИЙ РАЗДЕЛ ОТМЕЧЕН И НАСЫЩЕННОСТЬЮ, А НЕ ТОЛЬКО ЦВЕТОМ И ЗАЛИВКОЙ.
+ *
+ * Заливка `--lc-selected` на тёмной теме отличается от фона панели на
+ * несколько процентов светлоты, и при взгляде с полуметра — а именно так на
+ * рельс и смотрят, боковым зрением, — активная строка сливалась с соседями.
+ * Полужирное начертание видно раньше, чем различается оттенок, и работает
+ * там, где цвет различают хуже.
+ */
+.lc-rail__item[data-active] {
+  background: var(--lc-selected);
+  color: var(--lc-primary-text);
+  font-weight: var(--lc-fw-semibold);
+}
+
+/* Полоска активного раздела слева — та же метка «вы здесь», что и у
+   выбранного диалога в списке. В развёрнутом виде её роль берёт на себя
+   заливка во всю ширину, и вторая метка была бы шумом. */
+.lc-rail__item[data-active]::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 11px;
+  bottom: 11px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--lc-primary);
+}
+
+.lc-rail[data-expanded] .lc-rail__item[data-active]::before {
+  display: none;
+}
+
+/*
+ * Подпись НЕ переносится. Строки панели ростом в 40 пикселей, и подпись в две
+ * строки не просто выше — она сдвигает вниз всё, что ниже, и ломает ритм
+ * столбца. Длинное название лучше обрезать: полностью оно есть в подсказке и
+ * в `aria-label`.
+ */
+.lc-rail__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lc-rail__key {
+  font-size: var(--lc-fz-micro);
+  /* Сочетание клавиш — не самое тусклое в меню (аудит 15.09: «?» 2,70:1). */
+  color: var(--lc-text-3);
+  font-variant-numeric: var(--lc-num);
+}
+
+/* «?» — в рамке-клавише, как и остальные сочетания в подсказках. */
+.lc-rail__kbd {
+  min-width: 20px;
+  padding: 0 var(--lc-space-1);
+  border: 1px solid var(--lc-border-strong);
+  border-radius: var(--lc-radius-sm);
+  text-align: center;
+  font-family: var(--lc-font-mono);
+  line-height: 1.4;
+}
+
+/* Переключатель звука: положение видно и без слова. */
+.lc-rail__toggle {
+  position: relative;
+  flex: none;
+  width: 28px;
+  height: 16px;
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-border-strong);
+  transition: background var(--lc-dur-fast) var(--lc-ease);
+}
+.lc-rail__toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--lc-bg-0);
+  transition: transform var(--lc-dur-fast) var(--lc-ease);
+}
+.lc-rail__toggle[data-on] {
+  background: var(--lc-primary-solid);
+}
+.lc-rail__toggle[data-on]::after {
+  transform: translateX(12px);
+  background: var(--lc-on-primary);
+}
+.lc-rail:not([data-expanded]) .lc-rail__toggle {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────── подсказки свёрнутого ── */
+
+/*
+ * Подпись рисуется из `data-tip` — без порталов и без компонента подсказки.
+ * Показывается и по наведению, и по клавиатурному фокусу: свёрнутая панель
+ * это девять безымянных значков, и для того, кто ходит табом, они безымянны
+ * ровно так же.
+ */
+/* ⚠ `[data-tip]` ТРЕБУЕТСЯ У ВСЕХ ТРЁХ, а не только у значков. Без него логотип
+   без подписи (на телефоне он именно такой) при наведении показывал ПУСТУЮ рамку:
+   `content: attr(data-tip)` от отсутствующего атрибута даёт пустую строку, но
+   padding, границу и тень псевдоэлемент рисует всё равно. */
+.lc-rail:not([data-expanded]) .lc-rail__item[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__item[data-tip]:focus-visible::after,
+.lc-rail:not([data-expanded]) .lc-rail__logo[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__logo[data-tip]:focus-visible::after,
+.lc-rail:not([data-expanded]) .lc-rail__me[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__me[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  /*
+   * ⚠ ОТСТУП СЧИТАЕТСЯ ОТ ЦЕНТРА ЯКОРЯ, А НЕ ЖЁСТКИМ ЧИСЛОМ.
+   *
+   * Было `left: 56px` — число, отмеренное от 44-пиксельного значка. Рельс шире:
+   * 72px (`RAIL_WIDTH_COLLAPSED`), а сам значок вдвинут внутрь на 13px двумя
+   * границами. Левый край подписи приходился на 69px, то есть НА ТРИ ПИКСЕЛЯ
+   * ВНУТРИ рельса, — подпись начиналась поверх него и уезжала на контент.
+   *
+   * Жёсткое число тут не годится ещё и потому, что якорей два разного размера:
+   * значки 44px и логотип 30px. Одно и то же `left` дало бы подсказку логотипа
+   * на семь пикселей правее соседних — вместо «залезает» получили бы «не
+   * совпадает». Отсчёт от центра якоря верен при любом размере.
+   */
+  left: calc(50% + var(--lc-rail-w) / 2 + var(--lc-space-2));
+  z-index: var(--lc-z-toast);
+  white-space: nowrap;
+  /*
+   * ⚠ ПОТОЛОК ШИРИНЫ ОБЯЗАТЕЛЕН, И СДВИГА ВПРАВО ДЛЯ ЭТОГО НЕ ХВАТАЕТ. Колонка
+   * контента начинается ровно там же, где кончается рельс, поэтому подпись при
+   * `nowrap` всё равно ложится НА неё: самая длинная — «Разбор диалогов» вместе
+   * с подписью-пояснением. Ограничение с многоточием держит её в разумных
+   * пределах и не даёт накрыть поле поиска в «Чатах» и первый фильтр в «Разборе».
+   */
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /*
+   * ⚠ ЗАДЕРЖКА — ЧТОБЫ ПОДПИСЬ НЕ ВЫСКАКИВАЛА НА ПРОЛЁТЕ МЫШИ. Рельс узкий, и
+   * курсор пересекает его по пути к контенту десятки раз за смену; без задержки
+   * каждый такой пролёт даёт вспышку поверх экрана. 400 мс — то же значение, что
+   * у подсказок Mantine в теме, чтобы задержка везде была одна.
+   *
+   * `prefers-reduced-motion` это правило не гасит намеренно: глобальное правило
+   * снимает анимации, а переходы не трогает, и задержка — не движение.
+   */
+  opacity: 0;
+  transition: opacity 0s linear 400ms;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  /* Поверхность та же, что у подсказок Mantine (lc-base.css): тёмная в обеих
+     темах. Иначе в одном интерфейсе живут две внешне разные подсказки. */
+  background: var(--lc-bg-raise);
+  color: var(--lc-slate-50);
+  font-size: var(--lc-fz-caption);
+  box-shadow: var(--lc-shadow-2);
+  pointer-events: none;
+}
+
+/* Появление — только после задержки. Отдельным правилом, потому что `content`
+   и геометрия выше общие для наведения и фокуса, а прозрачность меняется. */
+.lc-rail:not([data-expanded]) .lc-rail__item[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__item[data-tip]:focus-visible::after,
+.lc-rail:not([data-expanded]) .lc-rail__logo[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__logo[data-tip]:focus-visible::after,
+.lc-rail:not([data-expanded]) .lc-rail__me[data-tip]:hover::after,
+.lc-rail:not([data-expanded]) .lc-rail__me[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────── счётчики ── */
+
+.lc-rail__badges {
+  display: contents;
+}
+
+.lc-rail[data-expanded] .lc-rail__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  margin-left: auto;
+}
+
+.lc-rail__badge {
+  min-width: 19px;
+  height: 19px;
+  /* Та же величина, что у счётчиков вкладок и непрочитанных в списке
+     (chat-list.css): одна пилюля счёта на весь продукт. */
+  padding: 0 var(--lc-space-1);
+  border-radius: var(--lc-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lc-unread-bg);
+  color: var(--lc-unread-text);
+  font-size: var(--lc-fz-micro);
+  font-weight: var(--lc-fw-semibold);
+  line-height: 1;
+  font-variant-numeric: var(--lc-num);
+}
+
+.lc-rail__badge--queue {
+  background: var(--lc-danger-solid);
+  color: var(--lc-on-danger);
+}
+
+/*
+ * В свёрнутом виде обе цифры уезжают на углы значка: очередь наверх (с неё
+ * начинается смена), непрочитанное вниз. Разведены и положением, и цветом —
+ * рядом друг с другом на сорока пикселях они читались как одно число.
+ */
+.lc-rail:not([data-expanded]) .lc-rail__badge {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  box-shadow: 0 0 0 2px var(--lc-bg-1);
+}
+
+.lc-rail:not([data-expanded]) .lc-rail__badge--queue {
+  top: 0;
+  bottom: auto;
+}
+
+/* Колокольчик носит свой счётчик (у него есть состояние «не знаем») — он
+   позиционируется теми же правилами, что бейджи разделов. */
+.lc-rail__item--bell .lc-bell__badge {
+  position: static;
+  margin-left: auto;
+}
+
+.lc-rail:not([data-expanded]) .lc-rail__item--bell .lc-bell__badge {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  margin-left: 0;
+  box-shadow: 0 0 0 2px var(--lc-bg-1);
+}
+
+/* ───────────────────────────────────────────────────── кнопка «это я» ── */
+
+.lc-rail__me {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lc-radius-md);
+  color: var(--lc-text-1);
+}
+
+.lc-rail[data-expanded] .lc-rail__me {
+  width: 100%;
+  height: 54px;
+  padding: 0 var(--lc-space-2);
+  gap: var(--lc-space-3);
+  justify-content: flex-start;
+  margin-top: var(--lc-space-1);
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+}
+
+.lc-rail[data-expanded][data-away] .lc-rail__me {
+  background: var(--lc-warning-subtle);
+  border-color: var(--lc-presence-away);
+}
+
+.lc-rail__ava {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* Пометка состояния на аватаре. Обводка — цветом того, на чём аватар лежит,
+   иначе точка сливается с краем. */
+.lc-rail__state {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 13px;
+  height: 13px;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-success);
+  border: 3px solid var(--lc-bg-1);
+}
+
+.lc-rail[data-expanded] .lc-rail__state {
+  border-color: var(--lc-surface);
+}
+
+.lc-rail[data-expanded][data-away] .lc-rail__state {
+  border-color: var(--lc-warning-subtle);
+}
+
+.lc-rail[data-away] .lc-rail__state {
+  background: var(--lc-presence-away);
+}
+
+.lc-rail__who {
+  min-width: 0;
+  font-size: var(--lc-fz-body);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Слово рядом с точкой: цвет не бывает единственным носителем смысла — то же
+   правило, что у `StatusDot`. */
+/*
+ * ⚠ «НА МЕСТЕ» СНЯТО С АКЦЕНТА (разбор дизайна 05.09).
+ *
+ * Здесь стоял `--lc-primary-text` — тот же цвет, которым в рельсе отмечен
+ * ТЕКУЩИЙ РАЗДЕЛ. Акцент в рабочем столбце обязан значить одно, а значил
+ * два: «вы здесь» и «вы на месте». «На месте» — состояние по умолчанию, в
+ * нём проходит вся смена, и красить его в цвет, которым зовут к действию,
+ * значит тратить единственный сильный цвет на молчание.
+ *
+ * «Отошёл» остаётся янтарным ниже: это отклонение от нормы, и его как раз
+ * надо видеть, не открывая ничего.
+ */
+.lc-rail__who em {
+  display: block;
+  font-style: normal;
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+.lc-rail[data-away] .lc-rail__who em {
+  color: var(--lc-warning-text);
+}
+
+/* ──────────────────────────────────────────── окно под кнопкой «это я» ── */
+
+/* Поле окна — 16, как у карточек: 14 было соседом ниоткуда. */
+.lc-me-pop {
+  padding: var(--lc-space-4);
+}
+
+.lc-me-pop__seg {
+  display: flex;
+  margin: var(--lc-space-3) 0 var(--lc-space-2);
+  /* ⚠ 3px — ЗАЯВЛЕННОЕ ИСКЛЮЧЕНИЕ ИЗ ШКАЛЫ, И ОНО ПАРНОЕ: ровно на эту величину
+     ниже посчитан внутренний радиус (`calc(--lc-radius-md - 3px)`). Возьми
+     ступень шкалы — и вложенная кнопка отклеится от рамки обоймы. */
+  padding: var(--lc-space-1);
+  background: var(--lc-bg-2);
+  border-radius: var(--lc-radius-md);
+}
+
+.lc-me-pop__seg button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2) 0;
+  border: 0;
+  /* ⚠ ВНУТРЕННИЙ РАДИУС = ВНЕШНИЙ МИНУС ОТСТУП. Так вложенная форма не «отклеивается»
+     от рамки: 12 − 3 = 9. Раньше здесь стояли два независимых числа (11 снаружи,
+     9 внутри), и правило держалось на том, что их подобрали на глаз вместе. */
+  border-radius: calc(var(--lc-radius-md) - 3px);
+  background: none;
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-body);
+  cursor: pointer;
+}
+
+.lc-me-pop__seg button u {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-text-5);
+  text-decoration: none;
+}
+
+.lc-me-pop__seg button[aria-pressed="true"] {
+  background: var(--lc-primary-subtle);
+  color: var(--lc-primary-text);
+  font-weight: var(--lc-fw-semibold);
+  box-shadow: inset 0 0 0 1px var(--lc-primary);
+}
+
+.lc-me-pop__seg button[aria-pressed="true"] u {
+  background: currentColor;
+}
+
+.lc-me-pop__seg button.is-away[aria-pressed="true"] {
+  background: var(--lc-warning-subtle);
+  color: var(--lc-warning-text);
+  box-shadow: inset 0 0 0 1px var(--lc-presence-away);
+}
+
+.lc-me-pop__seg button:disabled {
+  cursor: progress;
+}
+
+.lc-me-pop__hint {
+  margin: 0;
+  font-size: var(--lc-fz-caption);
+  line-height: 1.45;
+  color: var(--lc-text-3);
+}
+
+.lc-me-pop__menu {
+  margin-top: var(--lc-space-3);
+  padding-top: var(--lc-space-2);
+  border-top: 1px solid var(--lc-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.lc-me-pop__menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  width: 100%;
+  padding: var(--lc-space-2);
+  border: 0;
+  /* ⚠ ВНУТРЕННИЙ РАДИУС = ВНЕШНИЙ МИНУС ОТСТУП. Так вложенная форма не «отклеивается»
+     от рамки: 12 − 3 = 9. Раньше здесь стояли два независимых числа (11 снаружи,
+     9 внутри), и правило держалось на том, что их подобрали на глаз вместе. */
+  border-radius: calc(var(--lc-radius-md) - 3px);
+  background: none;
+  color: var(--lc-text-1);
+  font-size: var(--lc-fz-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.lc-me-pop__menu button:hover {
+  background: var(--lc-surface-hover);
+}
+
+.lc-me-pop__menu button.is-exit {
+  color: var(--lc-danger-text);
+}
+
+.lc-me-pop__conn {
+  margin-top: var(--lc-space-3);
+  padding: var(--lc-space-2) var(--lc-space-2) 0;
+  border-top: 1px solid var(--lc-border);
+}
+
+/*
+ * ТЕЛЕФОН — не медиазапросом, а тем же признаком `data-expanded`.
+ *
+ * Панель в 218 пикселей на экране в 390 съедает больше половины ширины, а
+ * рабочее место здесь — переписка, которой эта ширина и нужна. Поэтому на
+ * узких экранах панель всегда свёрнута; решает это `useRailExpanded`, потому
+ * что ширину столбца задаёт каркас в разметке. Разложи мы то же правило ещё
+ * и медиазапросом — получили бы два источника одной величины, и на первом же
+ * изменении брейкпоинта подписи спрятались бы в столбце шириной 218.
+ */

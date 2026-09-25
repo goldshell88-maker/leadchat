@@ -1,0 +1,154 @@
+/* «Что нового» (/updates) — читаемый список, а не лента коммитов. */
+
+/* Обвязка — у `.lc-page` (UpdatesPage.tsx): 32 сверху и 64 снизу были своим
+   числом одного этого экрана, и шапка здесь стояла ниже, чем в соседях. */
+.updates {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-5);
+}
+
+/*
+ * `.updates__head` удалён 12 августа вместе со своим заголовком: раздел
+ * перешёл на общую шапку страницы, а она свои отступы держит сама.
+ */
+
+/*
+ * Релиз носит `.lc-card` (UpdatesPage.tsx); рецепт ниже — его повтор.
+ * ⚠ Повтор оставлен намеренно: surfaceLadder и cardRecipe ищут `--lc-surface`,
+ * рамку и радиус именно здесь. Разойтись с `.lc-card` он не вправе.
+ */
+.updates__release {
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+  padding: var(--lc-space-5);
+}
+
+.updates__release-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lc-space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--lc-space-4);
+  padding-bottom: var(--lc-space-3);
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.updates__release-title {
+  margin: 0;
+  font-size: var(--lc-fz-section);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+.updates__date {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+  white-space: nowrap;
+}
+
+.updates__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-4);
+}
+
+.updates__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lc-space-3);
+}
+
+/* Метка вида — фиксированной ширины: столбец меток читается сверху вниз, и
+   человек находит «Исправлено» не вчитываясь в каждую строку. */
+.updates__kind {
+  flex: none;
+  width: 92px;
+  text-align: center;
+  padding: 2px var(--lc-space-2);
+  border-radius: var(--lc-radius-pill);
+  font-size: var(--lc-fz-micro);
+  font-weight: var(--lc-fw-semibold);
+  line-height: 1.5;
+}
+
+.updates__kind[data-kind="новое"] {
+  background: var(--lc-success-subtle);
+  color: var(--lc-success-text);
+}
+
+.updates__kind[data-kind="улучшено"] {
+  background: var(--lc-primary-subtle);
+  color: var(--lc-primary-text);
+}
+
+.updates__kind[data-kind="исправлено"] {
+  background: var(--lc-warning-subtle);
+  color: var(--lc-warning-text);
+}
+
+.updates__body {
+  min-width: 0;
+}
+
+.updates__what {
+  margin: 0;
+  font-size: var(--lc-fz-body);
+  font-weight: var(--lc-fw-medium);
+  color: var(--lc-text-1);
+  line-height: var(--lc-lh-body);
+}
+
+/* «Зачем» — вторым уровнем: сначала глаз ловит, ЧТО поменялось, и только при
+   интересе читает почему. Одинаковый вес превратил бы список в стену текста. */
+.updates__why {
+  margin: 2px 0 0;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+  line-height: var(--lc-lh-body);
+}
+
+/*
+ * ⚠ ТЕЛЕФОН: СТОЛБЕЦ МЕТОК ОТНИМАЛ У ЗАПИСИ БОЛЬШЕ ТРЕТИ СТРОКИ (замер 05.09).
+ *
+ * В файле не было ни одного правила по ширине, а метка вида объявлена жёстко:
+ * `width: 92px` плюс отступы — 108 на экране. Замер на 375: под запись
+ * оставалось 157 пикселей, и фраза «Быстрый ответ вставляется прямо из поля
+ * ввода: наберите „/“ и первые буквы названия» разваливалась на пять строк
+ * высотой 105 пикселей. Экран читают с телефона в первый рабочий день после
+ * переезда с Jivo — то есть ровно тогда, когда он и нужен.
+ *
+ * ⚠ ФИКСИРОВАННАЯ ШИРИНА МЕТКИ — НЕ ОШИБКА, А РЕШЕНИЕ ДЛЯ ДРУГОЙ ШИРИНЫ.
+ * На мониторе столбец меток читается сверху вниз и «Исправлено» находится не
+ * вчитываясь (довод у самого правила). Столбца из ОДНОЙ метки на строку не
+ * бывает — на телефоне записи и так идут по одной, — поэтому здесь метка
+ * встаёт над текстом и сжимается до своего слова, а `width` снимается: он
+ * оставил бы пилюлю в 108 пикселей с воздухом внутри.
+ *
+ * Порог 640 — тот же, которым «Живая лента» и плашки критичного по соседству
+ * отделяют телефон: три разных порога на четыре экрана одного участка
+ * означали бы три разных «телефона».
+ */
+@media (max-width: 640px) {
+  /* Двойные поля: 24 у страницы плюс 24 у карточки съедали 96 из 375. */
+  .updates__release {
+    padding: var(--lc-space-4);
+  }
+
+  .updates__item {
+    flex-direction: column;
+    gap: var(--lc-space-1);
+  }
+
+  .updates__kind {
+    width: auto;
+    align-self: flex-start;
+  }
+}

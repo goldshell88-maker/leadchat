@@ -1,0 +1,1747 @@
+<meta charset="utf-8">
+<title>LeadChat — огранка плотности</title>
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   ТОКЕНЫ. Единственное место в файле, где есть шестнадцатеричный цвет.
+   Тёмная тема — основная (боевой экран тёмный), светлая переопределяет
+   те же имена ниже.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* фоны */
+  --bg-app: #080a09;
+  --bg-panel: #0b0e0d;
+  --bg-raise: #1a221e;
+  --bg-hover: #141b18;
+  --bg-selected: #1e2c24;
+  --bg-field: #101613;
+
+  /* линии */
+  --line: #333c37;
+  --line-strong: #39433d;
+  --line-soft: #232b27;
+
+  /* чернила */
+  --text-1: #e7ede9;
+  --text-2: #c7d2c9;
+  --text-3: #949e97;
+  --text-4: #7c877f;
+  --text-5: #5a645e;
+
+  /* акцент */
+  --a-300: #7ed77c;
+  --a-500: #3cc13b;
+  --a-600: #2c9c2b;
+  --a-800: #1b631a;
+  --a-subtle: #10240f;
+  --ink-on-accent: #04160a;
+
+  /* сигналы */
+  --warn: #f59e0b;
+  --warn-soft: rgba(245, 158, 11, 0.2);
+  --warn-text: #d9a94e;
+  --warn-subtle: #241a05;
+  --on-warn: #1a1204;
+  --danger-solid: #dc2626;
+  --danger-text: #ff9ea1;
+  --info-subtle: #0d1b33;
+  --info-text: #93c5fd;
+  --purple-subtle: #1e1439;
+  --purple-text: #c4b5fd;
+
+  /* пузыри */
+  --bubble-in: #181f1c;
+  --bubble-in-line: #313a35;
+  --bubble-out: #1b631a;
+  --bubble-out-text: #ffffff;
+  --bubble-out-meta: rgba(255, 255, 255, 0.88);
+
+  --white: #ffffff;
+  --shadow-0: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.24);
+  --scrim: rgba(0, 0, 0, 0.4);
+
+  /* шкала отступов — шаг 4 */
+  --s-0: 2px; --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+
+  /* радиусы: три ступени и точка */
+  --r-xs: 6px; --r-sm: 8px; --r-md: 12px; --r-lg: 14px; --r-pill: 999px;
+
+  /* типографика */
+  --font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Helvetica Neue", Arial, sans-serif;
+  --fz-title: 20px;
+  --fz-card: 16px;
+  --fz-body: 14px;
+  --fz-note: 13px;
+  --fz-cap: 12px;
+  --fz-micro: 11px;
+
+  --rail-w: 72px;
+  --col-list: 320px;
+  --col-card: 320px;
+  --gutter: 12px;
+  --row-time-w: 48px;
+}
+
+:root[data-theme="light"] {
+  --bg-app: #e6eaef;
+  --bg-panel: #ffffff;
+  --bg-raise: #eef1f5;
+  --bg-hover: #e9eef3;
+  --bg-selected: #dcf1db;
+  --bg-field: #f5f7fa;
+
+  --line: #d3dbe4;
+  --line-strong: #c2ccd8;
+  --line-soft: #e4e9ef;
+
+  --text-1: #0f172a;
+  --text-2: #334155;
+  --text-3: #475569;
+  --text-4: #64748b;
+  --text-5: #94a3b8;
+
+  --a-300: #217b20;
+  --a-500: #217b20;
+  --a-600: #2c9c2b;
+  --a-800: #1b631a;
+  --a-subtle: #d6f4d5;
+  --ink-on-accent: #ffffff;
+
+  --warn: #f59e0b;
+  --warn-soft: rgba(245, 158, 11, 0.24);
+  --warn-text: #92400e;
+  --warn-subtle: #fffbeb;
+  --on-warn: #1a1204;
+  --danger-solid: #dc2626;
+  --danger-text: #b91c1c;
+  --info-subtle: #eff6ff;
+  --info-text: #1d4ed8;
+  --purple-subtle: #f5f3ff;
+  --purple-text: #6d28d9;
+
+  --bubble-in: #f1f5f9;
+  --bubble-in-line: #e2e8f0;
+  --bubble-out: #1b631a;
+  --bubble-out-text: #ffffff;
+  --bubble-out-meta: rgba(255, 255, 255, 0.9);
+
+  --shadow-0: 0 1px 1px rgba(15, 23, 42, 0.06);
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --scrim: rgba(15, 23, 42, 0.12);
+}
+
+/* ─────────────────────────────────────────────────────────── основа ─── */
+
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: var(--fz-body);
+  -webkit-font-smoothing: antialiased;
+  padding: 24px;
+}
+
+button { font: inherit; color: inherit; }
+
+/* Одна строка с многоточием. Обрезает CSS, в разметке текст целиком. */
+.tr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+.frame {
+  width: 1280px;
+  height: 860px;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg-app);
+  box-shadow: var(--shadow-1);
+}
+
+/* ═══════════════════════════════════════════════════ рельса слева ════ */
+
+.rail {
+  width: var(--rail-w);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-3) 0;
+  background: var(--bg-app);
+  border-right: 1px solid var(--line-soft);
+}
+
+.rail__mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--s-2);
+  border-radius: var(--r-md);
+  background: var(--a-subtle);
+  color: var(--a-300);
+  font-size: var(--fz-note);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rail__btn {
+  position: relative;
+  width: 40px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-4);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.rail__btn:hover { background: var(--bg-hover); color: var(--text-2); }
+
+.rail__btn[data-active] { background: var(--a-subtle); color: var(--a-300); }
+
+/* Метка активного раздела — 2px у самого края рельсы, а не рамка вокруг
+   кнопки: рамка спорит с радиусом соседей. */
+.rail__btn[data-active]::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: var(--r-pill);
+  background: var(--a-500);
+}
+
+.rail__spacer { flex: 1; }
+
+.rail__count {
+  min-width: 30px;
+  height: 20px;
+  padding: 0 var(--s-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--danger-solid);
+  color: var(--white);
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail__me {
+  width: 32px;
+  height: 32px;
+  margin-top: var(--s-2);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: var(--fz-cap);
+  font-weight: 600;
+}
+
+/* ═════════════════════════════════════════════════════ три колонки ═══ */
+
+.page {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: var(--gutter);
+  padding: var(--gutter);
+  background: var(--bg-app);
+}
+
+.pane {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════ колонка списка (320) ════ */
+
+.list {
+  width: var(--col-list);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.list__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-3) var(--s-2);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.list__title {
+  margin: 0;
+  font-size: var(--fz-title);
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.015em;
+  color: var(--text-1);
+}
+
+.seek { display: flex; align-items: center; gap: var(--s-1); }
+
+.search {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 0 var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg-field);
+  color: var(--text-4);
+  font-size: var(--fz-note);
+}
+
+.search svg { flex: none; color: var(--text-4); }
+
+.search__kbd {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: var(--r-xs);
+  background: var(--bg-raise);
+  color: var(--text-4);
+  font-size: var(--fz-micro);
+  line-height: 14px;
+  letter-spacing: 0.01em;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    color 150ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.icon-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.tabs { display: flex; gap: var(--s-1); }
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fz-cap);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    color 150ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.tab:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.tab[data-active] {
+  background: var(--bg-selected);
+  border-color: var(--a-600);
+  color: var(--text-1);
+  font-weight: 600;
+}
+
+.tab__n {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--bg-raise);
+  color: var(--text-3);
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.tab[data-active] .tab__n { background: var(--a-600); color: var(--ink-on-accent); }
+
+.tab__n--queue { background: var(--danger-solid); color: var(--white); }
+
+.list__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s-1) 0 var(--s-2);
+}
+
+/* ─────────────────────────────────────────────── строка диалога 68 ─── */
+/*
+ * Шаг строки 72 (карточка 68 + зазор 4). Поля по вертикали сняты почти
+ * целиком: высоту держат сами три строки текста, а не воздух вокруг них.
+ * Цель нажатия при этом 68×304 — вчетверо больше минимума.
+ */
+.row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: calc(100% - 16px);
+  height: 68px;
+  margin: 0 var(--s-2) var(--s-1);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: var(--r-pill);
+  background: transparent;
+}
+
+.row[data-urgency="waiting"]::before { background: var(--warn); }
+
+.row:hover { background: var(--bg-hover); }
+
+/* Выбранная строка: заливка + рамка. Свечение снято — рамка акцентом на
+   заливке уже отличима, а ореол размывал границу соседней строки. */
+.row[data-active] {
+  background: var(--bg-selected);
+  border-color: var(--a-600);
+}
+
+.row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 0 10px;
+}
+
+.ava {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: var(--fz-cap);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row__l1 { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+
+.row__name {
+  flex: 1;
+  font-size: var(--fz-body);
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--text-1);
+}
+
+.row[data-unread] .row__name { font-weight: 600; }
+
+.row__l2 {
+  font-size: var(--fz-micro);
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  color: var(--text-4);
+}
+
+.row__l3 { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+
+.row__prev {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fz-note);
+  line-height: 18px;
+  color: var(--text-3);
+}
+
+.row[data-unread] .row__prev { color: var(--text-2); }
+
+.row__unread {
+  flex: none;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--a-600);
+  color: var(--ink-on-accent);
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─────────────────────────────────────────── янтарная ячейка справа ── */
+
+.gauge {
+  position: relative;
+  flex: none;
+  width: var(--row-time-w);
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--s-2);
+  overflow: hidden;
+  border-radius: 0 var(--s-1) var(--s-1) 0;
+}
+
+.gauge__fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  transform-origin: bottom;
+  background: var(--warn-soft);
+}
+
+.gauge__val {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.gauge[data-level="calm"] .gauge__val {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--warn-text);
+}
+
+.gauge[data-level="warn"] .gauge__val {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--warn-text);
+}
+
+.gauge[data-level="late"] .gauge__fill { background: var(--warn); }
+
+.gauge[data-level="late"] .gauge__val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-warn);
+}
+
+/* ═══════════════════════════════════════════════════ лента (центр) ═══ */
+
+.thread {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.th-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+/* Аватар слева от ОБЕИХ строк, как в исходнике: две строки текста (20 + 2 + 16)
+   встают вровень с ним и не стоят экрану ни одного лишнего пикселя. */
+.th-head__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.th-head__l1 { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+
+.th-head__ava {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: var(--fz-cap);
+  font-weight: 600;
+}
+
+.th-head__name {
+  margin: 0;
+  flex: none;
+  font-size: var(--fz-card);
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.th-head__chips {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  overflow: hidden;
+}
+
+/* Чип шапки: один рост, одно поле, одна форма — до огранки они были трёх
+   разных высот, потому что каждый набирался своим кеглем. */
+.chip {
+  /* Сжимается, а не обрезается контейнером: три чипа всегда видны все три,
+     и при нехватке места длинный укорачивается многоточием сам. До огранки
+     третий чип просто уезжал под край шапки без всякого знака. */
+  flex: 0 1 auto;
+  min-width: 44px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  border-radius: var(--r-pill);
+  background: var(--bg-raise);
+  color: var(--text-3);
+  font-size: var(--fz-micro);
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip b { color: var(--text-2); font-weight: 600; }
+
+.chip--lead { background: var(--info-subtle); color: var(--info-text); }
+.chip--lead b { color: var(--info-text); }
+
+.th-head__right { flex: none; display: flex; align-items: center; gap: var(--s-1); }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  background: var(--a-subtle);
+  color: var(--a-300);
+  font-size: var(--fz-cap);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--a-500);
+}
+
+.pager {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.pager button {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.pager button + button { border-left: 1px solid var(--line); }
+.pager button:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.th-head__l2 {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font-size: var(--fz-cap);
+  line-height: 16px;
+  color: var(--text-4);
+}
+
+.th-head__src { flex: none; font-weight: 500; color: var(--text-3); }
+
+.th-head__ad { flex: 1 1 auto; min-width: 0; }
+
+.th-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s-3) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.msg { display: flex; }
+.msg--in { justify-content: flex-start; }
+.msg--out { justify-content: flex-end; }
+
+.bubble {
+  max-width: 74%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-0);
+}
+
+.msg--in .bubble {
+  background: var(--bubble-in);
+  border: 1px solid var(--bubble-in-line);
+  border-bottom-left-radius: var(--s-1);
+  color: var(--text-1);
+}
+
+.msg--out .bubble {
+  background: var(--bubble-out);
+  border: 1px solid var(--bubble-out);
+  border-bottom-right-radius: var(--s-1);
+  color: var(--bubble-out-text);
+}
+
+.bubble--media { padding: 0; background: none; border: 0; box-shadow: none; }
+
+.bubble__author {
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--bubble-out-meta);
+}
+
+.bubble__text {
+  margin: 0;
+  font-size: var(--fz-body);
+  line-height: 19px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble__meta {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fz-micro);
+  line-height: 12px;
+  color: var(--text-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.msg--out .bubble__meta { color: var(--bubble-out-meta); }
+
+.photo {
+  width: 216px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  display: block;
+  background: var(--bg-raise);
+}
+
+.bubble--media .bubble__meta { padding-top: 3px; color: var(--text-4); }
+
+/* ─────────────────────────────────────────────────────────── композер ─ */
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-2) var(--s-3) 10px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-panel);
+}
+
+.composer__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-2) var(--s-2) 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-field);
+}
+
+.composer__input {
+  min-height: 20px;
+  padding: 0 var(--s-1);
+  font-size: var(--fz-body);
+  line-height: 20px;
+  color: var(--text-4);
+}
+
+.composer__tools { display: flex; align-items: center; gap: var(--s-1); }
+.composer__spacer { flex: 1; }
+
+.composer__tool {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-4);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.composer__tool:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.composer__send {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--a-600);
+  color: var(--ink-on-accent);
+  cursor: pointer;
+}
+
+.composer__send:hover { background: var(--a-500); }
+
+.composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  height: 20px;
+  padding: 0 var(--s-1);
+}
+
+.modes {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background: var(--bg-raise);
+}
+
+.mode {
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-4);
+  font-size: var(--fz-micro);
+  cursor: pointer;
+}
+
+.mode[data-active] {
+  background: var(--bg-panel);
+  color: var(--text-1);
+  font-weight: 500;
+  box-shadow: var(--shadow-0);
+}
+
+/* Подсказка клавиш — самый тихий текст экрана. Рамки вокруг клавиш сняты:
+   восемь мелких рамок в одной строке весили больше, чем сама подсказка. */
+.hint {
+  font-size: var(--fz-micro);
+  line-height: 14px;
+  color: var(--text-5);
+  white-space: nowrap;
+}
+
+.hint b { color: var(--text-4); font-weight: 500; }
+
+/* ═════════════════════════════════════════════ правая колонка (320) ══ */
+
+.cards {
+  width: var(--col-card);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px var(--s-3) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg-panel);
+}
+
+.card__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+
+.card__title svg { color: var(--text-5); flex: none; }
+.card__title .card__count { margin-left: auto; letter-spacing: 0; color: var(--text-5); }
+
+.card__name {
+  font-size: var(--fz-card);
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.tagline {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 18px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--bg-raise);
+  color: var(--text-3);
+  font-size: var(--fz-micro);
+}
+
+.kv { display: flex; align-items: center; gap: 6px; min-width: 0; }
+
+.kv__ghost {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--a-300);
+  font-size: var(--fz-note);
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 1px dashed var(--line-strong);
+  line-height: 18px;
+}
+
+.kv__ghost:hover { color: var(--a-500); border-bottom-color: var(--a-600); }
+
+.kv__id {
+  font-size: var(--fz-cap);
+  line-height: 16px;
+  color: var(--text-4);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  color: var(--info-text);
+  font-size: var(--fz-cap);
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.card__link:hover { text-decoration: underline; }
+
+.card__ad {
+  font-size: var(--fz-note);
+  line-height: 17px;
+  color: var(--text-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.facts {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font-size: var(--fz-cap);
+  line-height: 16px;
+  color: var(--text-4);
+}
+
+.facts b {
+  color: var(--text-1);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.facts span { flex: none; }
+.facts .sep { color: var(--text-5); }
+
+/* Строка «подпись → значение» в «Ходе диалога»: подпись фиксированной
+   ширины, значение тянется. Раньше подписи стояли отдельными строками и
+   карточка была вдвое выше при том же содержимом. */
+.frow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 26px;
+}
+
+.frow__k {
+  flex: none;
+  width: 84px;
+  font-size: var(--fz-cap);
+  color: var(--text-4);
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg-field);
+  color: var(--text-1);
+  font-size: var(--fz-cap);
+  cursor: pointer;
+}
+
+.select svg { flex: none; margin-left: auto; color: var(--text-4); }
+.select:hover { border-color: var(--line-strong); background: var(--bg-hover); }
+
+.select__dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--a-500); }
+
+.frow__val {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fz-cap);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__empty {
+  font-size: var(--fz-cap);
+  line-height: 16px;
+  color: var(--text-5);
+}
+
+.btn-ghost {
+  align-self: flex-start;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fz-cap);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.btn-ghost:hover { background: var(--bg-hover); border-color: var(--line-strong); color: var(--text-1); }
+
+/* ═════════════════════════════════════════════════════════ отчёт ═════ */
+
+.report {
+  width: 1280px;
+  box-sizing: border-box;
+  margin-top: 24px;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg-panel);
+  color: var(--text-2);
+}
+
+.report h2 {
+  margin: 0 0 4px;
+  font-size: var(--fz-card);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.report p.lead { margin: 0 0 16px; font-size: var(--fz-note); color: var(--text-4); }
+
+.report table { width: 100%; border-collapse: collapse; font-size: var(--fz-note); }
+
+.report th {
+  text-align: left;
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fz-micro);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+
+.report td {
+  padding: 7px 12px 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  line-height: 18px;
+}
+
+.report td.n { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-1); }
+
+.report .stop {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-left: 2px solid var(--warn);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: var(--warn-subtle);
+  color: var(--warn-text);
+  font-size: var(--fz-note);
+  line-height: 19px;
+}
+</style>
+
+<div class="frame">
+
+  <!-- ══════════════════════════════ рельса ══════════════════════════ -->
+  <nav class="rail">
+    <div class="rail__mark">LP</div>
+
+    <button class="rail__btn" data-active title="Чаты">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 21l1.9-4.1A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"/></svg>
+    </button>
+    <button class="rail__btn" title="Доска">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>
+    </button>
+    <button class="rail__btn" title="Заявки">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M2.5 12h19"/></svg>
+    </button>
+    <button class="rail__btn" title="Быстрые ответы">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>
+    </button>
+    <button class="rail__btn" title="Статистика">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10M10 19V5M16 19v-6M22 19H2"/></svg>
+    </button>
+    <button class="rail__btn" title="Настройки">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/></svg>
+    </button>
+    <button class="rail__btn" title="Поиск">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="rail__btn" title="Звук">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+    </button>
+    <button class="rail__btn" title="Справка">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2.2-2.5 3.9"/><path d="M12 17.2h.01"/></svg>
+    </button>
+
+    <span class="rail__spacer"></span>
+    <span class="rail__count num">99+</span>
+    <span class="rail__me">ТД</span>
+  </nav>
+
+  <div class="page">
+
+    <!-- ═════════════════════════ колонка списка ═════════════════════ -->
+    <section class="pane list">
+      <header class="list__head">
+        <h1 class="list__title">Чаты</h1>
+
+        <div class="seek">
+          <div class="search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span class="tr" style="flex:1">Поиск: имя, телефон, текст</span>
+            <span class="search__kbd">Ctrl+K</span>
+          </div>
+          <button class="icon-btn" title="Сужения">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5Z"/></svg>
+          </button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab">Входящие <span class="tab__n tab__n--queue num">25</span></button>
+          <button class="tab" data-active>Мои <span class="tab__n num">47</span></button>
+          <button class="tab">Все <span class="tab__n num">12</span></button>
+        </div>
+      </header>
+
+      <div class="list__scroll">
+
+        <button class="row" data-unread data-urgency="waiting">
+          <span class="row__main">
+            <span class="ava">П</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Пользователь</span></span>
+              <span class="row__l2 tr">Анатолий МНЧ</span>
+              <span class="row__l3"><span class="row__prev tr">Доброе утро! Во сколько вы сможете подъехать сегодня?</span></span>
+            </span>
+          </span>
+          <span class="gauge" data-level="late">
+            <span class="gauge__fill"></span>
+            <span class="gauge__val num">1ч</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">П</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Пользователь</span></span>
+              <span class="row__l2 tr">Марк БТ/МНЧ</span>
+              <span class="row__l3">
+                <span class="row__prev tr">2-аяЗаводская 17, телефон для связи тот же</span>
+                <span class="row__unread num">3</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.14)"></span>
+            <span class="gauge__val num">1м</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">М</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Марина</span></span>
+              <span class="row__l2 tr">Новый КП</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Молодёжная18/2</span>
+                <span class="row__unread num">2</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.14)"></span>
+            <span class="gauge__val num">1м</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">Y</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Yan</span></span>
+              <span class="row__l2 tr">Анатолий МНЧ</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Просто что там нужно сделать, я не понял по описанию</span>
+                <span class="row__unread num">3</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.2)"></span>
+            <span class="gauge__val num">2м</span>
+          </span>
+        </button>
+
+        <button class="row">
+          <span class="row__main">
+            <span class="ava">ВА</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Вениамин Архипов</span></span>
+              <span class="row__l2 tr">Никита КП</span>
+              <span class="row__l3"><span class="row__prev tr">ДП Берёзовка 17</span></span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.26)"></span>
+            <span class="gauge__val num">3м</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">ВА</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Вениамин Архипов</span></span>
+              <span class="row__l2 tr">Артур КП</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Мой телефон 8900111 далее по связи уточню</span>
+                <span class="row__unread num">2</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.26)"></span>
+            <span class="gauge__val num">3м</span>
+          </span>
+        </button>
+
+        <button class="row">
+          <span class="row__main">
+            <span class="ava">ГК</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Гоша Кравцов</span></span>
+              <span class="row__l2 tr">Артур КП</span>
+              <span class="row__l3"><span class="row__prev tr">ладно, тогда не надо, я бы сам посмотрел сначала</span></span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.38)"></span>
+            <span class="gauge__val num">5м</span>
+          </span>
+        </button>
+
+        <button class="row" data-active data-unread>
+          <span class="row__main">
+            <span class="ava">ЭК</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Эльвира Ковригина</span></span>
+              <span class="row__l2 tr">Бригада Олега Лаптева КП</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Нам удобней самимподъехать и всё посмотреть на месте</span>
+                <span class="row__unread num">1</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="calm">
+            <span class="gauge__fill" style="transform:scaleY(0.38)"></span>
+            <span class="gauge__val num">5м</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">С</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Серый</span></span>
+              <span class="row__l2 tr">Никита КП</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Сколько по стоимости выйдет с выездом мастера?</span>
+                <span class="row__unread num">3</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="warn">
+            <span class="gauge__fill" style="transform:scaleY(0.46)"></span>
+            <span class="gauge__val num">6м</span>
+          </span>
+        </button>
+
+        <button class="row" data-unread>
+          <span class="row__main">
+            <span class="ava">Б</span>
+            <span class="row__body">
+              <span class="row__l1"><span class="row__name tr">Бусыгина 1006215</span></span>
+              <span class="row__l2 tr">Вячеслав БТ/МНЧ</span>
+              <span class="row__l3">
+                <span class="row__prev tr">Полевая, 26</span>
+                <span class="row__unread num">3</span>
+              </span>
+            </span>
+          </span>
+          <span class="gauge" data-level="warn">
+            <span class="gauge__fill" style="transform:scaleY(0.6)"></span>
+            <span class="gauge__val num">8м</span>
+          </span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ лента ════════════════════════════ -->
+    <section class="pane thread">
+
+      <header class="th-head">
+        <span class="th-head__ava">Т</span>
+        <div class="th-head__info">
+          <div class="th-head__l1">
+            <h2 class="th-head__name">Татьяна</h2>
+            <div class="th-head__chips">
+              <span class="chip chip--lead">партнёр <b class="num">516</b></span>
+              <span class="chip">источник <b>Б6</b></span>
+              <span class="chip">город <b>Воронеж</b></span>
+            </div>
+          </div>
+
+          <div class="th-head__l2">
+            <span class="th-head__src">Бригада Олега Лаптева КП</span>
+            <span class="tr th-head__ad">· Телемастер на дом / Ремонт телевизоров / Все бренды / ЖК LED oled / Выезд в день обращения</span>
+          </div>
+        </div>
+
+        <div class="th-head__right">
+            <span class="status"><span class="status__dot"></span>В работе</span>
+            <span class="pager">
+              <button title="Предыдущий">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+              </button>
+              <button title="Следующий">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+              </button>
+            </span>
+            <button class="icon-btn" style="width:26px;height:26px" title="Ещё">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="th-scroll">
+
+        <div class="msg msg--in">
+          <div class="bubble bubble--media">
+            <svg class="photo" viewBox="0 0 216 150" role="img" aria-label="Фото задней панели телевизора POLAR">
+              <rect width="216" height="150" fill="var(--bg-raise)"/>
+              <rect x="18" y="16" width="180" height="118" rx="4" fill="var(--bg-app)" stroke="var(--line-strong)"/>
+              <rect x="30" y="28" width="156" height="62" rx="2" fill="var(--bg-panel)" stroke="var(--line)"/>
+              <path d="M30 44h156M30 60h156M30 76h156" stroke="var(--line-soft)"/>
+              <rect x="36" y="98" width="46" height="24" rx="2" fill="var(--bg-panel)" stroke="var(--line)"/>
+              <circle cx="47" cy="110" r="4" fill="none" stroke="var(--text-5)"/>
+              <circle cx="60" cy="110" r="4" fill="none" stroke="var(--text-5)"/>
+              <circle cx="73" cy="110" r="4" fill="none" stroke="var(--text-5)"/>
+              <rect x="94" y="102" width="34" height="16" rx="2" fill="none" stroke="var(--text-5)"/>
+              <text x="140" y="115" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1.5" fill="var(--text-4)">POLAR</text>
+            </svg>
+            <span class="bubble__meta"><span class="num">18:48</span></span>
+          </div>
+        </div>
+
+        <div class="msg msg--in">
+          <div class="bubble">
+            <p class="bubble__text">Нет, не Билли просто он выключился, и он работает, все нету подсветки, я фонариком просветила, работает экран, нету подсветки.</p>
+            <span class="bubble__meta"><span class="num">18:49</span></span>
+          </div>
+        </div>
+
+        <div class="msg msg--in">
+          <div class="bubble">
+            <p class="bubble__text">Громкость сесть я могу, клацать каналы, нету подсветки в экране.</p>
+            <span class="bubble__meta"><span class="num">18:49</span></span>
+          </div>
+        </div>
+
+        <div class="msg msg--out">
+          <div class="bubble">
+            <span class="bubble__author">Трошин Данила (Чатер)</span>
+            <p class="bubble__text">Подскажите, куда к вам подъехать (квартира, подъезд, этаж) и ваш номер телефона, запишу вас</p>
+            <span class="bubble__meta">
+              <span class="num">19:15</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="msg msg--in">
+          <div class="bubble">
+            <p class="bubble__text">Вы мне скажите, сколько будет стоить, а то мне тут сказали 10000?</p>
+            <span class="bubble__meta"><span class="num">19:16</span></span>
+          </div>
+        </div>
+
+        <div class="msg msg--out">
+          <div class="bubble">
+            <span class="bubble__author">Трошин Данила (Чатер)</span>
+            <p class="bubble__text">Замена посадатрку у меня идет от 1000 рублей, точнее по запчастям смогу вас на месте сориентировать</p>
+            <span class="bubble__meta">
+              <span class="num">19:26</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="composer">
+        <div class="composer__field">
+          <div class="composer__input">Напишите сообщение…</div>
+          <div class="composer__tools">
+            <button class="composer__tool" title="Быстрые ответы">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>
+            </button>
+            <button class="composer__tool" title="Вложение">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.4 3.4 0 0 1 4.8 4.8L10 18a1.8 1.8 0 0 1-2.5-2.5l7.8-7.8"/></svg>
+            </button>
+            <span class="composer__spacer"></span>
+            <button class="composer__send" title="Отправить">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="composer__footer">
+          <div class="modes">
+            <button class="mode" data-active>Сообщение</button>
+            <button class="mode">Заметка</button>
+          </div>
+          <span class="hint">
+            <b>Enter</b> — отправить · <b>Shift+Enter</b> — перенос · <b>Ctrl+D</b> — закрыть диалог
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ правая колонка ═══════════════════════ -->
+    <aside class="cards">
+
+      <section class="card">
+        <h3 class="card__title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          Клиент
+        </h3>
+        <div class="card__name tr">Татьяна</div>
+        <span class="tagline">Впервые у нас</span>
+        <div class="kv"><button class="kv__ghost">указать телефон</button></div>
+        <div class="kv"><span class="kv__id">ID 381925064</span></div>
+        <a class="card__link" href="#">Открыть профиль на Авито
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </a>
+      </section>
+
+      <section class="card">
+        <h3 class="card__title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>
+          Заявка
+        </h3>
+        <div class="card__ad">Телемастер на дом / Ремонт телевизоров / Все бренды / ЖК LED oled / Выезд в день обращения</div>
+        <div class="facts">
+          <span><b class="num">360 ₽</b></span>
+          <span class="sep">·</span>
+          <span>Воронеж</span>
+          <span class="sep">·</span>
+          <span class="tr num">12:29 у клиента</span>
+        </div>
+        <a class="card__link" href="#">Открыть на Авито
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </a>
+      </section>
+
+      <section class="card">
+        <h3 class="card__title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          Ход диалога
+        </h3>
+        <div class="frow">
+          <span class="frow__k">Статус</span>
+          <button class="select"><span class="select__dot"></span><span class="tr">В работе</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+        <div class="frow">
+          <span class="frow__k">В работе</span>
+          <span class="frow__val">Уже 58 мин</span>
+        </div>
+        <div class="frow">
+          <span class="frow__k">Ответственный</span>
+          <button class="select"><span class="tr">Трошин Данила (Чатер)</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3 class="card__title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12l-4 4H4z"/><path d="M20 16h-4v4"/></svg>
+          Заметки <span class="card__count num">0</span>
+        </h3>
+        <p class="card__empty" style="margin:0">Пока пусто — заметку видят только свои.</p>
+        <button class="btn-ghost">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Добавить
+        </button>
+      </section>
+
+    </aside>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ отчёт ═══════════════════════════════ -->
+<section class="report">
+  <h2>Что именно изменено</h2>
+  <p class="lead">
+    Раскладка, состав и порядок элементов не тронуты. Меняется только качество
+    исполнения и распределение воздуха.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Место</th><th>Было</th><th>Стало</th><th>Зачем</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Строка списка: высота карточки / шаг</td>
+        <td class="n">78 / 84 px</td>
+        <td class="n">68 / 72 px</td>
+        <td>Вертикальные поля сняты, высоту держат три строки текста. Кегль имени тот же — 14 px, аватар остался.</td>
+      </tr>
+      <tr>
+        <td>Строк в 900 px ленты списка</td>
+        <td class="n">10 (840 px)</td>
+        <td class="n">12 (864 px)</td>
+        <td>+2 диалога в поле зрения без прокрутки. Цель нажатия 68×304 px — вчетверо выше минимума.</td>
+      </tr>
+      <tr>
+        <td>Внутри строки: зазор между строками / отступ слева / аватар</td>
+        <td class="n">3 / 12 / 36 px</td>
+        <td class="n">2 / 10 / 34 px</td>
+        <td>Кегли: имя 14, канал 11 (было 12), превью 13. Уменьшен только канал — он опознавательный, а не читаемый.</td>
+      </tr>
+      <tr>
+        <td>Заголовок «Чаты»</td>
+        <td class="n">28 px</td>
+        <td class="n">20 px</td>
+        <td>В колонке 320 px заголовок 28 px спорил с именами клиентов. Шапка списка стала 116 px вместо 148.</td>
+      </tr>
+      <tr>
+        <td>Вкладки: высота / поле / кегль</td>
+        <td class="n">32 / 12 / 13 px</td>
+        <td class="n">26 / 10 / 12 px</td>
+        <td>Ряд из трёх вкладок гарантированно в одну строку при любой длине счётчиков.</td>
+      </tr>
+      <tr>
+        <td>Шапка ленты: высота / поля / межстрочный зазор</td>
+        <td class="n">64 / 8—16 / 8 px</td>
+        <td class="n">56 / 10—12 / 4 px</td>
+        <td>Две строки остались двумя. Вторая строка отбита влево на 38 px — ровно под имя, вышла общая ось.</td>
+      </tr>
+      <tr>
+        <td>Чипы шапки</td>
+        <td>три разные высоты, кегль 12</td>
+        <td class="n">20 px, кегль 11</td>
+        <td>Один рост, одно поле, одна форма; значение внутри чипа набрано весом 600 — читается без цвета.</td>
+      </tr>
+      <tr>
+        <td>Пузырь: поля / зазор внутри / зазор между</td>
+        <td class="n">12—16 / 4 / 8 px</td>
+        <td class="n">8—12 / 3 / 8 px</td>
+        <td>Кегль текста 14 и интерлиньяж 19 не тронуты: читаемость ленты — последнее, что можно ужимать.</td>
+      </tr>
+      <tr>
+        <td>Композер: поле / строка подсказок</td>
+        <td class="n">56 / 32 px</td>
+        <td class="n">50 / 22 px</td>
+        <td>Подсказка была почти вровень с полем ввода. Рамки вокруг клавиш сняты — восемь мелких рамок весили больше самой подсказки.</td>
+      </tr>
+      <tr>
+        <td>Правая колонка: зазор между карточками</td>
+        <td class="n">12 px</td>
+        <td class="n">8 px</td>
+        <td>Карточек по-прежнему четыре, и каждая со своей рамкой. Границу между ними держит рамка, а не пустота.</td>
+      </tr>
+      <tr>
+        <td>Карточка: поля / зазор строк</td>
+        <td class="n">16 / 8 px</td>
+        <td class="n">10—12 / 6 px</td>
+        <td>Ни одна строка не убрана и не слита с соседней.</td>
+      </tr>
+      <tr>
+        <td>«Ход диалога»: три строки</td>
+        <td>подпись над значением, ~168 px</td>
+        <td>подпись слева, ~110 px</td>
+        <td>Подпись 84 px фиксированной ширины даёт левую ось; значения выровнены между собой.</td>
+      </tr>
+      <tr>
+        <td>Заголовки карточек</td>
+        <td class="n">12 px, обычный регистр</td>
+        <td class="n">11 px, капитель, трекинг 0.06em</td>
+        <td>Название карточки перестаёт спорить с её содержимым и сразу отличается от него по фактуре.</td>
+      </tr>
+      <tr>
+        <td>Радиусы</td>
+        <td class="n">6 / 8 / 12 / 16 / 20</td>
+        <td class="n">6 / 8 / 12 / 14 + pill</td>
+        <td>Панель и карточка теперь на одной ступени (14), строка и поле — на одной (12).</td>
+      </tr>
+      <tr>
+        <td>Рамки</td>
+        <td>одна линия везде</td>
+        <td>две: внешняя и внутренняя</td>
+        <td>Разделители внутри панели тише её собственной рамки — панель читается целиком, а не как решётка.</td>
+      </tr>
+      <tr>
+        <td>Выбранная строка</td>
+        <td>заливка + рамка + ореол</td>
+        <td>заливка + рамка</td>
+        <td>Ореол размывал границу соседней строки. Активный раздел рельсы помечен полосой 2 px у края, а не рамкой вокруг кнопки.</td>
+      </tr>
+      <tr>
+        <td>Числа</td>
+        <td>пропорциональные цифры</td>
+        <td>tabular-nums везде</td>
+        <td>Счётчики, время ожидания, ID, цена и часы не дёргаются при обновлении.</td>
+      </tr>
+      <tr>
+        <td>Длинные значения</td>
+        <td>ручные многоточия в тексте</td>
+        <td>обрезка средствами CSS</td>
+        <td>Превью, название объявления, имя ответственного: в разметке лежит строка целиком.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="stop">
+    Где я остановился. Строка списка — 68 px: ниже 64 три её строки начинают
+    слипаться, а превью, по которому диалог и узнают не открывая, перестаёт
+    читаться боковым зрением. Кегль превью оставлен 13 px, кегль имени 14 px,
+    интерлиньяж пузырей 19 px — эти три величины не уменьшались вовсе. Зазор
+    между карточками справа не опущен ниже 8 px: при 4 px две соседние рамки
+    сливаются в одну двойную линию. Никакая цель нажатия не стала меньше 26 px
+    по высоте.
+  </p>
+</section>

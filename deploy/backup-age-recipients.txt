@@ -1,0 +1,3 @@
+# Публичный ключ age для офсайт-копий (backup.sh). Расшифровать копию можно
+# только секретной половиной ключа — где она хранится, см. RUNBOOK-DEPLOY §10.2.
+age15ln8rcu7rv2t3mx7nqk6024l0wjq5yudjhzgp5nwje36w3zacc4s8v0k7t

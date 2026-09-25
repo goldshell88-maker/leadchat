@@ -1,0 +1,93 @@
+# ============================================================================
+# LeadChat — cron пользователя деплоя (docs/05-DEPLOY-OPS.md, Приложение А).
+#
+# Установка:
+#   crontab /srv/leadchat/deploy/crontab.leadchat
+# Проверка:
+#   crontab -l
+#
+# ВРЕМЯ: на сервере TZ=Europe/Moscow, cron считает по МСК.
+# 03:30 МСК = 00:30 UTC — именно так строка ночного прогона выглядит в
+# /var/log/leadchat-backup.log (скрипты печатают время в UTC).
+#
+# ПЕРЕМЕННЫЕ: DEPLOY_DIR / COMPOSE_FILE / RCLONE_REMOTE заданы здесь и имеют
+# приоритет над .env (см. шапку backup.sh). RCLONE_REMOTE указан явно, потому
+# что бакет Timeweb S3 называется UUID-ом, а не человеческим именем, — правка
+# операционной настройки не должна требовать редактирования файла с секретами.
+# ============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+DEPLOY_DIR=/srv/leadchat
+COMPOSE_FILE=/srv/leadchat/docker-compose.prod.yml:/srv/leadchat/docker-compose.override.yml
+RCLONE_REMOTE=offsite:afbac24b-221c-44f1-bd88-6df6fd6c65ba
+
+# ежедневный бэкап БД + офсайт media (05 §6.2)
+30 3 * * *  /srv/leadchat/deploy/backup.sh >> /var/log/leadchat-backup.log 2>&1  # leadchat-backup
+
+# вторая копия в другую страну — через 15 минут после ночного бэкапа (05 §6.3).
+#
+# ЭТА СТРОКА СТОЯЛА ТОЛЬКО НА СЕРВЕРЕ, ДОБАВЛЕННАЯ РУКАМИ. А установка crontab
+# делается по инструкции из шапки — `crontab /srv/leadchat/deploy/crontab.leadchat`,
+# то есть ПОЛНОЙ ЗАМЕНОЙ таблицы. Первая же переустановка (переезд, чистка,
+# правка соседней строки) стирала офсайт-копию из расписания начисто: cron
+# перестаёт запускать push-offsite.sh, ошибки нет, лог пуст, backup.sh
+# по-прежнему рапортует «backup OK». Узнать об этом можно было бы в тот
+# единственный день, когда вторая копия и понадобится.
+#
+# Ровно так уже терялся сам скрипт (см. его шапку) — теряется не файл, а всё,
+# что живёт только на сервере.
+#
+# BACKUP_DIR задан в строке, а не выше: у остальных заданий каталог копий свой
+# (backup.sh берёт его из .env), и общая переменная переучила бы их молча.
+45 3 * * *  BACKUP_DIR=/var/leadchat/backups /bin/bash /srv/leadchat/deploy/push-offsite.sh >> /var/log/leadchat-backup.log 2>&1  # leadchat-offsite
+
+# ежемесячная проверка восстановления — 5-го числа (05 §6.3)
+0 6 5 * *   /srv/leadchat/deploy/backup-verify.sh >> /var/log/leadchat-backup.log 2>&1  # leadchat-backup-verify
+
+# минимальный мониторинг вместо Uptime-Kuma, пока её негде поднять (05 §7.2):
+# health + health/deep + срок сертификата + диск + свежесть дампа.
+# Находки уходят в центр уведомлений внутри системы (INTERNAL_SERVICE_TOKEN);
+# внешних каналов у системы нет по решению заказчика — docs/23.
+*/5 * * * * /srv/leadchat/deploy/healthcheck-alert.sh >> /var/log/leadchat-health.log 2>&1  # leadchat-health
+
+# --- ВТОРОЙ СЕРВЕР (Нидерланды, 14 §5) --------------------------------------
+# Эта строка ставится НЕ ЗДЕСЬ, а в crontab второго сервера — иначе она
+# бессмысленна: проверка «отвечает ли система снаружи» с того же сервера не
+# переживает его падения (о смерти VPS некому будет написать).
+# На втором сервере нужны только скрипт и .env с тремя строками:
+#   HEALTHCHECK_BASE_URL=https://chat.partner-lead-centre.ru
+#                                                     переживает смерть сервера
+#   INTERNAL_SERVICE_TOKEN=... / INTERNAL_NOTIFY_URL=...  ← необязательно; путь
+#     /api/v1/internal/ на публичный edge не выпущен (nginx отдаёт 404), так что
+#     до центра уведомлений отсюда достают только через туннель.
+# EXTERNAL_MONITOR=1 — то, что превращает наблюдателя во внешнего: только с ним
+# скрипт вправе сообщать вид `system.unreachable`.
+# */5 * * * * EXTERNAL_MONITOR=1 DEPLOY_DIR=/srv/leadchat-watch /srv/leadchat-watch/healthcheck-alert.sh >> /var/log/leadchat-health.log 2>&1  # leadchat-health-external
+
+# чистка осиротевших вложений, еженедельно по понедельникам.
+# Брошенные вложения и старые выгрузки статистики убирает планировщик
+# (app/scheduler/jobs/stats.py: cleanup_media_orphans, cleanup_exports), а не cron.
+
+# снимок журналов контейнеров на диск хоста, КАЖДЫЙ ЧАС.
+#
+# ЗАЧЕМ ОТДЕЛЬНО ОТ ВЫКАТКИ. Тот же скрипт зовёт ship.sh шагом 4б — перед
+# пересозданием контейнеров, иначе журнал этого дня уходит вместе с ними. Но в
+# дни без выкатки страховки не было бы никакой: кольцевой буфер json-file с
+# ростом потока держит api около 25 ч, nginx около 21 ч (замер 24.09: 217 и
+# 208 МБ строк в сутки на 300 МБ буфера). Раз в сутки мало: у nginx оставалась
+# бы дыра в несколько часов. 21.09–24.09 строки на сервере не было вовсе, и
+# около двух суток журналов пропало.
+# Снимок инкрементный (отметка времени на сервис), так что второй запуск в
+# те же сутки ничего не дублирует, а `flock` внутри разводит совпадение с
+# выкаткой.
+#
+# ⚠ КАТАЛОГ /var/leadchat/logs ЗАВОДИТСЯ ОДИН РАЗ РУКАМИ (RUNBOOK-DEPLOY §4.7):
+#     sudo mkdir -p /var/leadchat/logs && sudo chown leadchat:leadchat /var/leadchat/logs
+# Без него скрипт печатает «!!» с этой же командой и выходит с кодом 0 —
+# ни cron, ни выкатка от этого не падают, но журналы не снимаются.
+7 * * * *   /bin/bash /srv/leadchat/deploy/archive-logs.sh >> /var/log/leadchat-backup.log 2>&1  # leadchat-logs-archive
+
+# ротация логов самих скриптов (чтобы не росли бесконечно)
+0 4 1 * *   find /var/log -maxdepth 1 -name 'leadchat-*.log' -size +50M -exec truncate -s 0 {} \;  # leadchat-logs

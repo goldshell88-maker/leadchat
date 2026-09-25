@@ -1,0 +1,1339 @@
+/*
+ * ПРАВАЯ КОЛОНКА — карточка клиента (docs/16-DESIGN-SYSTEM-2026.md §4.6).
+ *
+ * Не сплошная панель, а СТОПКА отдельных карточек (бриф, и так же на макете).
+ * Причина не только вкусовая: колонка собрана из блоков разной природы —
+ * «Клиент», «Заявка», «Ход диалога», — и разделительной линии между ними мало.
+ * Оператор ищет здесь один факт («телефон», «кто ответственный»), а не читает
+ * подряд; отдельные карточки дают глазу цель, на которой он останавливается.
+ *
+ * КАРТОЧЕК РОВНО ТРИ, И ЧЕТВЁРТОЙ БЫТЬ НЕ ДОЛЖНО (правка 10). Заметки и
+ * история клиента отделяются внутри своего блока чертой, а не новой карточкой:
+ * каждая лишняя карточка выталкивает телефон под сгиб экрана.
+ *
+ * Сама колонка при этом прозрачная — фон показывает страницу, как зазор
+ * между остальными колонками.
+ */
+
+.client-card {
+  display: flex;
+  flex-direction: column;
+  /*
+   * ЗАЗОР МЕЖДУ КАРТОЧКАМИ РАВЕН ИХ ВНУТРЕННЕМУ ПОЛЮ (огранка 08.09): 12 → 16.
+   * Воздух в колонке был двух разных сортов — 12 снаружи карточки и 16 внутри,
+   * — и на глаз это читалось как «карточки прижаты друг к другу теснее, чем их
+   * собственное содержимое к их краю».
+   */
+  gap: var(--lc-space-4);
+  /*
+   * ⚠ БОКОВОГО ПОЛЯ У КОЛОНКИ БОЛЬШЕ НЕТ: 4 → 0 (замер в браузере 08.09).
+   *
+   * Прежняя редакция держала здесь 4px «под полосу прокрутки справа и ради
+   * симметрии слева». Полоса в macOS наложенная, места не занимает, а эти 4px
+   * складывались с полем карточки 16 и её рамкой 1: заголовки «Клиент»,
+   * «Заявка», «Ход диалога» стояли на 21px от края колонки, тогда как имя в
+   * шапке ленты и композер — на 17. Замер до правки: 21 / 21 / 21, после: 17.
+   *
+   * Довод про «прижатые к краю блоки» отсюда не пропал, он просто выполняется
+   * не здесь: у карточки есть собственное поле 16, и без наших четырёх пикселей
+   * содержимое к краю колонки не подходит.
+   */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.client-card--empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* 24 → 16: то же поле, что у заполненной колонки (у неё оно приходит
+     от самой карточки), — пустая карточка встаёт на общую вертикаль 17. */
+  padding: var(--lc-space-4);
+}
+
+/*
+ * ПУСТОЕ СОСТОЯНИЕ — ТОЖЕ КАРТОЧКА, ПРОСТО ОДНА.
+ *
+ * Найдено проверкой боя 14 августа: без диалога справа висел голый текст без
+ * фона и рамки, тогда как обе соседние колонки — панели. Колонка выглядела не
+ * пустой, а недорисованной.
+ *
+ * Прозрачность самой колонки при этом не отменяется (см. шапку файла): фон
+ * получает не она, а карточка внутри неё. Довод «карточек ровно три» тоже не
+ * задет — он про заполненную колонку, а здесь их всего одна.
+ */
+.client-card__empty-card {
+  align-self: stretch;
+  align-items: center;
+  text-align: center;
+}
+
+/* Оверлей на узких экранах: кнопка «Клиент» в шапке ленты (03 §8.2). */
+.client-card--overlay {
+  position: fixed;
+  top: var(--lc-header-h);
+  right: 0;
+  bottom: 0;
+  width: var(--lc-col-card);
+  z-index: var(--lc-z-overlay);
+  padding: var(--lc-space-4);
+  background: var(--lc-bg-1);
+  border-left: 1px solid var(--lc-border);
+  box-shadow: var(--lc-shadow-3);
+}
+
+@media (max-width: 767px) {
+  /*
+   * На телефоне карточка занимает всё, кроме левой панели навигации.
+   *
+   * `width: 100%` здесь не работает: панель рисуется ПОВЕРХ (её z-index выше),
+   * и первые 56px карточки уходили под неё — имя клиента и телефон были
+   * обрезаны слева. Отступаем от панели явно, а ширину считает браузер.
+   */
+  .client-card--overlay {
+    left: var(--lc-rail-w);
+    width: auto;
+  }
+}
+
+/* ──────────────────────────────────────────── карточка-секция ───────── */
+
+/* Поверхность, рамка и радиус — у `.lc-card` (ClientCardPane.tsx надевает
+   его вместе с этим классом); тени у карточек больше нет — довод там же. */
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-4);
+}
+
+/*
+ * ЗАГОЛОВОК КАРТОЧКИ — ПОДПИСЬ БЛОКА, А НЕ ЗАГОЛОВОК В НЁМ (огранка 08.09).
+ *
+ * Вес 600 стоял разом у подписи блока и у того, ради чего блок открывают, —
+ * имени клиента и телефона. Полужирных в колонке было четыре подписи плюс два
+ * значения; после правки 600 остался только у значений, а подпись отличает от
+ * содержимого цвет (`--lc-text-3`) и разрядка. Кегль не тронут: 12px.
+ */
+.card-section__title {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  margin: 0;
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-medium);
+  letter-spacing: 0.04em;
+  color: var(--lc-text-3);
+}
+
+/*
+ * Иконка заголовка — метка блока, а не его содержимое, и не должна
+ * перетягивать взгляд на себя. Приглушение при этом делалось чернилами
+ * ВЫКЛЮЧЕННОГО состояния, а они на то и выключенные: `--lc-text-disabled`
+ * на поверхности карточки давал 2.65:1 в тёмной теме и 2.56:1 в светлой при
+ * норме 3:1 для графики (SC 1.4.11) — значок был ниже нормы в обеих темах
+ * сразу. `--lc-text-3` — те же чернила, что у самой подписи: 5.88 и 7.58.
+ * Тише подписи значок больше не будет, и это правильно: ниже нормы «тише»
+ * не бывает, бывает «не видно».
+ */
+.card-section__title svg {
+  color: var(--lc-text-3);
+  flex: none;
+}
+
+/* Заголовок первой карточки крупнее: это имя клиента, и оно — точка входа
+   во всю колонку. */
+.card-section--client .card-section__name {
+  font-size: var(--lc-fz-card);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+}
+
+/* ──────────────────────────────────────────────── контакты ──────────── */
+
+.card-phone {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  flex-wrap: wrap;
+  border-radius: var(--lc-radius-sm);
+  padding: var(--lc-space-1) var(--lc-space-2);
+  margin: 0 calc(-1 * var(--lc-space-2));
+  transition: background-color var(--lc-dur-base) var(--lc-ease);
+}
+
+/* Телефон появился в диалоге — подсветка на 2 с (11 §2.4). */
+.card-phone[data-hot="true"] {
+  background: var(--lc-primary-subtle);
+}
+
+.card-phone__value {
+  /*
+   * ⚠ ЧИСЛО, РАДИ КОТОРОГО КОЛОНКУ И ОТКРЫВАЮТ (05.09).
+   *
+   * Номер набирался `--lc-fz-body` — тем же кеглем, что «Ответственный»,
+   * «Объявление» и любая другая строка карточки. Между тем ищут здесь именно
+   * его: телефон сверяют глазами и диктуют вслух, и ради него же заведены и
+   * подсветка появления (`data-hot`), и кнопка копирования рядом, и разбор
+   * номера из переписки. Показатель обязан отличаться от подписи, иначе
+   * колонку приходится ЧИТАТЬ вместо того, чтобы взглянуть.
+   *
+   * Ступень вверх, до заголовка карточки, — та же, что у имени клиента этажом
+   * выше. Подпись «из переписки» рядом остаётся мелкой (`--lc-fz-caption`):
+   * крупное число и тихая подпись под ним — это и есть пара, а не два текста
+   * одного веса. В колонку помещается с запасом: 340 − 32 поля = 308, номер
+   * при 16px ~150, кнопка 26, подпись ~78 плюс зазоры — 270.
+   */
+  font-size: var(--lc-fz-card);
+  font-weight: var(--lc-fw-semibold);
+  color: var(--lc-text-1);
+  text-decoration: none;
+  font-variant-numeric: var(--lc-num);
+  /* С 11 августа номер показывается по группам — «+7 912 555-01-77», — и
+     пробелы в нём стали точками возможного переноса. Строка живёт во flex с
+     `flex-wrap`, ширина колонки 340 на типовом ноутбуке, и телефон, разорванный
+     на «+7 912 555-» / «01-77», хуже слипшихся цифр: его сверяют глазами и
+     диктуют вслух. Тот же класс носит «ID …» — его рвать тоже незачем. */
+  white-space: nowrap;
+}
+
+.card-phone__value:hover {
+  color: var(--lc-link);
+}
+
+.card-phone__copy {
+  display: grid;
+  place-items: center;
+  /* Зона нажатия 32 × 32 при значке 14 (аудит 15.09: было 26). */
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  color: var(--lc-text-3);
+  transition:
+    background-color var(--lc-dur-fast) var(--lc-ease),
+    color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.card-phone__copy:hover {
+  background: var(--lc-surface-hover);
+  color: var(--lc-text-1);
+}
+
+.card-phone__source {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+/* ─────────────────── телефон: ввод руками (правка 9) ────────────────── */
+
+/*
+ * Ссылка «указать телефон» стоит РОВНО ТАМ, где стоял бы номер, и занимает
+ * столько же по высоте: иначе карточка дёргается на глазах в момент
+ * сохранения — а сохраняют её, глядя на клиента и слушая его голос.
+ */
+.card-phone-add {
+  align-self: flex-start;
+  margin: 0 calc(-1 * var(--lc-space-2));
+}
+
+.card-phone-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.card-phone-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--lc-space-2);
+}
+
+/* ─────────────────────────── имя клиента, правка ────────────────────── */
+
+/* Имя и кнопка «изменить» в одну строку. `min-width: 0` у имени обязателен:
+   без него длинное имя встаёт на min-content и выдавливает кнопку за край блока.
+   ⚠ НО ОТ ОБРЕЗКИ КНОПКИ ОН НЕ СПАСАЕТ, а помогает ей: дележ места становится
+   пропорциональным, и кнопке достаётся меньше нужного. Пол ей задан отдельно —
+   см. `.card-name > button` ниже. Прежняя редакция этого комментария обещала
+   обратное, и обещание было неверным. */
+.card-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lc-space-2);
+}
+
+.card-name .card-section__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * ИМЯ КЛИЕНТА — САМО СЕБЕ КНОПКА (28.08, просьба владельца: «изменять имя без
+ * кнопки изменить, а просто наводя на поле имени»).
+ *
+ * Кнопка снаружи не выглядит кнопкой и не должна: в покое это обычное имя.
+ * Наведение поднимает подложку и проявляет карандаш — этого достаточно, чтобы
+ * понять, что сюда можно нажать, и недостаточно, чтобы имя выглядело полем
+ * ввода (пустой инпут в карточке просит, чтобы в него что-то ввели, и ловит
+ * случайные нажатия при прокрутке — ровно поэтому здесь и была ссылка).
+ */
+.card-name__trigger {
+  display: inline-flex;
+  align-items: center;
+  /* min-width: 0 — иначе длинное имя распирает строку вместо переноса. */
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  /* 6px — шага с таким числом в шкале нет; 8 есть, и подложка наведения от
+     этого только точнее совпадает с соседними. По вертикали 2 — тот же
+     `--lc-space-0`, что у пилюль: выше подложка налезала бы на строку. */
+  padding: var(--lc-space-0) var(--lc-space-2);
+  /* Отрицательный отступ гасит внутренний: в покое имя стоит там же, где стояло
+     обычным текстом, и переезда при появлении кнопки не видно. */
+  margin-inline-start: calc(-1 * var(--lc-space-2));
+  border: 0;
+  border-radius: var(--lc-radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: text; /* правим текст, а не «нажимаем действие» */
+}
+
+.card-name__trigger:hover {
+  background: var(--lc-bg-2);
+}
+
+.card-name__trigger:focus-visible {
+  outline: 2px solid var(--lc-accent);
+  outline-offset: 1px;
+}
+
+/*
+ * КНОПКА «ИЗМЕНИТЬ» НЕ СЖИМАЕТСЯ. ЧЕТВЁРТОЕ МЕСТО ТОГО ЖЕ ДЕФЕКТА.
+ *
+ * Механизм разобран целиком у `.card-merge__row .lc-btn` ниже: у Mantine-кнопки
+ * умолчание `flex: 0 1 auto`, на её корне `overflow: hidden` снимает
+ * автоматический минимальный размер, а подпись внутри рубится без многоточия.
+ * Место отбирает сосед: `min-width: 0` у имени (правило выше) делает дележ
+ * пропорциональным, поэтому при длинном имени кнопке достаётся меньше, чем ей
+ * нужно, и «изменить» обрывается посреди буквы.
+ *
+ * ⚠ КОММЕНТАРИЙ НАД `.card-name` УТВЕРЖДАЛ ОБРАТНОЕ — будто `min-width: 0`
+ * кнопку защищает. Он её как раз подставляет: без него имя встало бы на
+ * min-content и выдавило кнопку ещё сильнее, но и с ним она сжимается. Снять
+ * `min-width` нельзя, поэтому пол задаётся кнопке напрямую.
+ *
+ * Кнопка здесь без класса `.lc-btn` (ClientNameField.tsx), поэтому селектор по
+ * элементу, а не по классу, как у соседей.
+ */
+.card-name > button {
+  flex: none;
+}
+
+.card-name-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+/* ───────────────── идентификатор Авито мелким шрифтом ───────────────── */
+
+/*
+ * Отдельного блока «Клиент на Авито» больше нет (правка 9): он повторял имя и
+ * сообщал об отсутствии данных, занимая столько же места, сколько личность
+ * клиента. Здесь — три строки мелким шрифтом под именем и телефоном.
+ *
+ * РИТМ (огранка 08.09): внутри одной смысловой строки — 4, и только 4. Было 2
+ * (шаг мимо всех четырёх уровней колонки) плюс собственный `margin-top: 4`,
+ * который складывался с зазором карточки 8 и давал 12 — а 12 в колонке отдан
+ * разделителю. Отступ снят: между строками карточки везде 8.
+ */
+.card-avito-id {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+.card-idline {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+.card-idline__value {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+  font-variant-numeric: var(--lc-num);
+  /* Идентификатор сверяют глазами и диктуют поддержке Авито — рвать его
+     переносом нельзя ровно по той же причине, что и телефон. */
+  white-space: nowrap;
+}
+
+/* «ещё 2» — идентификаторы объединённых карточек по кнопке (аудит 15.09). */
+.card-idline--extra {
+  flex-wrap: wrap;
+}
+.card-idline__more {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-link);
+  cursor: pointer;
+}
+.card-idline__more:hover {
+  text-decoration: underline;
+}
+.card-idline__list {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+.card-idline__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+/*
+ * Значок «почему тут нет ссылки на профиль» (правка 10). Объяснение висело
+ * отдельной строкой у КАЖДОГО диалога — техническое оправдание на постоянном
+ * показе; спрашивают о нём раз в жизни. Текст целиком ушёл в `title` и
+ * `aria-label`.
+ *
+ * `cursor: help` — единственный признак того, что на значке есть что читать:
+ * подсказка появляется только под мышью, и без смены курсора её не найдут.
+ */
+.card-idline__hint {
+  display: inline-flex;
+  align-items: center;
+  /* Те же 2.65:1 / 2.56:1, что у значков заголовков, и та же починка —
+     `--lc-text-3` (5.88 и 7.58). Значок, который нужно найти мышью, обязан
+     быть хотя бы виден. */
+  color: var(--lc-text-3);
+  cursor: help;
+}
+
+/* ───────── распознанный в переписке номер: вопрос, а не запись ───────── */
+
+.card-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+/*
+ * Рамка пунктиром — та же, что у подсказки объединения, и это не экономия
+ * стилей: обе говорят «здесь вопрос к вам», в отличие от залитых строк, которые
+ * сообщают о свершившемся. Одинаковый вопрос обязан выглядеть одинаково, иначе
+ * его учатся узнавать дважды.
+ */
+.card-candidate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-2);
+  border-radius: var(--lc-radius-sm);
+  border: 1px dashed var(--lc-border);
+}
+
+.card-candidate__phone {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  color: var(--lc-text-1);
+}
+
+/*
+ * Фраза клиента целиком.
+ *
+ * `pre-wrap` — переносы строк человек ставил сам, и склеенный в абзац адрес с
+ * номером читается хуже написанного. `anywhere` — в сообщении бывает ссылка или
+ * слипшиеся цифры длиннее колонки, и без переноса они растянули бы карточку.
+ * Высота ограничена и прокручивается: обрезать текст многоточием здесь нельзя —
+ * ради этого текста блок и заведён.
+ */
+.card-candidate__quote {
+  margin: 0;
+  padding: var(--lc-space-1) var(--lc-space-2);
+  border-left: 2px solid var(--lc-border);
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-bg-2);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 9em;
+  overflow-y: auto;
+}
+
+.card-candidate__links,
+.card-candidate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lc-space-2);
+}
+
+/* Кнопки решения — отдельной строкой и с воздухом сверху: нажимают их один
+   раз и насовсем, и промах мышью здесь стоит чужого телефона в карточке. */
+.card-candidate__actions {
+  margin-top: var(--lc-space-1);
+}
+
+/* ──────────────── объединение карточек клиента (правка 9) ───────────── */
+
+.card-merge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.card-merge__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-2);
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-bg-2);
+}
+
+/* Подсказка «возможно, это тот же человек» — с рамкой, а не заливкой:
+   она предлагает действие, а строка выше сообщает о свершившемся, и путать
+   их нельзя. */
+.card-merge__row[data-hint="true"] {
+  background: transparent;
+  border: 1px dashed var(--lc-border);
+}
+
+.card-merge__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+  min-width: 0;
+}
+
+/*
+ * КНОПКИ ЭТОЙ ПАНЕЛИ НЕ СЖИМАЮТСЯ. ТРЕТЬЕ МЕСТО ТОГО ЖЕ ДЕФЕКТА В ПРОЕКТЕ.
+ *
+ * Что видно на экране: подпись «Разъединить» обрублена посреди буквы. Почему —
+ * три звена, каждое само по себе безобидно:
+ *
+ *   1) у Mantine-кнопки нет своего `flex`, и `.lc-btn` его тоже не задаёт, —
+ *      значит действует умолчание `flex: 0 1 auto`, кнопка сжимаема;
+ *   2) на корне кнопки стоит `overflow: hidden` (Mantine), а это ПО СПЕЦИФИКАЦИИ
+ *      снимает автоматический минимальный размер флекс-элемента: пол становится
+ *      нулём, и ужиматься кнопка может сколько угодно;
+ *   3) подпись внутри — `white-space: nowrap; overflow: hidden` БЕЗ
+ *      `text-overflow: ellipsis`, поэтому лишнее не переносится и не даёт «…»,
+ *      а просто рубится.
+ *
+ * Место отбирает сосед: у `.card-merge__text` стоит `min-width: 0` (и снять его
+ * нельзя — иначе длинный текст встанет на min-content и выдавит кнопку сильнее),
+ * поэтому дефицит делится ПРОПОРЦИОНАЛЬНО, а не «сначала жмём то, что
+ * переносится». В колонке 380px под строку остаётся ~320px, кнопке нужно ~111px,
+ * тексту по max-content ~340px — кнопке достаётся ~78px из нужных 111.
+ *
+ * Вбок обрезанное не уезжает: `.client-card` выше — `overflow-x: hidden`.
+ *
+ * Правило то же, что уже стоит в шапке ленты (chat-thread.css) и у панели
+ * действий (thread-actions.css). Лечим ОБЕ кнопки панели: у «Объединить» тот же
+ * механизм, просто сосед короче и обрезка не так заметна.
+ */
+.card-merge__row .lc-btn {
+  flex: none;
+}
+
+/* ─────────────── история клиента внутри блока «Клиент» ──────────────── */
+
+/*
+ * РАЗДЕЛИТЕЛЬ СИММЕТРИЧЕН (огранка 08.09): было 12 сверху и 8 снизу.
+ *
+ * Двенадцать сверху набирались из зазора карточки 8 плюс собственные 4 —
+ * снизу же стояли голые 8, и черта сидела не посередине своего воздуха.
+ * Замер в браузере до правки: 12 / 8, после: 12 / 12. Собственный отступ 4
+ * оставлен именно потому, что зазор родителя отменить нельзя: 8 + 4 = 12.
+ */
+.card-client-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  margin-top: var(--lc-space-1);
+  padding-top: var(--lc-space-3);
+  border-top: 1px solid var(--lc-border);
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-1);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-link);
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+/* ──────────────────────────────────────────────────── теги ──────────── */
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lc-space-2);
+}
+
+.card-tag {
+  /* ⚠ НЕ `height`, А `min-height` (разбор дизайна 28.08).
+     Переноса тексту никто не запрещал, а жёсткая высота его не удерживает:
+     длинная метка («Требуется выезд оценщика») уходила на вторую строку, а
+     таблетка оставалась в 24px — текст вылезал за скруглённый фон и налезал на
+     соседний ряд меток. Короткая метка не меняется: 18px текста плюс 4px
+     отступа — это 22px, ниже прежних 24. */
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--lc-space-0) var(--lc-space-3);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-bg-2);
+  color: var(--lc-text-2);
+  font-size: var(--lc-fz-caption);
+  font-weight: var(--lc-fw-medium);
+}
+
+.card-tag[data-danger="true"] {
+  background: var(--lc-danger-subtle);
+  color: var(--lc-danger-text);
+  border-color: var(--lc-danger);
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+/* ───────────────────────────────────────── история — таймлайн ───────── */
+/*
+ * Вертикальная линия с точками. Линия рисуется на контейнере, а не на каждой
+ * строке: иначе между строками остаются разрывы, и «лента событий» читается
+ * как несколько независимых списков.
+ */
+
+.card-history {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--lc-space-4);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 12 → 8: события — это строки списка, а 12 в колонке отдан разделителю.
+     Линия таймлайна между ними не рвётся, она рисуется на контейнере. */
+  gap: var(--lc-space-2);
+}
+
+.card-history::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--lc-border);
+}
+
+.card-history__row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-1) var(--lc-space-2);
+  margin-left: calc(-1 * var(--lc-space-2));
+  border: none;
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+/* Точка события. Обводка цветом карточки «прорезает» линию таймлайна —
+   без неё точка выглядит бусиной, надетой на нитку. */
+.card-history__row::before {
+  content: "";
+  position: absolute;
+  left: calc(
+    -1 * var(--lc-space-2) + 1px
+  ); /* центр точки — ровно на линии (28.08) */
+  top: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-primary);
+  box-shadow: 0 0 0 3px var(--lc-surface);
+}
+
+.card-history__row:hover {
+  background: var(--lc-surface-hover);
+}
+
+.card-history__title {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-1);
+  /* Одна строка: полное название — в title (аудит 15.09). */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-history__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 var(--lc-space-1);
+  font-size: var(--lc-fz-micro);
+  color: var(--lc-text-3);
+}
+
+.card-history__head {
+  font-size: var(--lc-fz-micro);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--lc-text-3);
+}
+
+/* Статус обращения — чип с формой и цветом; словарь тот же, что у списка. */
+.card-history__status {
+  display: inline-block;
+  padding: 0 var(--lc-space-1);
+  border-radius: var(--lc-radius-pill);
+  font-size: var(--lc-fz-micro);
+  line-height: 16px;
+  background: var(--lc-status-closed-bg);
+  color: var(--lc-status-closed-text);
+}
+.card-history__status[data-status="in_progress"] {
+  background: var(--lc-status-inprogress-bg);
+  color: var(--lc-status-inprogress-text);
+}
+.card-history__status[data-status="new"] {
+  background: var(--lc-status-new-bg);
+  color: var(--lc-status-new-text);
+}
+.card-history__status[data-status="waiting"],
+.card-history__status[data-status="snoozed"] {
+  background: var(--lc-status-waiting-bg);
+  color: var(--lc-status-waiting-text);
+}
+
+/* ─────────────────────────────────────────────────── заметки ────────── */
+
+/*
+ * ЗАМЕТКИ — СТРОКА ВНУТРИ «ХОДА ДИАЛОГА» (правка 10). Правка 9 свернула их в
+ * одну строку, но оставила отдельной карточкой: «Заметки (0)» держали
+ * собственную рамку, тень и поля — четвёртый блок в колонке ради нуля.
+ *
+ * Разделитель тот же, что у истории клиента: тонкая черта сверху вместо новой
+ * карточки. Одинаковый приём для одинакового случая — «дальше идёт другое, но
+ * из той же истории».
+ */
+.card-notes-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+  /* Разделитель тот же и симметричен так же: 8 (зазор карточки) + 4 сверху,
+     12 снизу. Было 12 / 8 — см. довод у `.card-client-history`. */
+  margin-top: var(--lc-space-1);
+  padding-top: var(--lc-space-3);
+  border-top: 1px solid var(--lc-border);
+}
+
+.card-notes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lc-space-2);
+}
+
+/*
+ * Переключатель — настоящая кнопка, а не div с onClick: он должен получать
+ * фокус с клавиатуры и объявляться как «свёрнуто/развёрнуто» (aria-expanded в
+ * разметке). Внешне это по-прежнему заголовок блока.
+ */
+.card-notes-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-1) 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--lc-fz-caption);
+  /* Внешне это заголовок блока — значит и набран он как заголовок блока:
+     500 плюс разрядка, ровно как `.card-section__title`. */
+  font-weight: var(--lc-fw-medium);
+  letter-spacing: 0.04em;
+  color: var(--lc-text-3);
+}
+
+.card-notes-toggle:hover {
+  color: var(--lc-text-1);
+}
+
+.card-notes-toggle svg {
+  color: var(--lc-text-3);
+  flex: none;
+}
+
+.card-notes-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.card-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+/*
+ * Радиус тот же, что у заметки в ленте (`.msg--note .msg__bubble`): это одна и
+ * та же сущность, показанная в двух местах, и рисовалась она двумя радиусами —
+ * 8 здесь и 12 там. Цвет (янтарь = внутренняя заметка) отличать её от обычного
+ * сообщения обязан, форма — нет.
+ */
+.card-notes__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border-left: 3px solid var(--lc-bubble-note-accent);
+  border-radius: var(--lc-radius-md);
+  background: var(--lc-bubble-note);
+  color: var(--lc-bubble-note-text);
+  font-size: var(--lc-fz-caption);
+}
+
+/* Заметка, не доехавшая до сервера: тот же текст, но видно, что его там нет.
+   Приглушаем и красим край тревожным — не пряча: спрятать значит потерять
+   написанное молча. */
+/* ⚠ ПРАВИЛА У ТЕКСТА ЗАМЕТКИ НЕ БЫЛО ВОВСЕ (разбор дизайна 28.08).
+   Класс встречался только в разметке. Значит действовали начальные
+   `overflow-wrap: normal` и `white-space: normal`: неразрывный кусок — ссылка,
+   номер заказа, адрес без пробелов — распирал плашку и молча уезжал за её край,
+   а переводы строк, которые человек сам набрал в заметке, схлопывались в одну.
+   Те же два свойства уже стоят у цитаты кандидата и у текста сообщения. */
+.card-notes__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ⚠ ПРОЗРАЧНОСТИ ГРУПП ПЕРЕМНОЖАЮТСЯ (разбор дизайна 28.08).
+   Здесь стояло `opacity: 0.75` на всю плашку, а подпись внутри несла ещё и
+   свои `opacity: 0.8`. В итоге строка «не сохранилась» — единственная, которую
+   человек обязан прочесть, — была самой блёклой в блоке: 3.06:1 в светлой теме
+   при норме 4.5:1. Приглушать сообщение о потере нельзя; отличие плашки держит
+   цветная полоса слева, она никуда не делась. После правки 6.24:1 и 8.26:1.
+   ⚠ `opacity: 1` отсюда убран 08.09 — не потому, что довод устарел, а потому,
+   что гасить стало нечего: прозрачность снята у самой подписи (ниже). */
+.card-notes__item[data-failed] {
+  border-left-color: var(--lc-danger);
+}
+
+.card-notes__item[data-failed] .card-notes__meta {
+  color: var(--lc-danger-text);
+}
+
+/*
+ * ⚠ ТА ЖЕ ПРОЗРАЧНОСТЬ, ЧТО И У ОШИБКИ, — ТОЛЬКО У ОБЫЧНОЙ ПОДПИСИ (08.09).
+ *
+ * Правка 28.08 сняла `opacity` с плашки и с подписи ОШИБКИ, а обычную подпись
+ * автора оставила на 0.8. Посчитано: янтарные чернила заметки под 0.8 на её же
+ * подложке дают 4.41:1 в СВЕТЛОЙ теме при норме 4.5 — тот же дефект, только
+ * тише и потому не замеченный. Без прозрачности 6.84:1 (светлая) и 11.28:1
+ * (тёмная).
+ *
+ * Тише текста заметки подпись остаётся кеглем: 11 против 12. Приглушать её
+ * ещё и прозрачностью незачем — это имя того, кто заметку написал, и по нему
+ * решают, спрашивать ли автора.
+ */
+.card-notes__meta {
+  font-size: var(--lc-fz-micro);
+}
+
+/* Форма заметки открыта прямо в карточке, без модального окна (бриф). */
+.card-note-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-2);
+}
+
+.card-note-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--lc-space-2);
+}
+
+/* ────────────────────────────────────────────────── скелетон ────────── */
+
+.card-skeleton {
+  display: flex;
+  flex-direction: column;
+  /* 12 → 16: скелетон изображает стопку карточек, и зазор у него обязан быть
+     тот же, что у настоящей стопки, — иначе колонка дёргается при загрузке. */
+  gap: var(--lc-space-4);
+}
+
+.card-skeleton__block {
+  height: 96px;
+  border-radius: var(--lc-radius-lg);
+  background: var(--lc-surface);
+  animation: lc-skeleton-pulse var(--lc-skeleton-speed) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-skeleton__block {
+    animation: none;
+  }
+}
+
+/* ────────────────────────────── модалка «Передать диалог» ───────────── */
+
+.transfer-list {
+  display: flex;
+  flex-direction: column;
+  /* Окно, а не карточка: четырёхшаговый ритм колонки сюда не распространяется,
+     а 2 — законная ступень шкалы (`--lc-space-0`). Строки списка держат
+     собственное поле 8/12, и разводить их ещё и воздухом незачем. */
+  gap: var(--lc-space-0);
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-md);
+  padding: var(--lc-space-1);
+}
+
+.transfer-list__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lc-space-2);
+  padding: var(--lc-space-4);
+}
+
+.transfer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  width: 100%;
+  padding: var(--lc-space-2) var(--lc-space-3);
+  border: none;
+  border-radius: var(--lc-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--lc-fz-body);
+  transition: background-color var(--lc-dur-fast) var(--lc-ease);
+}
+
+.transfer-row:hover {
+  background: var(--lc-surface-hover);
+}
+
+.transfer-row[data-active="true"] {
+  background: var(--lc-selected);
+}
+
+.transfer-row:disabled {
+  opacity: var(--lc-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.transfer-row__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--lc-radius-circle);
+  background: var(--lc-presence-offline);
+  flex: none;
+}
+
+.transfer-row__dot[data-state="online"] {
+  background: var(--lc-presence-online);
+}
+
+/* «Отошёл» — третье состояние, а не отсутствие второго: человек за столом,
+   ему можно передать. Янтарный тот же, что у рейки и списка сотрудников. */
+.transfer-row__dot[data-state="away"] {
+  background: var(--lc-presence-away);
+}
+
+.transfer-row__name {
+  flex: 1;
+  color: var(--lc-text-1);
+}
+
+.transfer-row__role {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-3);
+}
+
+/* ─────────────────────────── чёрный список (docs/19) ───── */
+
+.card-blocked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Ритм: 4 внутри строки. Собственный `margin-top: 8` снят — он складывался
+     с зазором карточки и давал 16, то есть плашка отбивалась от соседей
+     полем целой карточки. Отделяет её заливка, а не пустота. */
+  gap: var(--lc-space-1);
+  padding: var(--lc-space-2) var(--lc-space-3);
+  background: var(--lc-warning-subtle);
+  border-radius: var(--lc-radius-sm);
+}
+
+.card-blocked__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--lc-space-2);
+  margin-top: var(--lc-space-4);
+}
+
+/* ─────────────────────────── позванные в диалог (docs/19) ───── */
+
+/*
+ * ЗДЕСЬ ЖИЛ `.card-actions` — ряд равноправных кнопок в перенос.
+ *
+ * Потребителей у него не осталось ни одного, и путь к этому стоит записать:
+ * сперва (правка 10 от 12 августа) из правой колонки ушли «Передать» и
+ * «Позвать» — действие живёт в одном месте, для них это иконки в шапке ленты;
+ * последним потребителем остался ряд готовых сроков в окне «Отложить диалог»
+ * («Через час», «Завтра утром», «В понедельник»), а в тот же день владелец
+ * снял отложку целиком. Правило сторожит `cssDeadClasses.test.ts`.
+ */
+
+.card-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lc-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card-participant {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lc-space-0);
+  max-width: 100%;
+  padding: var(--lc-space-0) var(--lc-space-1) var(--lc-space-0)
+    var(--lc-space-2);
+  background: var(--lc-surface-hover);
+  border-radius: var(--lc-radius-pill);
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-1);
+}
+
+.card-participant__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Крестик проявляется по наведению, но на тач-экранах наведения нет —
+   там он виден всегда, иначе убрать человека было бы нечем. */
+.card-participant__remove {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--lc-space-0);
+  border: none;
+  background: transparent;
+  color: var(--lc-text-3);
+  border-radius: var(--lc-radius-circle);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--lc-dur-fast) var(--lc-ease);
+}
+
+.card-participant:hover .card-participant__remove,
+.card-participant__remove:focus-visible {
+  opacity: 1;
+}
+
+.card-participant__remove:hover {
+  color: var(--lc-danger-text);
+}
+
+@media (hover: none) {
+  .card-participant__remove {
+    opacity: 1;
+  }
+}
+
+/*
+ * ⚠ ВИДЕН — ЕЩЁ НЕ ЗНАЧИТ ДОСТУПЕН (замер 05.09, окно 2560 и оверлей на 1024).
+ *
+ * Правило выше вернуло крестику видимость там, где наведения не бывает, и на
+ * этом остановилось: сама цель осталась 12×20 при норме 24×24. Пальцем в неё
+ * не попасть, а промах мимо крестика открывает не то — и это действие
+ * УБИРАЕТ человека из диалога, то есть отменяется не нажатием, а разговором.
+ *
+ * Растим только под грубым вводом: на настольном виде крестик остаётся
+ * маленьким намеренно — он проявляется наведением и не должен разгонять
+ * пилюлю с именем.
+ */
+@media (pointer: coarse) {
+  .card-participant__remove {
+    min-width: 24px;
+    min-height: 24px;
+    justify-content: center;
+  }
+}
+
+/*
+ * Подсказка под полем правки имени (28.08). Кнопок «Сохранить» и «Отмена»
+ * больше нет — вместо них строка о том, чем закончить: Enter сохраняет, Escape
+ * отменяет, уход из поля тоже сохраняет. Мельче основного текста и приглушённо:
+ * это напоминание на один раз, а не часть значения.
+ */
+.card-name-edit__hint {
+  display: block;
+  margin-top: var(--lc-space-1);
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-micro);
+}
+
+/*
+ * ⚠ ПОДВАЛ ОКОН «ПЕРЕДАТЬ» И «ПОЗВАТЬ» ПРИЛИПАЕТ К НИЗУ.
+ *
+ * ЗАМЕР (стенд .dump/merka-okon.html, собранный CSS, четверо в списке; оба
+ * состояния рельса дали одни и те же числа — окно в портале, рельс ему не
+ * достаётся):
+ *
+ *   «Позвать», 768×627 и 1280×627: окно 31.4…595.6, содержимого 670 при
+ *       видимых 562 — «Отмена» и «Позвать» низом на 678.4, на 51px НИЖЕ экрана;
+ *   «Передать», 768×627: содержимого 571 при видимых 562 — подвал упирается в
+ *       самый край (низ кнопок 579.4 при нижней границе окна 595.6), и любая
+ *       строка сверх нынешней уводит его туда же.
+ *
+ * Окна — близнецы (одна разметка, разные подписи), поэтому правило одно на
+ * оба: разное поведение подвала у двух соседних кнопок читалось бы как разное
+ * последствие. Прокрутка у окна есть, но её признака нет — полоса в macOS
+ * наложенная (разбор — hotkeys-modal.css).
+ *
+ * Отрицательное поле снизу и равное ему внутреннее закрывают нижние 24px поля
+ * `.mantine-Modal-body`, иначе под прилипшим подвалом остаётся щель.
+ */
+.card-dialog__foot {
+  position: sticky;
+  bottom: 0;
+  background: var(--lc-surface);
+  padding-top: var(--lc-space-3);
+  padding-bottom: var(--lc-space-5);
+  margin-bottom: calc(-1 * var(--lc-space-5));
+}
+
+/* Дополнительные номера человека — список с действием (правка 09.09).
+   Раньше здесь стояла одна строка текста; разбор — в шапке
+   `ClientExtraPhones.tsx`. Кегль и цвет те же, что были у строки, чтобы блок
+   не начал спорить за внимание с самим телефоном выше. */
+.card-extra-phones__title {
+  margin: 0 0 var(--lc-space-1);
+}
+
+.card-extra-phones__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+/* Номер и кнопка в одной строке; на узкой карточке кнопка переносится вниз,
+   а не выдавливает номер за край. */
+.card-extra-phones__item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lc-space-2);
+}
+
+.card-extra-phones__value {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+}
+
+/* Доказательство номера (12.09): откуда, когда, со словом каким. Бледнее
+   самого номера — это подпись, а не второй номер. */
+.card-extra-phones__note,
+.card-extra-phones__near {
+  flex-basis: 100%;
+}
+
+.card-extra-phones__value--rejected {
+  text-decoration: line-through;
+  color: var(--lc-text-3);
+}
+
+/* Адрес выезда (09.09). Кегль и цвет те же, что у телефона выше: это два
+   предмета одного разговора, и спорить за внимание им незачем. */
+.card-address {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+/* Варианты карты (12.09) — столбиком, адреса длинные. С 18.09 это текст, а
+   не кнопки: автоматика такие строки не пишет, варианты — подсказка тому, кто
+   нажмёт «изменить». Кегль и цвет — как у слов вердикта над ними. */
+.card-address__variants {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+/* Вариант — целый адрес с посёлком и сельским поселением («Лесной переулок,
+   4, Луговое, Луговское сельское поселение»): на ширине карточки он
+   переносится, а не уезжает за край (владелец 12.09: «съезжает»). */
+.card-address__variant {
+  font-size: var(--lc-fz-caption);
+  color: var(--lc-text-2);
+  overflow-wrap: anywhere;
+}
+
+.card-address__value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lc-space-1);
+  color: var(--lc-text-1);
+}
+
+/* Длинный адрес переносится, а не распирает карточку: «Санкт-Петербург,
+   Черёмуховая аллея, д. 12 корп. 3, кв 146» на узкой карточке не помещается
+   ни при каком кегле. */
+.card-address__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.card-address__copy {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--lc-text-3);
+  cursor: pointer;
+}
+
+.card-address__copy:hover {
+  color: var(--lc-text-1);
+}
+
+.card-address__edit,
+.card-address__suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lc-space-1);
+}
+
+.card-address__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  /* По центру: в этой же строке живёт вопрос «Убрать адрес из карточки?»
+     рядом с кнопками подтверждения (пакет 6.0а). */
+  align-items: center;
+  gap: var(--lc-space-1);
+}
+
+/* Предложение приглушено: это вопрос, а не факт карточки. Поверхность — та же,
+   что у наведения в этом же файле: своего третьего уровня в шкале нет, и
+   заводить его ради одного блока значило бы завести четвёртый вид фона. */
+.card-address__suggest {
+  padding: var(--lc-space-2);
+  border-radius: var(--lc-radius-sm);
+  background: var(--lc-surface-hover);
+}
+
+.card-address__suggest-title {
+  margin: 0;
+}
+
+.card-address__suggest-value {
+  color: var(--lc-text-1);
+  overflow-wrap: anywhere;
+}
+
+/* Слова карты под адресом: подтверждение — цветом успеха, отказ — предупреждения,
+   «проверяем» — приглушено. Ссылка на дом — координатами, без адреса в запросе. */
+.card-address__geo {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.card-address__map-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.card-address__attribution {
+  color: var(--lc-text-3);
+}
+
+/* Фраза клиента — цитатой, чтобы её не путали с нашим разбором. */
+.card-address__quote {
+  margin: 0;
+  padding-left: var(--lc-space-2);
+  border-left: 2px solid var(--lc-border);
+  color: var(--lc-text-3);
+  font-size: var(--lc-fz-caption);
+  overflow-wrap: anywhere;
+}
+
+.card-address__quote-parts {
+  color: var(--lc-text-2);
+}
+
+/* ─────────────── объединения одной строкой (владелец 13.09) ───────────── */
+
+/* Строка объединения — компактнее подсказки: без заливки, только тонкая
+   левая черта, чтобы список из трёх не выглядел тремя карточками. */
+.card-merge__row--compact {
+  background: transparent;
+  padding: 0 0 0 var(--lc-space-2);
+  border-left: 2px solid var(--lc-border);
+  border-radius: 0;
+  align-items: center;
+}
+
+/*
+ * «Разъединить» рвёт связь карточек — разрушающее действие не должно
+ * выглядеть так же безобидно, как «изменить» (аудит 15.09). Свой цвет, а
+ * подсказка «больше эту пару автоматика не тронет» — в title кнопки.
+ */
+.card-merge__unmerge {
+  color: var(--lc-danger-text);
+}

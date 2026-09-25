@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "revision": 3,
+  "entry": "greet",
+  "settings": {
+    "max_bot_messages_row": 5,
+    "max_offscript_messages": 2
+  },
+  "steps": [
+    {
+      "id": "greet",
+      "type": "send",
+      "params": {
+        "text": "Здравствуйте, {client_name}\nПодскажите, что случилось — какая техника и что с ней?"
+      },
+      "next": "ask_problem"
+    },
+    {
+      "id": "ask_problem",
+      "type": "ask",
+      "params": {
+        "text": null,
+        "var": "problem",
+        "validate": "any",
+        "retry_text": null,
+        "max_attempts": 1,
+        "timeout": "20m"
+      },
+      "next": "ai_draft",
+      "on_timeout": "ping_problem",
+      "on_invalid": null
+    },
+    {
+      "id": "ping_problem",
+      "type": "send",
+      "params": {
+        "text": [
+          "Ну что, расскажете, что случилось?",
+          "Так что у вас произошло?",
+          "Подскажете, в чём проблема?",
+          "Что случилось-то? Гляну, чем помочь",
+          "Расскажите, что не так, и подскажу",
+          "Опишите, что произошло, разберусь",
+          "Что именно не работает?",
+          "А что у вас стряслось?"
+        ]
+      },
+      "next": "ask_problem_2"
+    },
+    {
+      "id": "ask_problem_2",
+      "type": "ask",
+      "params": {
+        "text": null,
+        "var": "problem2",
+        "validate": "any",
+        "retry_text": null,
+        "max_attempts": 1,
+        "timeout": "24h"
+      },
+      "next": "ai_draft",
+      "on_timeout": "handoff_no_reply",
+      "on_invalid": null
+    },
+    {
+      "id": "ai_draft",
+      "type": "ai_answer",
+      "params": {
+        "confidence_threshold": 0.6,
+        "max_reply_len": 800,
+        "context_messages": 30
+      },
+      "next": "check_hours",
+      "on_low_confidence": null
+    },
+    {
+      "id": "check_hours",
+      "type": "condition",
+      "params": {
+        "conditions": [
+          {
+            "if": {
+              "kind": "work_hours",
+              "from": "10:00",
+              "to": "20:00",
+              "timezone": "Europe/Moscow"
+            },
+            "next": "handoff_day"
+          }
+        ],
+        "else": "night_msg"
+      }
+    },
+    {
+      "id": "handoff_day",
+      "type": "handoff",
+      "params": {
+        "reason": "scenario",
+        "comment": "Клиент описал проблему, бот дал предварительный ответ",
+        "tags": [
+          "первичный-приём"
+        ]
+      }
+    },
+    {
+      "id": "night_msg",
+      "type": "send",
+      "params": {
+        "text": "Отвечу утром. Оставьте телефон — наберу первым делом"
+      },
+      "next": "ask_phone"
+    },
+    {
+      "id": "ask_phone",
+      "type": "ask",
+      "params": {
+        "text": null,
+        "var": "phone",
+        "validate": "phone",
+        "retry_text": "Кажется, это не номер. Напишите в формате +7 900 000-00-00",
+        "max_attempts": 2,
+        "timeout": "20m"
+      },
+      "next": "tag_contact",
+      "on_timeout": "ping_phone",
+      "on_invalid": "handoff_night"
+    },
+    {
+      "id": "ping_phone",
+      "type": "send",
+      "params": {
+        "text": "Подскажете номер? Наберу, как освобожусь"
+      },
+      "next": "ask_phone_2"
+    },
+    {
+      "id": "ask_phone_2",
+      "type": "ask",
+      "params": {
+        "text": null,
+        "var": "phone2",
+        "validate": "phone",
+        "retry_text": "Кажется, это не номер. Напишите в формате +7 900 000-00-00",
+        "max_attempts": 2,
+        "timeout": "12h"
+      },
+      "next": "tag_contact",
+      "on_timeout": "handoff_night",
+      "on_invalid": "handoff_night"
+    },
+    {
+      "id": "tag_contact",
+      "type": "tag",
+      "params": {
+        "tags": [
+          "контакт собран"
+        ]
+      },
+      "next": "note_contact"
+    },
+    {
+      "id": "note_contact",
+      "type": "note",
+      "params": {
+        "text": "🤖 Бот собрал контакт: {phone}\n🤖 Бот собрал контакт: {phone2}\nПроблема со слов клиента: {problem}\nПроблема со слов клиента: {problem2}"
+      },
+      "next": "handoff_night"
+    },
+    {
+      "id": "handoff_night",
+      "type": "handoff",
+      "params": {
+        "reason": "scenario",
+        "comment": "Ночной диалог: проблема зафиксирована, перезвонить утром первыми",
+        "tags": [
+          "ночной-лид"
+        ]
+      }
+    },
+    {
+      "id": "handoff_no_reply",
+      "type": "handoff",
+      "params": {
+        "reason": "scenario",
+        "comment": "Клиент не ответил на первый вопрос. Диалог остаётся в общей очереди — автозакрытия по таймауту нет, закрывает менеджер вручную",
+        "tags": [
+          "без ответа"
+        ]
+      }
+    }
+  ]
+}

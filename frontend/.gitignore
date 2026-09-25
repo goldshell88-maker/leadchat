@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.local
+.env
+.env.*
+__probe.*
+
+# Снимки разметки для стенда адаптива (src/test/*.dump.tsx)
+.dump/

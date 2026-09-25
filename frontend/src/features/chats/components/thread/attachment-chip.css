@@ -1,0 +1,102 @@
+/*
+ * Ссылка, место и объявление в ленте — три разных предмета, а не три
+ * одинаковые строки со скрепкой (просьба владельца 05.09).
+ *
+ * ⚠ ЦВЕТ БЕРЁТСЯ ИЗ `currentColor` ПО ТОЙ ЖЕ ПРИЧИНЕ, ЧТО У ПРОИГРЫВАТЕЛЯ
+ * (voice-player.css): чип живёт внутри пузыря, а пузырей четыре — входящий,
+ * исходящий с заливкой акцентом, заметка и бот. Любой цвет из шкалы верен
+ * ровно на одном из них.
+ */
+
+/*
+ * Ширина числом, потолок процентом. Довод и замер записаны у проигрывателя
+ * (voice-player.css): процент внутри `min()` при расчёте вклада неразрешим, и
+ * `width: min(280px, 100%)` схлопывает предмет до его содержимого.
+ */
+.att-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--lc-space-2);
+  width: 280px;
+  max-width: 100%;
+  margin-top: var(--lc-space-1);
+  padding: var(--lc-space-2);
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: var(--lc-radius-sm);
+  color: inherit;
+  /* Подчёркивание здесь лишнее: рамка и значок уже говорят, что это предмет, а
+     не слово в тексте. */
+  text-decoration: none;
+  transition: background var(--lc-motion-fast);
+}
+
+.att-chip:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.att-chip:focus-visible {
+  outline: 2px solid var(--lc-focus-border);
+  outline-offset: 2px;
+}
+
+/* Переходить некуда (Авито не дало адреса) — и вид не обещает перехода. */
+.att-chip--flat {
+  cursor: default;
+}
+
+.att-chip--flat:hover {
+  background: none;
+}
+
+.att-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Значок не участвует в дележе места: у соседнего текста автоминимум равен
+     min-content, у значка — нулю, и при нехватке ширины весь дефицит ложился
+     бы на него (замер 28.08 на строке файла дал скрепку шириной РОВНО 0). */
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--lc-radius-sm);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.att-chip__text {
+  display: flex;
+  flex-direction: column;
+  /* Иначе длинный адрес не даёт колонке сжиматься, и чип вылезает за
+     скруглённый край пузыря. */
+  min-width: 0;
+}
+
+.att-chip__kind {
+  font-size: var(--lc-fz-micro);
+  opacity: var(--lc-opacity-muted);
+}
+
+.att-chip__gist {
+  font-size: var(--lc-fz-caption);
+  /* Имена файлов Авито приходят одним куском без пробелов
+     (`IMG_20260828_154233_фото_машины_шильдик_сзади.jpg`). Без разрыва такая
+     строка не сжимается вовсе и даёт горизонтальную полосу прокрутки всей
+     ленте — то же правило и тот же довод, что у `.msg__file`. */
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Хвост адреса — В ОДНУ СТРОКУ С МНОГОТОЧИЕМ, в отличие от строки выше.
+ *
+ * Разница намеренная. Суть (домен, адрес места, название объявления) нужна
+ * целиком, а хвост `/moskva/telefony/apple_iphone_13_128gb_2938471820` — это
+ * шестьдесят знаков, которые при переносе занимают три строки и делают чип
+ * выше самого сообщения. Полный адрес при этом не потерян: он лежит в
+ * подсказке ссылки.
+ */
+.att-chip__note {
+  overflow: hidden;
+  font-size: var(--lc-fz-micro);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: var(--lc-opacity-muted);
+}

@@ -1,0 +1,2795 @@
+# Приложение к шагу 5: выгрузка строк интерфейса
+
+Машинная выгрузка всех текстов, которые видит человек, с путями и номерами
+строк. Основной разбор — `docs/36-AUDIT-STEP5-TEXTS.md`.
+
+---
+
+# Полная выгрузка текстов интерфейса LeadChat (шаг 5 аудита)
+
+Фронтенд: 1862 фрагментов в 114 файлах (комментарии исключены).
+Бэкенд: 799 строк с кириллицей вне docstring в 57 файлах.
+
+## Фронтенд: сколько текстов в каком файле
+
+- 126 — `frontend/src/features/uikit/UiKitPage.tsx`
+- 97 — `frontend/src/features/updates/changelog.ts`
+- 90 — `frontend/src/features/settings/accounts/AccountsPage.tsx`
+- 73 — `frontend/src/features/settings/team/TeamMembersTab.tsx`
+- 59 — `frontend/src/features/settings/bots/scenario.ts`
+- 52 — `frontend/src/features/table/TablePage.tsx`
+- 51 — `frontend/src/features/templates/TemplatesManager.tsx`
+- 46 — `frontend/src/features/chats/components/card/ClientCardPane.tsx`
+- 46 — `frontend/src/features/chats/components/list/ChatListPane.tsx`
+- 38 — `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx`
+- 37 — `frontend/src/features/settings/bots/SandboxDrawer.tsx`
+- 34 — `frontend/src/features/settings/bots/BotsPage.tsx`
+- 33 — `frontend/src/features/notifications/NotificationsPage.tsx`
+- 33 — `frontend/src/features/stats/components/SummaryCards.tsx`
+- 31 — `frontend/src/features/notifications/catalog.ts`
+- 31 — `frontend/src/features/settings/bots/validation.ts`
+- 30 — `frontend/src/features/settings/team/auditActions.ts`
+- 27 — `frontend/src/features/chats/components/composer/Composer.tsx`
+- 27 — `frontend/src/features/settings/team/AuditLogTab.tsx`
+- 27 — `frontend/src/shared/lib/formatTime.ts`
+- 26 — `frontend/src/app/AppLayout.tsx`
+- 26 — `frontend/src/features/settings/bots/BotEditor.tsx`
+- 25 — `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx`
+- 24 — `frontend/src/features/chats/components/thread/ChatThreadPane.tsx`
+- 24 — `frontend/src/features/stats/components/ManagersTable.tsx`
+- 21 — `frontend/src/features/chats/components/list/ConversationListItem.tsx`
+- 21 — `frontend/src/features/chats/inbox/useInbox.ts`
+- 21 — `frontend/src/features/updates/UpdatesPage.tsx`
+- 20 — `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx`
+- 19 — `frontend/src/features/auth/InvitePage.tsx`
+- 19 — `frontend/src/features/settings/bots/components/StepCard.tsx`
+- 19 — `frontend/src/features/settings/distribution/DistributionTab.tsx`
+- 19 — `frontend/src/features/stats/components/MetricChart.tsx`
+- 18 — `frontend/src/features/chats/components/card/BlockClientButton.tsx`
+- 18 — `frontend/src/features/chats/hooks/useConversationActions.ts`
+- 17 — `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx`
+- 17 — `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx`
+- 17 — `frontend/src/features/settings/profile/ProfilePage.tsx`
+- 17 — `frontend/src/features/stats/lib/heatmap.ts`
+- 16 — `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx`
+- 15 — `frontend/src/features/chats/components/thread/ThreadActions.tsx`
+- 15 — `frontend/src/features/stats/hooks/useStatsExport.tsx`
+- 14 — `frontend/src/features/hotkeys/catalog.ts`
+- 14 — `frontend/src/features/settings/accounts/WeekBars.tsx`
+- 14 — `frontend/src/features/settings/distribution/WorkHoursBlock.tsx`
+- 14 — `frontend/src/features/stats/MyTodayWidget.tsx`
+- 14 — `frontend/src/features/stats/components/ExportModal.tsx`
+- 13 — `frontend/src/features/chats/components/card/PeoplePicker.tsx`
+- 13 — `frontend/src/features/chats/components/thread/MessageBubble.tsx`
+- 13 — `frontend/src/features/settings/bots/defaultScenario.ts`
+- 11 — `frontend/src/features/auth/LoginPage.tsx`
+- 11 — `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx`
+- 11 — `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx`
+- 10 — `frontend/src/features/chats/components/thread/TransferBar.tsx`
+- 9 — `frontend/src/features/auth/ForgotPasswordForm.tsx`
+- 9 — `frontend/src/features/chats/components/card/InviteDialog.tsx`
+- 9 — `frontend/src/features/chats/outcomes.ts`
+- 9 — `frontend/src/features/hotkeys/useChatHotkeys.ts`
+- 9 — `frontend/src/features/settings/bots/components/ScheduleEditor.tsx`
+- 9 — `frontend/src/features/settings/profile/ContactAdminForm.tsx`
+- 9 — `frontend/src/features/settings/profile/MyChannelsBlock.tsx`
+- 9 — `frontend/src/features/stats/components/Heatmap.tsx`
+- 9 — `frontend/src/features/stats/components/StatsFilters.tsx`
+- 8 — `frontend/src/features/chats/components/list/WaitGauge.tsx`
+- 8 — `frontend/src/features/settings/team/roles.ts`
+- 7 — `frontend/src/features/settings/SettingsLayout.tsx`
+- 7 — `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx`
+- 7 — `frontend/src/features/settings/profile/AppearanceBlock.tsx`
+- 7 — `frontend/src/features/settings/team/InviteModal.tsx`
+- 7 — `frontend/src/features/stats/lib/format.ts`
+- 7 — `frontend/src/shared/api/http.ts`
+- 7 — `frontend/src/shared/lib/period.ts`
+- 6 — `frontend/src/features/chats/components/card/TransferDialog.tsx`
+- 6 — `frontend/src/features/notifications/NotificationPanel.tsx`
+- 6 — `frontend/src/features/settings/team/TeamPage.tsx`
+- 5 — `frontend/src/features/chats/components/thread/OutcomeModal.tsx`
+- 5 — `frontend/src/features/chats/inbox/InboxDecisionBar.tsx`
+- 5 — `frontend/src/features/settings/profile/AboutAppBlock.tsx`
+- 5 — `frontend/src/features/settings/profile/HotkeysBlock.tsx`
+- 5 — `frontend/src/features/settings/team/OneTimeLinkModal.tsx`
+- 5 — `frontend/src/features/templates/vars.ts`
+- 5 — `frontend/src/platform/tauri/ipc.ts`
+- 5 — `frontend/src/shared/realtime/applyWsEvent.ts`
+- 4 — `frontend/src/features/chats/hooks/usePins.ts`
+- 4 — `frontend/src/features/notifications/useNotifications.ts`
+- 4 — `frontend/src/features/settings/bots/components/StepForms/CloseForm.tsx`
+- 4 — `frontend/src/features/stats/StatsPage.tsx`
+- 4 — `frontend/src/platform/UpdateBanner.tsx`
+- 4 — `frontend/src/platform/toast.ts`
+- 4 — `frontend/src/shared/api/rateLimit.ts`
+- 4 — `frontend/src/shared/stores/badges.ts`
+- 3 — `frontend/src/app/router.tsx`
+- 3 — `frontend/src/features/hotkeys/HotkeysModal.tsx`
+- 3 — `frontend/src/features/notifications/CriticalBanners.tsx`
+- 3 — `frontend/src/features/notifications/NotificationBell.tsx`
+- 3 — `frontend/src/features/notifications/time.ts`
+- 3 — `frontend/src/features/presence/PresenceMenuItems.tsx`
+- 3 — `frontend/src/features/settings/bots/components/StepForms/NoteForm.tsx`
+- 3 — `frontend/src/features/settings/bots/components/StepForms/SendForm.tsx`
+- 3 — `frontend/src/features/settings/bots/components/StepForms/TagForm.tsx`
+- 3 — `frontend/src/features/settings/bots/components/VariableTextarea.tsx`
+- 3 — `frontend/src/shared/lib/waiting.ts`
+- 2 — `frontend/src/features/presence/usePresence.ts`
+- 2 — `frontend/src/features/settings/bots/components/StepRefSelect.tsx`
+- 2 — `frontend/src/features/settings/templates/TemplatesPage.tsx`
+- 2 — `frontend/src/features/stats/components/StatCard.tsx`
+- 2 — `frontend/src/features/stats/lib/delta.ts`
+- 2 — `frontend/src/platform/index.ts`
+- 2 — `frontend/src/platform/tauri/notifier.ts`
+- 1 — `frontend/src/platform/bridge.ts`
+- 1 — `frontend/src/platform/tauri/index.ts`
+- 1 — `frontend/src/platform/tauri/offline.ts`
+- 1 — `frontend/src/platform/tauri/updater.ts`
+- 1 — `frontend/src/shared/stores/sessionStore.ts`
+
+## Фронтенд: все фрагменты
+
+- `frontend/src/app/AppLayout.tsx:34` — Администратор
+- `frontend/src/app/AppLayout.tsx:35` — Руководитель
+- `frontend/src/app/AppLayout.tsx:36` — Менеджер
+- `frontend/src/app/AppLayout.tsx:37` — Наблюдатель
+- `frontend/src/app/AppLayout.tsx:61` — В сети
+- `frontend/src/app/AppLayout.tsx:63` — Подключение…
+- `frontend/src/app/AppLayout.tsx:65` — Сбой на сервере
+- `frontend/src/app/AppLayout.tsx:66` — Нет соединения
+- `frontend/src/app/AppLayout.tsx:69` — Сервер отвечает · v${q.data?.version ?? "?"}
+- `frontend/src/app/AppLayout.tsx:70` — Соединение: ${label}
+- `frontend/src/app/AppLayout.tsx:108` — ✓ Соединение восстановлено
+- `frontend/src/app/AppLayout.tsx:140` — Меню пользователя
+- `frontend/src/app/AppLayout.tsx:164` — Профиль
+- `frontend/src/app/AppLayout.tsx:172` — Что нового
+- `frontend/src/app/AppLayout.tsx:173` — есть непрочитанное
+- `frontend/src/app/AppLayout.tsx:175` — Выйти
+- `frontend/src/app/AppLayout.tsx:227` — Горячие клавиши (?)
+- `frontend/src/app/AppLayout.tsx:231` — Горячие клавиши
+- `frontend/src/app/AppLayout.tsx:244` — Основная навигация
+- `frontend/src/app/AppLayout.tsx:245` — Чаты
+- `frontend/src/app/AppLayout.tsx:276` — Разбор диалогов
+- `frontend/src/app/AppLayout.tsx:281` — Разбор диалогов
+- `frontend/src/app/AppLayout.tsx:289` — Статистика
+- `frontend/src/app/AppLayout.tsx:294` — Статистика
+- `frontend/src/app/AppLayout.tsx:301` — Настройки
+- `frontend/src/app/AppLayout.tsx:306` — Настройки
+- `frontend/src/app/router.tsx:48` — Страница не найдена
+- `frontend/src/app/router.tsx:51` — Такой страницы нет или она переехала
+- `frontend/src/app/router.tsx:54` — К диалогам
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:25` — Если такой сотрудник есть, администратор получит заявку
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:68` — Администратор выдаст новую ссылку установки пароля и передаст её вам.
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:71` — Вернуться ко входу
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:81` — Не помню пароль
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:84` — Оставьте email — заявка уйдёт администратору, он выдаст новую ссылку установки пароля.
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:88` — Сервер недоступен — заявка не отправлена. Проверьте соединение
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:93` — Слишком много заявок — эта не отправлена. Попробуйте {formatRetryAfter(limitedFor)}
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:106` — Отправить заявку
+- `frontend/src/features/auth/ForgotPasswordForm.tsx:109` — Вернуться ко входу
+- `frontend/src/features/auth/InvitePage.tsx:28` — if (/[a-zа-яё]/.test(p) && /[A-ZА-ЯЁ]/.test(p)) score += 15;
+- `frontend/src/features/auth/InvitePage.tsx:30` — if (/[^a-zA-Zа-яА-ЯёЁ0-9\s]/.test(p)) score += 20;
+- `frontend/src/features/auth/InvitePage.tsx:31` — слабый
+- `frontend/src/features/auth/InvitePage.tsx:32` — средний
+- `frontend/src/features/auth/InvitePage.tsx:33` — надёжный
+- `frontend/src/features/auth/InvitePage.tsx:58` — Ссылка устарела
+- `frontend/src/features/auth/InvitePage.tsx:61` — Ссылка недействительна, устарела или уже использована. Запросите новую у администратора
+- `frontend/src/features/auth/InvitePage.tsx:64` — Перейти ко входу
+- `frontend/src/features/auth/InvitePage.tsx:122` — Не получилось загрузить приглашение
+- `frontend/src/features/auth/InvitePage.tsx:125` — Повторить
+- `frontend/src/features/auth/InvitePage.tsx:148` — Пароль не подходит: минимум 10 символов
+- `frontend/src/features/auth/InvitePage.tsx:165` — Здравствуйте, {firstName}!
+- `frontend/src/features/auth/InvitePage.tsx:168` — Придумайте пароль для входа в LeadChat
+- `frontend/src/features/auth/InvitePage.tsx:176` — Не получилось сохранить пароль. Попробуйте ещё раз
+- `frontend/src/features/auth/InvitePage.tsx:184` — Пароль (мин. ${MIN_PASSWORD_LENGTH} символов)
+- `frontend/src/features/auth/InvitePage.tsx:192` — Минимум ${MIN_PASSWORD_LENGTH} символов
+- `frontend/src/features/auth/InvitePage.tsx:203` — Повторите пароль
+- `frontend/src/features/auth/InvitePage.tsx:207` — Пароли не совпадают
+- `frontend/src/features/auth/InvitePage.tsx:210` — Сохранить и войти
+- `frontend/src/features/auth/LoginPage.tsx:109` — Учётная запись отключена, обратитесь к администратору
+- `frontend/src/features/auth/LoginPage.tsx:119` — Не получилось войти. Попробуйте ещё раз
+- `frontend/src/features/auth/LoginPage.tsx:146` — «Мы ремонтируем — Вы зарабатываете»
+- `frontend/src/features/auth/LoginPage.tsx:156` — Слишком много попыток входа. Повторите через {formatCountdown(lockedRemaining)}
+- `frontend/src/features/auth/LoginPage.tsx:166` — Сервер недоступен. Проверьте соединение
+- `frontend/src/features/auth/LoginPage.tsx:188` — Пароль
+- `frontend/src/features/auth/LoginPage.tsx:197` — Запомнить меня
+- `frontend/src/features/auth/LoginPage.tsx:208` — Войти
+- `frontend/src/features/auth/LoginPage.tsx:212` — Неверный email или пароль
+- `frontend/src/features/auth/LoginPage.tsx:218` — Не помню пароль
+- `frontend/src/features/auth/LoginPage.tsx:229` — Скачать приложение для Windows
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:53` — Клиент помечен
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:53` — Пометка снята
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:55` — Не получилось
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:55` — Попробуйте ещё раз
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:65` — Снять пометку
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:67` — Клиент снова станет обычным: его обращения будут вставать в очередь и
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:68` — звенеть у команды.
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:72` — Отмена
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:75` — Снять пометку
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:83` — Пометить клиента
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:85` — Его сообщения по-прежнему будут приходить и сохраняться — вы их не
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:86` — потеряете. Перестанет только одно: диалог не встанет в очередь и не
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:87` — будет звенеть у команды.
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:94` — Почему
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:95` — Через полгода никто не вспомнит, кого и за что пометили
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:96` — Пишет каждый день, ничего не заказывает
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:102` — Отмена
+- `frontend/src/features/chats/components/card/BlockClientButton.tsx:105` — Пометить
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:39` — Новый
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:40` — В работе
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:41` — Закрыт
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:44` — негатив
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:140` — Заметки
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:143` — Заметок пока нет
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:150` — Сотрудник
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:162` — Заметка — увидят только сотрудники
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:163` — Текст заметки
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:168` — Отмена
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:171` — Сохранить
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:180` — Добавить заметку к диалогу ${conversation.client.name ?? CLIENT_FALLBACK}
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:182` — + добавить
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:220` — Карточка клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:222` — Выберите диалог — здесь появится карточка клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:230` — Карточка клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:246` — Телефон скопирован
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:251` — Карточка клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:252` — Клиент
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:256` — ★ {client.avito_rating.toFixed(1)} · на Авито
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:268` — Скопировать телефон
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:273` — (из диалога)
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:277` — телефон не указан
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:291` — Нежелательный клиент
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:299` — Сообщения приходят, но диалог не встаёт в очередь.
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:312` — Объявление
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:318` — Открыть на Авито →
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:324` — Теги
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:353` — Чем закончилось
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:366` — Диалог
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:369` — Ответственный
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:374` — Ответственный
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:376` — Без ответственного
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:387` — Вы
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:389` — Не назначен
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:405` — Позваны
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:412` — Позван(а) в диалог
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:415` — Вы
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:422` — Выйти из диалога
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:422` — Убрать ${p.full_name}
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:442` — Передать
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:455` — Позвать
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:462` — История клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:467` — Повторить
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:471` — Первое обращение клиента
+- `frontend/src/features/chats/components/card/ClientCardPane.tsx:478` — Без объявления
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:61` — Позвать в диалог
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:63` — Диалог останется за вами. Коллега получит уведомление и увидит диалог
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:64` — в своих «Моих».
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:74` — Кого позвать
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:78` — Зачем зовёте
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:79` — скажи, чинится ли эта модель
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:88` — ⓘ Придёт в уведомлении — коллега сразу поймёт, что от него нужно
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:93` — Отмена
+- `frontend/src/features/chats/components/card/InviteDialog.tsx:96` — Позвать
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:8` — администратор
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:9` — руководитель
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:10` — менеджер
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:11` — наблюдатель
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:35` — Кому
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:36` — Никого не нашлось
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:58` — поиск по имени
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:64` — Сотрудники
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:72` — Не получилось загрузить сотрудников
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:75` — Повторить
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:99` — в сети
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:99` — офлайн
+- `frontend/src/features/chats/components/card/PeoplePicker.tsx:104` —  (офлайн)
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:56` — Передать диалог
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:67` — Комментарий коллеге (необязательно)
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:68` — торгуется, дай скидку до 10%
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:77` — ⓘ Комментарий увидит только команда
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:82` — Отмена
+- `frontend/src/features/chats/components/card/TransferDialog.tsx:85` — Передать
+- `frontend/src/features/chats/components/composer/Composer.tsx:275` — Панель отправки
+- `frontend/src/features/chats/components/composer/Composer.tsx:277` — Диалог закрыт.
+- `frontend/src/features/chats/components/composer/Composer.tsx:285` — Вернуть в работу
+- `frontend/src/features/chats/components/composer/Composer.tsx:295` — Панель отправки
+- `frontend/src/features/chats/components/composer/Composer.tsx:298` — Аккаунт Авито отключён — отправка невозможна
+- `frontend/src/features/chats/components/composer/Composer.tsx:301` — Переподключить
+- `frontend/src/features/chats/components/composer/Composer.tsx:308` — Сообщение слишком длинное — сократите текст
+- `frontend/src/features/chats/components/composer/Composer.tsx:330` — Авито не принимает файлы от нас — сообщение не уйдёт. Приложите файл
+- `frontend/src/features/chats/components/composer/Composer.tsx:331` — к заметке или отправьте клиенту ссылку.
+- `frontend/src/features/chats/components/composer/Composer.tsx:336` — Вложения
+- `frontend/src/features/chats/components/composer/Composer.tsx:340` — загрузка…
+- `frontend/src/features/chats/components/composer/Composer.tsx:341` — не загрузилось
+- `frontend/src/features/chats/components/composer/Composer.tsx:345` — Убрать вложение ${a.name}
+- `frontend/src/features/chats/components/composer/Composer.tsx:368` — Длинное сообщение придёт клиенту частями
+- `frontend/src/features/chats/components/composer/Composer.tsx:384` — Заметка — увидят только сотрудники
+- `frontend/src/features/chats/components/composer/Composer.tsx:384` — Напишите сообщение…
+- `frontend/src/features/chats/components/composer/Composer.tsx:385` — Текст заметки
+- `frontend/src/features/chats/components/composer/Composer.tsx:385` — Текст сообщения
+- `frontend/src/features/chats/components/composer/Composer.tsx:392` — Быстрые ответы · /
+- `frontend/src/features/chats/components/composer/Composer.tsx:396` — Быстрые ответы
+- `frontend/src/features/chats/components/composer/Composer.tsx:408` — Прикрепить файл
+- `frontend/src/features/chats/components/composer/Composer.tsx:412` — Прикрепить файл
+- `frontend/src/features/chats/components/composer/Composer.tsx:433` — Отправить заметку
+- `frontend/src/features/chats/components/composer/Composer.tsx:433` — Отправить сообщение
+- `frontend/src/features/chats/components/composer/Composer.tsx:444` — Режим ввода
+- `frontend/src/features/chats/components/composer/Composer.tsx:452` — Сообщение
+- `frontend/src/features/chats/components/composer/Composer.tsx:469` — — отправить ·
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:27` — МОИ
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:27` — ОБЩИЕ
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:36` — ОБЩИЕ
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:37` — ОБЩИЕ
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:113` — Быстрые ответы
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:116` — Быстрые ответы
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:123` — найти шаблон…
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:124` — Поиск по быстрым ответам
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:129` — Список быстрых ответов
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:137` — Не получилось загрузить
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:140` — Повторить
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:146` — Ничего не нашлось
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:146` — Шаблонов пока нет
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:149` — Создать первый
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:149` — Управлять шаблонами
+- `frontend/src/features/chats/components/composer/TemplatePickerPopover.tsx:181` — ↑↓ — выбрать · Enter — вставить · Esc — закрыть
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:46` — Мои
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:47` — Все
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:58` — Новые
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:59` — В работе
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:60` — Закрытые
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:92` — Очередь пуста
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:93` — Новые обращения появятся здесь — их будет видно и слышно
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:115` — Пока тихо
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:116` — У вас пока нет диалогов
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:119` — Посмотреть новые
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:125` — Все диалоги разобраны
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:125` — Новых диалогов нет — всё разобрано
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:127` — Закрытых диалогов пока нет
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:132` — Диалогов пока нет
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:133` — Подключите аккаунт Авито — и они появятся здесь
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:136` — К настройкам
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:141` — Диалогов пока нет
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:301` — Фильтр по статусу
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:302` — Статус: любой
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:313` — Фильтр по каналу
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:314` — Канал: все
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:327` — Фильтр по менеджеру
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:328` — Менеджер: все
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:411` — Список диалогов
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:414` — Чаты
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:425` — Всего диалогов
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:425` — Ждут в очереди
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:426` — ${inboxOpen ? "Ждут в очереди" : "Всего диалогов"}: ${total}
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:436` — Поиск по имени, телефону или сообщению…
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:437` — Поиск по диалогам
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:457` — Фильтры диалогов
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:466` — Входящие
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:466` — Входящие, в очереди: ${inboxCount}
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:471` — Входящие
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:518` — Разгрузить…
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:551` — Фильтры
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:557` — Сужений: ${activeFilters}
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:574` — Найдено: {total ?? 0}
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:577` — Сбросить ✕
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:589` — Не получилось загрузить
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:592` — Повторить
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:602` — Ничего не нашлось
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:603` — Ничего не найдено по «${filters.q}». Ищем по имени, телефону и тексту сообщений
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:606` — Сбросить поиск
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:642` — Загрузка диалогов
+- `frontend/src/features/chats/components/list/ChatListPane.tsx:672` — Никто не берёт: {inboxEscalated}
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:9` — негатив
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:13` — Сообщений пока нет
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:14` — Вложение
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:15` — Вы: ${body}
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:82` — Клиент
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:106` — не отправлено
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:107` — Ответ оператора не дошёл до клиента — откройте диалог и повторите
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:113` — никто не берёт
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:113` — никто не берёт · ${waitText}
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:114` — От диалога отказались все, кому он доступен
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:118` — Клиент недоволен
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:118` — негатив
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:136` — aria-label={                                  , непрочитанных: ${row.unread_count}        }
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:136` — Диалог: ${clientName}${unread ? 
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:170` — Закреплено вами
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:171` — Закреплено
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:177` — Диалог передан вам
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:178` — Передан вам
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:201` — без объявления
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:250` — Передать диалог
+- `frontend/src/features/chats/components/list/ConversationListItem.tsx:254` — Передать диалог: ${clientName}
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:31` — ${minutes}м
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:33` — ${hours}ч
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:37` — ${days}д
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:37` — 99+д
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:71` — Отказались все — клиент ждёт ${waiting.text}
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:72` — Никто не ведёт, ждёт ${waiting.text}
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:99` — Клиент ждёт ответа ${waiting.text}
+- `frontend/src/features/chats/components/list/WaitGauge.tsx:100` — Ждёт ${waiting.text}
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:50` — Выберите диалог слева
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:50` — или нажмите Ctrl+K для поиска
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:83` — Возможно, ссылка устарела
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:83` — Диалог не найден
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:166` — ${minutes} мин
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:168` — ${Math.floor(minutes / 60)} ч
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:169` — ${Math.floor(minutes / (60 * 24))} дн
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:278` — Клиент
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:287` — Переписка
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:294` — Назад к списку
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:303` — Клиент
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:332` — Клиент ждёт ответа
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:334` — ждёт {waitingFor.text}
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:363` — Следующий ({inboxCount})
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:399` — Закрыть
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:406` — Карточка клиента
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:410` — Клиент
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:416` — Загрузка…
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:416` — Не получилось загрузить диалог
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:430` — Загрузка истории
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:440` — Не получилось загрузить
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:443` — Повторить
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:448` — Сообщений пока нет
+- `frontend/src/features/chats/components/thread/ChatThreadPane.tsx:478` — ↓ новые сообщения
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:17` — ${bytes} Б
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:18` — ${Math.round(bytes / 1024)} КБ
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:19` — ${(bytes / (1024 * 1024)).toFixed(1)} МБ
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:34` — Отправляется
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:41` — Не доставлено
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:47` — Доставлено
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:173` — Оператор
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:182` — Сотрудник
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:183` — только сотрудникам
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:194` — Не доставлено: ${msg.delivery_error}
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:194` — Не отправилось
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:199` — Повторить
+- `frontend/src/features/chats/components/thread/MessageBubble.tsx:207` — Удалить
+- `frontend/src/features/chats/components/thread/OutcomeModal.tsx:39` — Чем закончилось обращение?
+- `frontend/src/features/chats/components/thread/OutcomeModal.tsx:78` — Сумма заказа, ₽ — если известна
+- `frontend/src/features/chats/components/thread/OutcomeModal.tsx:79` — Только для выезда. Можно оставить пустым
+- `frontend/src/features/chats/components/thread/OutcomeModal.tsx:80` — например, 4500
+- `frontend/src/features/chats/components/thread/OutcomeModal.tsx:89` — Закрыть без ответа
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:59` — Действия с диалогом
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:61` — Закрепить у себя
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:61` — Открепить
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:66` — Закрепить у себя
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:66` — Открепить
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:85` — Вернуть в очередь
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:89` — Вернуть в очередь
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:99` — Позвать коллегу
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:103` — Позвать коллегу
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:112` — Передать диалог
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:116` — Передать диалог
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:128` — Снять пометку «нежелательный»
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:129` — Пометить как нежелательного
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:140` — Снять пометку «нежелательный»
+- `frontend/src/features/chats/components/thread/ThreadActions.tsx:141` — Пометить как нежелательного
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:48` — Вы отказались от диалога
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:48` — Диалог принят
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:51` — Не получилось
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:52` — Попробуйте ещё раз
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:64` — ${offer.by?.full_name ?? "Коллега"} передаёт вам диалог
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:66` — Ждёт подтверждения: ${offer.to.full_name}
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:67` — ${offer.by?.full_name ?? "Коллега"} → ${offer.to.full_name}: ждёт подтверждения
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:81` — Диалог пока за вами — отвечайте клиенту, если он напишет.
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:94` — Принять
+- `frontend/src/features/chats/components/thread/TransferBar.tsx:103` — Отказаться
+- `frontend/src/features/chats/hooks/useConversationActions.ts:83` — Статус не изменился
+- `frontend/src/features/chats/hooks/useConversationActions.ts:84` — Не получилось сменить статус — попробуйте ещё раз
+- `frontend/src/features/chats/hooks/useConversationActions.ts:84` — Этот статус уже стоит
+- `frontend/src/features/chats/hooks/useConversationActions.ts:144` — Диалог передан
+- `frontend/src/features/chats/hooks/useConversationActions.ts:146` — Ответственный: ${res.conversation.assignee.full_name}
+- `frontend/src/features/chats/hooks/useConversationActions.ts:147` — Диалог вернулся в «Новые»
+- `frontend/src/features/chats/hooks/useConversationActions.ts:154` — Не получилось передать
+- `frontend/src/features/chats/hooks/useConversationActions.ts:157` — Этому сотруднику нельзя назначать диалоги
+- `frontend/src/features/chats/hooks/useConversationActions.ts:159` — Сотрудник деактивирован
+- `frontend/src/features/chats/hooks/useConversationActions.ts:160` — Попробуйте ещё раз
+- `frontend/src/features/chats/hooks/useConversationActions.ts:187` — Позвали в диалог
+- `frontend/src/features/chats/hooks/useConversationActions.ts:188` — ${who.full_name} получит уведомление
+- `frontend/src/features/chats/hooks/useConversationActions.ts:188` — Коллега получит уведомление
+- `frontend/src/features/chats/hooks/useConversationActions.ts:195` — Не получилось позвать
+- `frontend/src/features/chats/hooks/useConversationActions.ts:198` — Этот сотрудник и так ведёт диалог
+- `frontend/src/features/chats/hooks/useConversationActions.ts:199` — Попробуйте ещё раз
+- `frontend/src/features/chats/hooks/useConversationActions.ts:215` — Не получилось убрать
+- `frontend/src/features/chats/hooks/useConversationActions.ts:215` — Попробуйте ещё раз
+- `frontend/src/features/chats/hooks/usePins.ts:34` — Не получилось закрепить
+- `frontend/src/features/chats/hooks/usePins.ts:37` — Закреплённых уже максимум — открепите что-нибудь
+- `frontend/src/features/chats/hooks/usePins.ts:39` — Закреплять можно только свои диалоги
+- `frontend/src/features/chats/hooks/usePins.ts:40` — Попробуйте ещё раз
+- `frontend/src/features/chats/inbox/InboxDecisionBar.tsx:44` — Решение по диалогу из очереди
+- `frontend/src/features/chats/inbox/InboxDecisionBar.tsx:46` — Диалог ждёт в очереди — примите его, чтобы ответить
+- `frontend/src/features/chats/inbox/InboxDecisionBar.tsx:56` — Принять диалог
+- `frontend/src/features/chats/inbox/InboxDecisionBar.tsx:65` — Отклонить
+- `frontend/src/features/chats/inbox/InboxDecisionBar.tsx:88` — Следующий в очереди
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:42` — Разгрузить очередь
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:44` — Закроются диалоги, которые стоят в очереди и в которых давно тихо.
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:45` — Взятые кем-то не тронутся. Если клиент напишет снова, диалог вернётся
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:46` — сам.
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:51` — Тихо дольше, дней
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:64` — Не получилось посчитать
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:68` — Закрывать нечего — таких диалогов нет
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:73` — Закроется диалогов: {count}
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:78` — Без имени
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:86` — и ещё {count - (preview.data?.sample.length ?? 0)}
+- `frontend/src/features/chats/inbox/UnloadQueueDialog.tsx:96` — Отмена
+- `frontend/src/features/chats/inbox/useInbox.ts:70` — Диалог уже занят
+- `frontend/src/features/chats/inbox/useInbox.ts:71` — Диалог принял ${claimedBy.full_name}
+- `frontend/src/features/chats/inbox/useInbox.ts:130` — Не получилось принять диалог
+- `frontend/src/features/chats/inbox/useInbox.ts:131` — Попробуйте ещё раз
+- `frontend/src/features/chats/inbox/useInbox.ts:171` — Диалог вернулся в очередь
+- `frontend/src/features/chats/inbox/useInbox.ts:172` — Его снова видят все операторы
+- `frontend/src/features/chats/inbox/useInbox.ts:177` — Не получилось вернуть диалог
+- `frontend/src/features/chats/inbox/useInbox.ts:178` — Попробуйте ещё раз
+- `frontend/src/features/chats/inbox/useInbox.ts:213` — Диалог отклонён
+- `frontend/src/features/chats/inbox/useInbox.ts:214` — От него отказались все
+- `frontend/src/features/chats/inbox/useInbox.ts:215` — Вернуть
+- `frontend/src/features/chats/inbox/useInbox.ts:225` — Диалог вернулся в вашу очередь
+- `frontend/src/features/chats/inbox/useInbox.ts:229` — Вернуть не получилось
+- `frontend/src/features/chats/inbox/useInbox.ts:230` — Диалог уже приняли или закрыли
+- `frontend/src/features/chats/inbox/useInbox.ts:239` — Не получилось отклонить
+- `frontend/src/features/chats/inbox/useInbox.ts:240` — Диалог остался в очереди — попробуйте ещё раз
+- `frontend/src/features/chats/inbox/useInbox.ts:281` — Закрывать было нечего
+- `frontend/src/features/chats/inbox/useInbox.ts:281` — Очередь разгружена
+- `frontend/src/features/chats/inbox/useInbox.ts:282` — Закрыто диалогов: ${res.closed}
+- `frontend/src/features/chats/inbox/useInbox.ts:287` — Не получилось разгрузить
+- `frontend/src/features/chats/inbox/useInbox.ts:287` — Попробуйте ещё раз
+- `frontend/src/features/chats/outcomes.ts:26` — Выезд назначен
+- `frontend/src/features/chats/outcomes.ts:26` — мастер поедет
+- `frontend/src/features/chats/outcomes.ts:27` — Отказ
+- `frontend/src/features/chats/outcomes.ts:27` — передумал, дорого, нашёл сам
+- `frontend/src/features/chats/outcomes.ts:28` — Не наш профиль
+- `frontend/src/features/chats/outcomes.ts:28` — такую технику не ремонтируем
+- `frontend/src/features/chats/outcomes.ts:29` — Спам
+- `frontend/src/features/chats/outcomes.ts:30` — Нет ответа
+- `frontend/src/features/chats/outcomes.ts:30` — написал и пропал
+- `frontend/src/features/hotkeys/HotkeysModal.tsx:18` — Горячие клавиши
+- `frontend/src/features/hotkeys/HotkeysModal.tsx:20` — Основные сочетания совпадают с Jivo — переучиваться не нужно. Всё то же самое
+- `frontend/src/features/hotkeys/HotkeysModal.tsx:21` — по-прежнему можно сделать мышью.
+- `frontend/src/features/hotkeys/catalog.ts:23` — Принять диалог — как в Jivo
+- `frontend/src/features/hotkeys/catalog.ts:24` — Отметить решённым (закрыть) — как в Jivo
+- `frontend/src/features/hotkeys/catalog.ts:25` — Передать диалог — как в Jivo
+- `frontend/src/features/hotkeys/catalog.ts:26` — Предыдущий и следующий диалог — как в Jivo
+- `frontend/src/features/hotkeys/catalog.ts:27` — Отклонить диалог — вне поля ввода; в Jivo такого не было
+- `frontend/src/features/hotkeys/catalog.ts:28` — Поиск по диалогам — из любого раздела
+- `frontend/src/features/hotkeys/catalog.ts:29` — Тоже перемещение по списку, без Ctrl
+- `frontend/src/features/hotkeys/catalog.ts:30` — Следующий диалог с непрочитанными
+- `frontend/src/features/hotkeys/catalog.ts:31` — Срезы списка: Мои, Все, Новые, Закрытые
+- `frontend/src/features/hotkeys/catalog.ts:32` — Открытый диалог — курсор в поле ввода
+- `frontend/src/features/hotkeys/catalog.ts:33` — Режим внутренней заметки
+- `frontend/src/features/hotkeys/catalog.ts:34` — Быстрые ответы — в пустом поле ввода
+- `frontend/src/features/hotkeys/catalog.ts:35` — Закрыть по очереди: карточку, заметку, поиск
+- `frontend/src/features/hotkeys/catalog.ts:36` — Эта справка — из любого места
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:167` — к
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:172` — в
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:177` — е
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:217` — е
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:227` — О
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:227` — о
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:228` — Л
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:228` — л
+- `frontend/src/features/hotkeys/useChatHotkeys.ts:259` — л
+- `frontend/src/features/notifications/CriticalBanners.tsx:60` — Подтвердить
+- `frontend/src/features/notifications/CriticalBanners.tsx:82` — Критичные уведомления
+- `frontend/src/features/notifications/CriticalBanners.tsx:88` — и ещё {rest}
+- `frontend/src/features/notifications/NotificationBell.tsx:22` — Уведомления
+- `frontend/src/features/notifications/NotificationBell.tsx:22` — Уведомления — непрочитанных: ${unread}
+- `frontend/src/features/notifications/NotificationBell.tsx:34` — Уведомления
+- `frontend/src/features/notifications/NotificationPanel.tsx:53` — не прочитано
+- `frontend/src/features/notifications/NotificationPanel.tsx:77` — Уведомления
+- `frontend/src/features/notifications/NotificationPanel.tsx:80` — Уведомления
+- `frontend/src/features/notifications/NotificationPanel.tsx:88` — Отметить все прочитанными
+- `frontend/src/features/notifications/NotificationPanel.tsx:95` — Пока ничего не происходило
+- `frontend/src/features/notifications/NotificationPanel.tsx:115` — Показать все
+- `frontend/src/features/notifications/NotificationsPage.tsx:44` — Всё время
+- `frontend/src/features/notifications/NotificationsPage.tsx:45` — Сегодня
+- `frontend/src/features/notifications/NotificationsPage.tsx:46` — 7 дней
+- `frontend/src/features/notifications/NotificationsPage.tsx:47` — 30 дней
+- `frontend/src/features/notifications/NotificationsPage.tsx:48` — Произвольный
+- `frontend/src/features/notifications/NotificationsPage.tsx:52` — Любая важность
+- `frontend/src/features/notifications/NotificationsPage.tsx:127` — Прочитано
+- `frontend/src/features/notifications/NotificationsPage.tsx:184` — Уведомления
+- `frontend/src/features/notifications/NotificationsPage.tsx:185` — Уведомления
+- `frontend/src/features/notifications/NotificationsPage.tsx:187` — Вашей роли уведомления не приходят
+- `frontend/src/features/notifications/NotificationsPage.tsx:194` — Журнал уведомлений
+- `frontend/src/features/notifications/NotificationsPage.tsx:199` — Уведомления
+- `frontend/src/features/notifications/NotificationsPage.tsx:202` — Отметить все прочитанными
+- `frontend/src/features/notifications/NotificationsPage.tsx:210` — Важность
+- `frontend/src/features/notifications/NotificationsPage.tsx:223` — Тип события
+- `frontend/src/features/notifications/NotificationsPage.tsx:224` — Тип: любой
+- `frontend/src/features/notifications/NotificationsPage.tsx:237` — Период
+- `frontend/src/features/notifications/NotificationsPage.tsx:256` — Произвольный период
+- `frontend/src/features/notifications/NotificationsPage.tsx:257` — Выберите даты
+- `frontend/src/features/notifications/NotificationsPage.tsx:273` — Только непрочитанные
+- `frontend/src/features/notifications/NotificationsPage.tsx:291` — Не получилось загрузить уведомления
+- `frontend/src/features/notifications/NotificationsPage.tsx:294` — Повторить
+- `frontend/src/features/notifications/NotificationsPage.tsx:300` — За выбранный период уведомлений нет
+- `frontend/src/features/notifications/NotificationsPage.tsx:309` — Время
+- `frontend/src/features/notifications/NotificationsPage.tsx:310` — Важность
+- `frontend/src/features/notifications/NotificationsPage.tsx:311` — Событие
+- `frontend/src/features/notifications/NotificationsPage.tsx:312` — Что произошло
+- `frontend/src/features/notifications/NotificationsPage.tsx:314` — Действие
+- `frontend/src/features/notifications/NotificationsPage.tsx:328` — {offset + 1}–{offset + shown} из {total}
+- `frontend/src/features/notifications/NotificationsPage.tsx:337` — Назад
+- `frontend/src/features/notifications/NotificationsPage.tsx:345` — Вперёд
+- `frontend/src/features/notifications/NotificationsPage.tsx:354` — Новая ссылка установки пароля
+- `frontend/src/features/notifications/NotificationsPage.tsx:356` — Ссылка показывается один раз и действует 72 часа. Передайте её сотруднику лично.
+- `frontend/src/features/notifications/catalog.ts:27` — Критичное
+- `frontend/src/features/notifications/catalog.ts:28` — Важное
+- `frontend/src/features/notifications/catalog.ts:29` — Обычное
+- `frontend/src/features/notifications/catalog.ts:76` — Аккаунт требует переподключения
+- `frontend/src/features/notifications/catalog.ts:77` — Приём сообщений остановился
+- `frontend/src/features/notifications/catalog.ts:78` — Резервное копирование не выполнилось
+- `frontend/src/features/notifications/catalog.ts:79` — Планировщик не отвечает
+- `frontend/src/features/notifications/catalog.ts:80` — Система не отвечает снаружи
+- `frontend/src/features/notifications/catalog.ts:81` — Очередь входящих не разбирается
+- `frontend/src/features/notifications/catalog.ts:82` — Сообщения не уходят клиентам
+- `frontend/src/features/notifications/catalog.ts:83` — На диске мало места
+- `frontend/src/features/notifications/catalog.ts:84` — Сертификат скоро истекает
+- `frontend/src/features/notifications/catalog.ts:85` — AI временно недоступен
+- `frontend/src/features/notifications/catalog.ts:88` — Запрос на сброс пароля
+- `frontend/src/features/notifications/catalog.ts:89` — Сообщение администратору
+- `frontend/src/features/notifications/catalog.ts:90` — Учётная запись заблокирована
+- `frontend/src/features/notifications/catalog.ts:93` — Клиент недоволен
+- `frontend/src/features/notifications/catalog.ts:94` — Диалог без ответа
+- `frontend/src/features/notifications/catalog.ts:95` — Клиент вернулся в закрытый диалог
+- `frontend/src/features/notifications/catalog.ts:96` — Вам передали диалог
+- `frontend/src/features/notifications/catalog.ts:114` — Клиент ждёт вашего ответа
+- `frontend/src/features/notifications/catalog.ts:115` — Диалог никто не принял
+- `frontend/src/features/notifications/catalog.ts:116` — Ответ не дошёл до клиента
+- `frontend/src/features/notifications/catalog.ts:117` — Очередь разгружена автоматически
+- `frontend/src/features/notifications/catalog.ts:121` — Сообщения от клиентов не разбираются
+- `frontend/src/features/notifications/catalog.ts:124` — Канал отобрали: подписка пропала
+- `frontend/src/features/notifications/catalog.ts:127` — Уведомление
+- `frontend/src/features/notifications/catalog.ts:142` — Открыть диалог
+- `frontend/src/features/notifications/catalog.ts:143` — Открыть аккаунты
+- `frontend/src/features/notifications/catalog.ts:144` — Открыть команду
+- `frontend/src/features/notifications/catalog.ts:157` — Подтвердить
+- `frontend/src/features/notifications/time.ts:16` — только что
+- `frontend/src/features/notifications/time.ts:19` — ${m} ${plural(m, "минуту", "минуты", "минут")} назад
+- `frontend/src/features/notifications/time.ts:30` — повторялось ${count} ${plural(count, "раз", "раза", "раз")}
+- `frontend/src/features/notifications/useNotifications.ts:149` — Готово
+- `frontend/src/features/notifications/useNotifications.ts:150` — Действие выполнено
+- `frontend/src/features/notifications/useNotifications.ts:159` — Действие не выполнено
+- `frontend/src/features/notifications/useNotifications.ts:160` — Попробуйте ещё раз
+- `frontend/src/features/presence/PresenceMenuItems.tsx:26` — Моё состояние
+- `frontend/src/features/presence/PresenceMenuItems.tsx:34` — На месте
+- `frontend/src/features/presence/PresenceMenuItems.tsx:43` — Отошёл — новых обращений не давать
+- `frontend/src/features/presence/usePresence.ts:59` — Состояние не сохранилось
+- `frontend/src/features/presence/usePresence.ts:60` — Попробуйте ещё раз — пока система считает, что вы на месте
+- `frontend/src/features/settings/SettingsLayout.tsx:14` — Разделы настроек
+- `frontend/src/features/settings/SettingsLayout.tsx:17` — Аккаунты Авито
+- `frontend/src/features/settings/SettingsLayout.tsx:22` — Быстрые ответы
+- `frontend/src/features/settings/SettingsLayout.tsx:27` — Боты
+- `frontend/src/features/settings/SettingsLayout.tsx:32` — Распределение
+- `frontend/src/features/settings/SettingsLayout.tsx:37` — Команда
+- `frontend/src/features/settings/SettingsLayout.tsx:41` — Профиль
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:43` — работает
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:44` — требует переподключения
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:45` — отключён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:71` — не снят — Авито не ответил
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:73` — сбой
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:74` — не зарегистрирован
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:85` — Вебхук молчит — сообщения доезжают реконсиляцией с задержкой
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:86` — Вебхук молчит
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:92` — Канал выключен, но подписка на стороне Авито осталась нашей — сообщения по-прежнему идут сюда. Нажмите «Отключить» ещё раз, когда Авито ответит.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:93` — Подписка не снята
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:120` — все
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:138` — Назначены: ${preview.map((u) => u.full_name).join(", ")}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:139` —  и ещё ${hidden}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:151` — Назначить операторов на аккаунт ${account.title}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:154` — Назначить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:160` — Никто не назначен — обращения канала видят все операторы
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:179` — Не получилось начать переподключение
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:180` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:210` — Аккаунт отключён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:211` — Приём остановлен, переписка удалена
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:216` — Не получилось отключить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:216` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:223` — Аккаунт включён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:228` — Не получилось включить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:231` — Токены устарели за время простоя — нужно переподключение через Авито
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:232` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:242` — Подписка на входящие обновлена
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:247` — Авито не принял подписку
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:250` — Сначала включите аккаунт
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:251` — Попробуйте ещё раз через минуту
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:272` — Аккаунт переименован
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:275` — Не переименовалось
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:275` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:282` — Аккаунт удалён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:289` — Аккаунт не удалён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:290` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:300` — Токен обновлён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:305` — Не получилось обновить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:308` — Авито отозвал доступ — нужно переподключение
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:310` — Токен уже обновляется, подождите несколько секунд
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:311` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:322` — Аккаунт ${account.title}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:327` — Статус: ${STATUS_LABEL[account.status]}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:357` — Название аккаунта
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:363` — Название
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:364` — Так аккаунт будет называться в списках, фильтрах и статистике. На стороне Авито ничего не изменится.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:372` — Отмена
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:379` — Сохранить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:388` — Токен: активен{account.token_expires_at ?                                                    :   }
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:388` — , до ${formatListTime(account.token_expires_at)}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:393` — Загрузка истории
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:395` — Загружаем историю… {account.backfill?.chats_offset ?? 0} чатов
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:412` — Загрузка истории сорвалась на {account.backfill?.chats_offset ?? 0} чатах.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:413` — Уже загруженное на месте — повтор продолжит с этого места.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:417` — Подключён {formatDate(account.created_at)}
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:427` — Обновить токен
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:435` — Требует переподключения
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:438` — Токен отозван на стороне Авито. Приём сообщений остановлен.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:446` — 🔄 Переподключить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:453` — Отключён вручную, переписка удалена. Включить можно в любой момент — новые обращения
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:454` — снова начнут приходить.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:474` — Переименовать
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:483` — Подписаться на входящие заново, не переподключая аккаунт через Авито
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:485` — Обновить подписку
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:499` — Отключить аккаунт «${account.title}» и удалить его переписку?    
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:500` — Приём новых обращений остановится, подписка на стороне Авито снимется, 
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:501` — а все диалоги и сообщения этого аккаунта будут удалены без возможности вернуть.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:508` — Отключить и стереть
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:520` — Включить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:534` — Удалить аккаунт «${account.title}» из системы?    
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:535` — Вместе с ним будут удалены все его диалоги и сообщения. Отменить нельзя.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:542` — Удалить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:566` — Аккаунт подключён
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:567` — Загружаем историю чатов…
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:572` — Переподключение отменено
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:573` — Вы авторизовали другой аккаунт Авито
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:579` — Не удалось подключить аккаунт
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:580` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:609` — Аккаунты Авито
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:610` — Каналы, обращения которых приходят в «Чаты»
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:625` — Подключить аккаунт
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:637` — Это не настоящий Авито.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:638` — любые ключи и покажет выдуманный аккаунт. Настоящие обращения приходить не будут.
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:641` — Переключить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:654` — Не получилось загрузить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:657` — Повторить
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:664` — Подключите первый аккаунт Авито
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:670` — Нужны Client ID и Client Secret из кабинета разработчика того аккаунта — и обращения по всем его объявлениям пойдут в «Чаты»
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:671` — Аккаунты подключает администратор
+- `frontend/src/features/settings/accounts/AccountsPage.tsx:675` — Подключить аккаунт
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:31` — не может отвечать клиентам
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:35` — return s.toLowerCase().replace(/ё/g,    ).trim();
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:35` — е
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:98` — оператор
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:109` —  · снимите галочку, чтобы сохранить аккаунт
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:182` — Операторы назначены
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:185` — Канал «${account.title}» доступен всем операторам
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:186` — На аккаунт «${account.title}» назначено: ${selected.size}
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:195` — Не получилось сохранить. Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:226` — Назначить операторов на аккаунт «${account.title}»
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:230` — Только сотрудники, назначенные операторами, могут общаться с клиентами этого аккаунта.
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:237` — Изменения не сохранены
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:239` — Закрыть экран и потерять расставленные галочки?
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:242` — Остаться
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:245` — Закрыть без сохранения
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:264` — Не получилось загрузить список сотрудников
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:267` — Повторить
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:274` — Поиск по имени
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:275` — Имя сотрудника
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:282` — Выбрано: {selected.size} из {selectableCount}
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:289` — Набор нельзя сохранить
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:291` — {blocked.length === 1 ?                   :                  } аккаунт. Снимите{   }
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:291` — больше не ведут
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:291` — больше не ведёт
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:292` — {blocked.length === 1 ?           :          }, чтобы сохранить: вернуть{   }
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:292` — галочки
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:292` — галочку
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:293` — {blocked.length === 1 ?       :     } можно будет, когда сотрудник снова станет
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:293` — его
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:293` — их
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:294` — оператором.
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:298` — Сотрудники
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:301` — Никого не нашли
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:321` — Никто не выбран
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:322` — всем
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:323` — закрывается, а открывается для всех, иначе обращения повисли бы.
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:331` — Отмена
+- `frontend/src/features/settings/accounts/AssignOperatorsModal.tsx:341` — Сохранить
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:96` — Переключено на настоящий Авито
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:100` — Не переключилось
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:101` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:131` — Это тот же аккаунт, что уже подключён
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:133` — Ключи принадлежат каналу «${account.title}» — они обновлены, новый канал не появился. 
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:134` — Для другого аккаунта Авито нужны его собственные Client ID и Client Secret, 
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:135` — созданные в его кабинете разработчика.
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:142` — Аккаунт «${account.title}» подключён
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:143` — Новые обращения по его объявлениям пойдут в «Чаты»
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:153` — Не подключилось
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:154` — Попробуйте ещё раз
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:169` — Подключить аккаунт Авито
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:173` — Нужны два значения из кабинета разработчика Авито того аккаунта, который
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:174` — подключаете. Пароль от аккаунта не требуется — если ключей у вас нет, попросите их
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:175` — у того, кто ведёт этот аккаунт.
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:180` — из кабинета разработчика Авито
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:195` — Система смотрит на встроенный имитатор
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:197` — Он примет любые ключи и покажет выдуманный аккаунт — настоящих обращений не
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:198` — будет. Переключите на настоящий Авито перед подключением.
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:206` — Переключить на настоящий Авито
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:214` — Приложению нужны права
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:219` — Без них Авито примет ключи, но переписку не отдаст.
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:225` — Отмена
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:232` — Сначала переключите систему на настоящий Авито
+- `frontend/src/features/settings/accounts/ConnectChannelWizard.tsx:237` — Подключить
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — вс
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — вт
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — пн
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — пт
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — сб
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — ср
+- `frontend/src/features/settings/accounts/WeekBars.tsx:26` — чт
+- `frontend/src/features/settings/accounts/WeekBars.tsx:58` — За неделю обращений не было
+- `frontend/src/features/settings/accounts/WeekBars.tsx:68` — Обращения по дням недели, всего ${stats.total}
+- `frontend/src/features/settings/accounts/WeekBars.tsx:89` — {plural(stats.total,            ,            ,            )} за неделю
+- `frontend/src/features/settings/accounts/WeekBars.tsx:89` — обращение
+- `frontend/src/features/settings/accounts/WeekBars.tsx:89` — обращений
+- `frontend/src/features/settings/accounts/WeekBars.tsx:89` — обращения
+- `frontend/src/features/settings/accounts/WeekBars.tsx:93` — Обращения, на которые никто ни разу не ответил
+- `frontend/src/features/settings/bots/BotEditor.tsx:149` — Не удалось переключить бота
+- `frontend/src/features/settings/bots/BotEditor.tsx:149` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotEditor.tsx:161` — Бот «${bot.name}» обновлён
+- `frontend/src/features/settings/bots/BotEditor.tsx:161` — Сценарий сохранён
+- `frontend/src/features/settings/bots/BotEditor.tsx:170` — Не удалось сохранить
+- `frontend/src/features/settings/bots/BotEditor.tsx:170` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotEditor.tsx:190` — Бот не найден
+- `frontend/src/features/settings/bots/BotEditor.tsx:191` — Возможно, его удалили
+- `frontend/src/features/settings/bots/BotEditor.tsx:194` — К списку ботов
+- `frontend/src/features/settings/bots/BotEditor.tsx:212` — ← К списку ботов
+- `frontend/src/features/settings/bots/BotEditor.tsx:218` — Имя бота
+- `frontend/src/features/settings/bots/BotEditor.tsx:224` — Включён
+- `frontend/src/features/settings/bots/BotEditor.tsx:227` — Включён
+- `frontend/src/features/settings/bots/BotEditor.tsx:233` — Аккаунты Авито
+- `frontend/src/features/settings/bots/BotEditor.tsx:234` — Аккаунт может быть привязан только к одному боту
+- `frontend/src/features/settings/bots/BotEditor.tsx:254` — База знаний ai_answer
+- `frontend/src/features/settings/bots/BotEditor.tsx:255` — Текст целиком уходит в промпт модели на шаге ai_answer. Пишите фактами: услуга — цена от — срок
+- `frontend/src/features/settings/bots/BotEditor.tsx:271` — Сценарий
+- `frontend/src/features/settings/bots/BotEditor.tsx:282` — + добавить шаг
+- `frontend/src/features/settings/bots/BotEditor.tsx:297` — + Добавить шаг
+- `frontend/src/features/settings/bots/BotEditor.tsx:308` — Сохранить
+- `frontend/src/features/settings/bots/BotEditor.tsx:308` — Сохранить с предупреждениями
+- `frontend/src/features/settings/bots/BotEditor.tsx:311` — 🧪 Протестировать
+- `frontend/src/features/settings/bots/BotEditor.tsx:314` — Отменить изменения
+- `frontend/src/features/settings/bots/BotEditor.tsx:318` — Есть несохранённые изменения
+- `frontend/src/features/settings/bots/BotEditor.tsx:345` — Ошибки блокируют сохранение — почините отмеченные шаги
+- `frontend/src/features/settings/bots/BotsPage.tsx:30` — Не удалось переключить бота
+- `frontend/src/features/settings/bots/BotsPage.tsx:30` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotsPage.tsx:40` — Не удалось создать бота
+- `frontend/src/features/settings/bots/BotsPage.tsx:40` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotsPage.tsx:56` — Бот удалён
+- `frontend/src/features/settings/bots/BotsPage.tsx:64` — Бот не удалён
+- `frontend/src/features/settings/bots/BotsPage.tsx:66` — Сначала отвяжите каналы: ${bound}
+- `frontend/src/features/settings/bots/BotsPage.tsx:67` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotsPage.tsx:78` — ${source.name} (копия)
+- `frontend/src/features/settings/bots/BotsPage.tsx:90` — Не удалось дублировать бота
+- `frontend/src/features/settings/bots/BotsPage.tsx:90` — Попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotsPage.tsx:98` — Боты
+- `frontend/src/features/settings/bots/BotsPage.tsx:99` — Бот здоровается и собирает контекст, пока менеджеры заняты. Как только пишет оператор — бот замолкает в этом диалоге навсегда
+- `frontend/src/features/settings/bots/BotsPage.tsx:102` — + Создать бота
+- `frontend/src/features/settings/bots/BotsPage.tsx:118` — Не удалось загрузить ботов
+- `frontend/src/features/settings/bots/BotsPage.tsx:119` — Проверьте соединение и попробуйте ещё раз
+- `frontend/src/features/settings/bots/BotsPage.tsx:122` — Повторить
+- `frontend/src/features/settings/bots/BotsPage.tsx:131` — Ботов пока нет
+- `frontend/src/features/settings/bots/BotsPage.tsx:132` — Создайте первого из шаблона «Первичный приём» — он поздоровается и соберёт контакт, пока менеджеры заняты
+- `frontend/src/features/settings/bots/BotsPage.tsx:135` — + Создать бота
+- `frontend/src/features/settings/bots/BotsPage.tsx:145` — Бот
+- `frontend/src/features/settings/bots/BotsPage.tsx:146` — Вкл
+- `frontend/src/features/settings/bots/BotsPage.tsx:147` — Аккаунты
+- `frontend/src/features/settings/bots/BotsPage.tsx:148` — Расписание
+- `frontend/src/features/settings/bots/BotsPage.tsx:150` — Диалогов/7д
+- `frontend/src/features/settings/bots/BotsPage.tsx:171` — {bot.scenario_steps_count} шаг(ов)
+- `frontend/src/features/settings/bots/BotsPage.tsx:172` —  · база знаний есть
+- `frontend/src/features/settings/bots/BotsPage.tsx:172` —  · без базы знаний
+- `frontend/src/features/settings/bots/BotsPage.tsx:178` — Включить бота ${bot.name}
+- `frontend/src/features/settings/bots/BotsPage.tsx:214` — Дублировать
+- `frontend/src/features/settings/bots/BotsPage.tsx:224` — Удалить бота «${bot.name}»?    
+- `frontend/src/features/settings/bots/BotsPage.tsx:225` — Сценарий и база знаний пропадут без возврата. 
+- `frontend/src/features/settings/bots/BotsPage.tsx:226` — Если бот привязан к каналам, система откажет и назовёт их.
+- `frontend/src/features/settings/bots/BotsPage.tsx:233` — Удалить
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:28` — бот вне расписания — в диалог не входит
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:29` — бот сейчас ничего не ждёт — таймаут промотать нечему
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:43` — → шаг {event.id} ({event.type}){event.detail ?                     :   }
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:50` —  · дедлайн ${event.deadline}
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:62` — 🔀 условие {event.step} → {event.next}
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:68` — ↻ переспрашиваю ({event.step}, попытка {event.attempts})
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:76` — 🔎 сработал детектор: {event.detector ===                 ?                          : event.detector}
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:76` — клиент просит человека
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:82` — таймаут не в счёт — клиент успел ответить
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:89` —  · модель просит оператора
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:129` — Иван
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:130` — Ремонт iPhone
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:177` — ⏩ таймаут
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:222` — 🧪 Песочница: ${draft.name} (черновик)
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:227` — Время
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:229` — сейчас
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:230` — задать
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:236` — Время симуляции
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:244` — заглушка
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:245` — настоящий
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:252` — Клиент
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:259` — Объявление
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:266` — Сбросить
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:277` — Сначала почините сценарий
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:293` — Типовой чек перед включением: дневной сценарий → «сейчас ночь» → невалидный телефон дважды →
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:294` — «позовите оператора» → «ужасный сервис!». Так за минуту проверяются все шесть условий передачи
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:295` — оператору
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:311` — Состояние
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:318` — Ждёт: {waiting.var ?? waiting.kind}
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:319` —  · до ${waiting.deadline}
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:338` — счётчики
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:341` — шагов: {counters.steps_total ?? 0}/{limits.max_steps_total} · подряд бота:{   }
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:345` — мимо сценария: {counters.offscript_msgs ?? 0}/{limits.max_offscript_messages} · вызовов AI:{   }
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:357` — ⏩ Промотать таймаут
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:364` — Ответ клиента
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:365` — ответ клиента…
+- `frontend/src/features/settings/bots/SandboxDrawer.tsx:387` — Отправить ответ клиента
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:45` — Расписание
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:48` — Круглосуточно
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:49` — По расписанию
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:75` — Интервал ${i + 1}: начало
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:86` — Интервал ${i + 1}: конец
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:94` — через полночь
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:101` — Удалить интервал ${i + 1}
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:118` — + интервал
+- `frontend/src/features/settings/bots/components/ScheduleEditor.tsx:121` — Время московское ({schedule.timezone ??                })
+- `frontend/src/features/settings/bots/components/StepCard.tsx:80` — Идентификатор шага ${step.id}
+- `frontend/src/features/settings/bots/components/StepCard.tsx:98` — старт
+- `frontend/src/features/settings/bots/components/StepCard.tsx:108` — Ошибка в шаге
+- `frontend/src/features/settings/bots/components/StepCard.tsx:113` — Предупреждение в шаге
+- `frontend/src/features/settings/bots/components/StepCard.tsx:117` — Выше
+- `frontend/src/features/settings/bots/components/StepCard.tsx:121` — Переместить выше: ${step.id}
+- `frontend/src/features/settings/bots/components/StepCard.tsx:128` — Ниже
+- `frontend/src/features/settings/bots/components/StepCard.tsx:132` — Переместить ниже: ${step.id}
+- `frontend/src/features/settings/bots/components/StepCard.tsx:139` — Удалить шаг
+- `frontend/src/features/settings/bots/components/StepCard.tsx:144` — Удалить шаг ${step.id}
+- `frontend/src/features/settings/bots/components/StepCard.tsx:158` — Тип шага
+- `frontend/src/features/settings/bots/components/StepCard.tsx:172` — Сделать стартовым
+- `frontend/src/features/settings/bots/components/StepCard.tsx:196` — Сменить тип шага?
+- `frontend/src/features/settings/bots/components/StepCard.tsx:196` — Удалить шаг?
+- `frontend/src/features/settings/bots/components/StepCard.tsx:202` — Шаг ${step.id} будет удалён. Переходы других шагов на него придётся поправить вручную.
+- `frontend/src/features/settings/bots/components/StepCard.tsx:203` — Параметры шага сбросятся на значения по умолчанию нового типа.
+- `frontend/src/features/settings/bots/components/StepCard.tsx:207` — Отмена
+- `frontend/src/features/settings/bots/components/StepCard.tsx:217` — Сменить тип
+- `frontend/src/features/settings/bots/components/StepCard.tsx:217` — Удалить
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:21` — Порог уверенности: {threshold.toFixed(2)}
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:30` — Порог уверенности
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:34` — Ниже порога (или если модель сама просит человека) — переход «при низкой уверенности»
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:40` — Макс. длина ответа
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:41` — символов
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:48` — Глубина контекста
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:49` — последних сообщений диалога
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:58` — Приватность: перед отправкой в модель телефоны в тексте заменяются на {         } — найденный номер
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:59` — остаётся в переменных бота и в карточке клиента
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:63` — далее →
+- `frontend/src/features/settings/bots/components/StepForms/AiAnswerForm.tsx:69` — при низкой уверенности →
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:10` — const CYRILLIC = /[а-яё]/i;
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:27` — Регулярка не компилируется
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:36` — Вопрос
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:37` — Можно оставить пустым — тогда вопрос уже задан предыдущим шагом send
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:45` — Переменная
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:46` — Латиница, с буквы: phone, problem
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:49` — Только латиница — это имя ключа в bot_vars
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:54` — Валидатор
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:68` — Регулярное выражение
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:69` — re.search по ответу клиента, до 200 символов
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:79` — Retry-текст
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:80` — Отправляется, когда ответ не прошёл валидацию
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:89` — Попыток
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:96` — Таймаут
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:112` — ответ →
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:118` — по таймауту →
+- `frontend/src/features/settings/bots/components/StepForms/AskForm.tsx:125` — попытки исчерпаны →
+- `frontend/src/features/settings/bots/components/StepForms/CloseForm.tsx:18` — завершает сценарий
+- `frontend/src/features/settings/bots/components/StepForms/CloseForm.tsx:21` — Закрыть молча
+- `frontend/src/features/settings/bots/components/StepForms/CloseForm.tsx:27` — Прощальное сообщение
+- `frontend/src/features/settings/bots/components/StepForms/CloseForm.tsx:35` — В ленту добавится заметка «Диалог закрыт ботом»
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:30` — Рабочее время с
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:38` — Рабочее время до
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:45` — Часовой пояс
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:70` — Интервал через полночь — день относится к его началу
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:78` — Имя переменной
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:89` — Имя переменной
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:95` — Значение переменной
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:106` — Ключевые слова через запятую
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:124` — Регулярное выражение
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:143` — Условия проверяются сверху вниз, побеждает первое истинное
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:149` — если
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:152` — Вид условия ${i + 1}
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:175` — Условие ${i + 1}: переход
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:189` — Удалить условие ${i + 1}
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:208` — + условие
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:212` — иначе →
+- `frontend/src/features/settings/bots/components/StepForms/ConditionForm.tsx:213` — Обязательная ветка: сюда бот идёт, если ни одно условие не сработало
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:18` — завершает сценарий
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:21` — Причина
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:22` — Попадёт в bot_vars.handoff.reason и в журнал аудита
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:28` — Комментарий менеджеру
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:29` — Ляжет заметкой в диалог — её видят только сотрудники
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:36` — Теги
+- `frontend/src/features/settings/bots/components/StepForms/HandoffForm.tsx:37` — Добавятся к conversations.tags
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:23` — Текст вопроса
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:24` — Варианты перечисляйте цифрами — клиент отвечает номером или словом
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:31` — Переменная (необязательно)
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:32` — Сюда запишется id выбранного варианта
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:41` — Варианты ({p.options.length}/10)
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:47` — Вариант
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:48` — Вариант ${i + 1}: название
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:55` — Ключевые слова через запятую
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:56` — Вариант ${i + 1}: ключевые слова
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:71` — переход →
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:72` — Вариант ${i + 1}: переход
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:81` — Удалить вариант ${i + 1}
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:100` — Новый вариант
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:108` — + вариант
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:113` — Retry-текст
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:122` — Попыток
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:129` — Таймаут
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:140` — мимо вариантов →
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:141` — Несовпадение считается «мимо сценария» (условие handoff №4)
+- `frontend/src/features/settings/bots/components/StepForms/MenuForm.tsx:148` — по таймауту →
+- `frontend/src/features/settings/bots/components/StepForms/NoteForm.tsx:12` — Текст заметки
+- `frontend/src/features/settings/bots/components/StepForms/NoteForm.tsx:13` — Видна только сотрудникам — жёлтая вставка в ленте
+- `frontend/src/features/settings/bots/components/StepForms/NoteForm.tsx:19` — далее →
+- `frontend/src/features/settings/bots/components/StepForms/SendForm.tsx:12` — Текст
+- `frontend/src/features/settings/bots/components/StepForms/SendForm.tsx:13` — 1–1000 символов. Доставка асинхронная — бот не ждёт подтверждения Авито
+- `frontend/src/features/settings/bots/components/StepForms/SendForm.tsx:19` — далее →
+- `frontend/src/features/settings/bots/components/StepForms/TagForm.tsx:11` — Теги
+- `frontend/src/features/settings/bots/components/StepForms/TagForm.tsx:12` — До 50 символов каждый; дубликаты схлопываются
+- `frontend/src/features/settings/bots/components/StepForms/TagForm.tsx:19` — далее →
+- `frontend/src/features/settings/bots/components/StepRefSelect.tsx:11` — — дефолт: передать оператору —
+- `frontend/src/features/settings/bots/components/StepRefSelect.tsx:39` — ${current} (нет такого шага)
+- `frontend/src/features/settings/bots/components/VariableTextarea.tsx:60` — Вставить переменную
+- `frontend/src/features/settings/bots/components/VariableTextarea.tsx:61` — Вставить переменную: ${label}
+- `frontend/src/features/settings/bots/components/VariableTextarea.tsx:67` — Переменные
+- `frontend/src/features/settings/bots/defaultScenario.ts:18` — Здравствуйте, {client_name}! Это сервис Lead Partner 👋  Подскажите, что случилось с техникой — модель и проблему?
+- `frontend/src/features/settings/bots/defaultScenario.ts:62` — Клиент описал проблему, бот дал предварительный ответ
+- `frontend/src/features/settings/bots/defaultScenario.ts:63` — первичный-приём
+- `frontend/src/features/settings/bots/defaultScenario.ts:69` — Мастер ответит утром. Оставьте телефон — перезвоним первыми ✔
+- `frontend/src/features/settings/bots/defaultScenario.ts:79` — Кажется, это не номер телефона 🙂 Напишите в формате +7 900 000-00-00
+- `frontend/src/features/settings/bots/defaultScenario.ts:90` — контакт собран
+- `frontend/src/features/settings/bots/defaultScenario.ts:96` — 🤖 Бот собрал контакт: {phone}  Проблема со слов клиента: {problem}
+- `frontend/src/features/settings/bots/defaultScenario.ts:104` — Ночной диалог: проблема зафиксирована, перезвонить утром первыми
+- `frontend/src/features/settings/bots/defaultScenario.ts:105` — ночной-лид
+- `frontend/src/features/settings/bots/defaultScenario.ts:118` — Замена экрана iPhone — ориентировочно от 8900 ₽, срок 1–2 часа.
+- `frontend/src/features/settings/bots/defaultScenario.ts:119` — Диагностика бесплатная, точная стоимость — после неё.
+- `frontend/src/features/settings/bots/defaultScenario.ts:120` — Работаем ежедневно 10:00–20:00, приём техники без записи.
+- `frontend/src/features/settings/bots/defaultScenario.ts:124` — Новый бот
+- `frontend/src/features/settings/bots/scenario.ts:30` — Отправить текст клиенту
+- `frontend/src/features/settings/bots/scenario.ts:30` — Сообщение
+- `frontend/src/features/settings/bots/scenario.ts:31` — Вопрос
+- `frontend/src/features/settings/bots/scenario.ts:31` — Задать вопрос и ждать ответ
+- `frontend/src/features/settings/bots/scenario.ts:32` — Вопрос с вариантами ответа
+- `frontend/src/features/settings/bots/scenario.ts:32` — Меню
+- `frontend/src/features/settings/bots/scenario.ts:33` — Ветвление без вопроса
+- `frontend/src/features/settings/bots/scenario.ts:33` — Условие
+- `frontend/src/features/settings/bots/scenario.ts:34` — Ответ AI
+- `frontend/src/features/settings/bots/scenario.ts:34` — Ответ Claude по базе знаний
+- `frontend/src/features/settings/bots/scenario.ts:35` — Оператору
+- `frontend/src/features/settings/bots/scenario.ts:35` — Передать диалог человеку
+- `frontend/src/features/settings/bots/scenario.ts:36` — Закрыть
+- `frontend/src/features/settings/bots/scenario.ts:36` — Закрыть диалог
+- `frontend/src/features/settings/bots/scenario.ts:37` — Повесить теги на диалог
+- `frontend/src/features/settings/bots/scenario.ts:37` — Тег
+- `frontend/src/features/settings/bots/scenario.ts:38` — Внутренняя заметка для менеджера
+- `frontend/src/features/settings/bots/scenario.ts:38` — Заметка
+- `frontend/src/features/settings/bots/scenario.ts:55` — пн
+- `frontend/src/features/settings/bots/scenario.ts:56` — вт
+- `frontend/src/features/settings/bots/scenario.ts:57` — ср
+- `frontend/src/features/settings/bots/scenario.ts:58` — чт
+- `frontend/src/features/settings/bots/scenario.ts:59` — пт
+- `frontend/src/features/settings/bots/scenario.ts:60` — сб
+- `frontend/src/features/settings/bots/scenario.ts:61` — вс
+- `frontend/src/features/settings/bots/scenario.ts:66` — 30 минут
+- `frontend/src/features/settings/bots/scenario.ts:67` — 1 час
+- `frontend/src/features/settings/bots/scenario.ts:68` — 2 часа
+- `frontend/src/features/settings/bots/scenario.ts:69` — 12 часов
+- `frontend/src/features/settings/bots/scenario.ts:70` — 24 часа
+- `frontend/src/features/settings/bots/scenario.ts:71` — 3 дня
+- `frontend/src/features/settings/bots/scenario.ts:72` — без лимита
+- `frontend/src/features/settings/bots/scenario.ts:76` — рабочее время
+- `frontend/src/features/settings/bots/scenario.ts:77` — переменная существует
+- `frontend/src/features/settings/bots/scenario.ts:78` — переменная равна
+- `frontend/src/features/settings/bots/scenario.ts:79` — текст содержит
+- `frontend/src/features/settings/bots/scenario.ts:80` — текст по regex
+- `frontend/src/features/settings/bots/scenario.ts:84` — любой ответ
+- `frontend/src/features/settings/bots/scenario.ts:85` — телефон
+- `frontend/src/features/settings/bots/scenario.ts:86` — число
+- `frontend/src/features/settings/bots/scenario.ts:125` — Текст сообщения
+- `frontend/src/features/settings/bots/scenario.ts:131` — Ваш вопрос клиенту?
+- `frontend/src/features/settings/bots/scenario.ts:147` — Выберите вариант:  1. Первый  2. Второй
+- `frontend/src/features/settings/bots/scenario.ts:149` — Первый
+- `frontend/src/features/settings/bots/scenario.ts:150` — Второй
+- `frontend/src/features/settings/bots/scenario.ts:152` — Ответьте, пожалуйста, цифрой 🙂
+- `frontend/src/features/settings/bots/scenario.ts:188` — Заметка для менеджера
+- `frontend/src/features/settings/bots/scenario.ts:340` — рабочее время ${cond.from}–${cond.to}
+- `frontend/src/features/settings/bots/scenario.ts:342` — есть {${cond.var}}
+- `frontend/src/features/settings/bots/scenario.ts:346` — текст содержит ${cond.keywords.slice(0, 3).join(", ")}
+- `frontend/src/features/settings/bots/scenario.ts:348` — текст по regex ${clip(cond.regex, 20)}
+- `frontend/src/features/settings/bots/scenario.ts:358` — ask → ${step.params.var} · таймаут ${timeoutLabel(step.params.timeout)}
+- `frontend/src/features/settings/bots/scenario.ts:360` — menu: ${step.params.options.length} вариант(ов) · «${clip(step.params.text, 28)}»
+- `frontend/src/features/settings/bots/scenario.ts:362` — condition: ${step.params.conditions ⏎         .map((c) => conditionSummary(c.if)) ⏎         .slice(0, 1) ⏎         .join("")} → иначе ${step.params.else}
+- `frontend/src/features/settings/bots/scenario.ts:367` — ai_answer · порог ${step.params.confidence_threshold ?? 0.6} → ${step.next}
+- `frontend/src/features/settings/bots/scenario.ts:371` — close · молча
+- `frontend/src/features/settings/bots/scenario.ts:383` — никогда
+- `frontend/src/features/settings/bots/scenario.ts:385` — МСК
+- `frontend/src/features/settings/bots/scenario.ts:390` — пн–вс
+- `frontend/src/features/settings/bots/validation.ts:54` — Шаг ${stepId}: регулярка длиннее 200 символов
+- `frontend/src/features/settings/bots/validation.ts:60` — Шаг ${stepId}: регулярка не компилируется
+- `frontend/src/features/settings/bots/validation.ts:68` — Идентификатор «${step.id}»: только латиница в нижнем регистре, цифры и _
+- `frontend/src/features/settings/bots/validation.ts:75` — Шаг ${step.id}: текст обязателен
+- `frontend/src/features/settings/bots/validation.ts:78` — Шаг ${step.id}: текст длиннее ${TEXT_MAX} символов
+- `frontend/src/features/settings/bots/validation.ts:88` — Шаг ${step.id}: имя переменной — латиница, с буквы, до 32 символов (например phone)
+- `frontend/src/features/settings/bots/validation.ts:96` — Шаг ${step.id}: без таймаута бот может ждать вечно
+- `frontend/src/features/settings/bots/validation.ts:102` — Шаг ${step.id}: у меню нет ни одного варианта
+- `frontend/src/features/settings/bots/validation.ts:107` — Шаг ${step.id}: у варианта «${o.label}» нет ключевых слов
+- `frontend/src/features/settings/bots/validation.ts:117` — Шаг ${step.id}: слово «${word}» есть в нескольких вариантах
+- `frontend/src/features/settings/bots/validation.ts:124` — Шаг ${step.id}: нет ни одного условия
+- `frontend/src/features/settings/bots/validation.ts:129` — Шаг ${step.id}: у условия «текст содержит» нет слов
+- `frontend/src/features/settings/bots/validation.ts:132` — Шаг ${step.id}: в условии не указана переменная
+- `frontend/src/features/settings/bots/validation.ts:138` — Шаг ${step.id}: не выбрано ни одного тега
+- `frontend/src/features/settings/bots/validation.ts:230` — В сценарии нет ни одного шага
+- `frontend/src/features/settings/bots/validation.ts:237` — Идентификатор «${step.id}» встречается дважды
+- `frontend/src/features/settings/bots/validation.ts:245` — Стартовый шаг «${scenario.entry}» не найден в сценарии
+- `frontend/src/features/settings/bots/validation.ts:251` — Шаг ${step.id}: переход на несуществующий шаг «${ref.ref}»
+- `frontend/src/features/settings/bots/validation.ts:261` — Шаг ${step.id} недостижим из стартового шага
+- `frontend/src/features/settings/bots/validation.ts:268` — Шаг ${id}: из него нельзя дойти до handoff или close — сценарий повиснет
+- `frontend/src/features/settings/bots/validation.ts:274` — Шаг ${loop}: цикл без вопроса клиенту — бот зациклится
+- `frontend/src/features/settings/bots/validation.ts:291` — Переменную {${v}} пишут несколько шагов: ${owners.join(", ")}
+- `frontend/src/features/settings/bots/validation.ts:299` — Шаг ${step.id}: переменная {${name}} нигде не заполняется
+- `frontend/src/features/settings/bots/validation.ts:309` — Шаг ${entryStep.id}: сценарий стартует молчаливым ожиданием ответа
+- `frontend/src/features/settings/bots/validation.ts:315` — База знаний пуста — шаг ai_answer ответит хуже
+- `frontend/src/features/settings/bots/validation.ts:340` — Имя бота не может быть пустым
+- `frontend/src/features/settings/bots/validation.ts:341` — Имя длиннее ${NAME_MAX} символов
+- `frontend/src/features/settings/bots/validation.ts:347` — База знаний длиннее ${KNOWLEDGE_BASE_MAX} символов
+- `frontend/src/features/settings/bots/validation.ts:356` — Расписание без интервалов не включит бота никогда
+- `frontend/src/features/settings/bots/validation.ts:360` — Интервал ${i + 1}: начало и конец совпадают
+- `frontend/src/features/settings/bots/validation.ts:363` — Интервал ${i + 1}: не выбран ни один день недели
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:66` — Сохранено
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:70` — Не удалось сохранить
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:71` — Попробуйте ещё раз
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:101` — Не удалось загрузить настройки
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:103` — Повторить
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:118` — Распределение диалогов
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:119` — Обычно новое обращение ждёт во «Входящих», пока его кто-нибудь не примет. Можно раздавать автоматически — тому, кто сейчас свободнее всех
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:127` — Раздавать диалоги автоматически
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:133` — Новое обращение сразу уходит свободному оператору
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:134` — Всё как сейчас: диалоги принимают вручную из «Входящих»
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:140` — Сколько диалогов держать на одном операторе
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:143` — Больше этого числа система ему не отдаст — обращение подождёт во
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:144` — «Входящих», где его видят все.
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:153` — Потолок диалогов на оператора
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:163` — Без ограничения
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:186` — Сохранить
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:190` — Есть несохранённые изменения
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:196` — Диалог уходит только тому, кто сейчас в сети и назначен на этот канал.
+- `frontend/src/features/settings/distribution/DistributionTab.tsx:197` — Если подходящих нет — обращение остаётся во «Входящих».
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:59` — Отчёты пересчитаются в течение часа
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:59` — Сохранено
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:63` — Не удалось сохранить
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:64` — Попробуйте ещё раз
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:73` — Рабочие часы
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:76` — Окно, по которому считается скорость первого ответа. Время вне его в
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:77` — расчёт не идёт: ночная пауза не портит цифру, но и не украшает её.
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:83` — С
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:93` — До
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:111` — Конец не позже начала — рабочих часов не останется, и скорость ответа
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:112` — будет нулевой.
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:130` — Сохранить часы
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:134` — Есть несохранённые изменения
+- `frontend/src/features/settings/distribution/WorkHoursBlock.tsx:140` — Отчёты пересчитываются раз в час — новые цифры появятся не мгновенно.
+- `frontend/src/features/settings/profile/AboutAppBlock.tsx:55` — О приложении
+- `frontend/src/features/settings/profile/AboutAppBlock.tsx:64` — Проверить обновления
+- `frontend/src/features/settings/profile/AboutAppBlock.tsx:68` — Обновить до {available.version}
+- `frontend/src/features/settings/profile/AboutAppBlock.tsx:73` — У вас последняя версия
+- `frontend/src/features/settings/profile/AboutAppBlock.tsx:82` — Запускать при входе в Windows
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:34` — Оформление
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:37` — Тема запоминается для этого компьютера.
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:43` — Тёмная
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:44` — Светлая
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:45` — Как в системе
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:47` — Тема оформления
+- `frontend/src/features/settings/profile/AppearanceBlock.tsx:52` — Звук новых сообщений
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:24` — Сообщение отправлено администратору
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:71` — Написать администратору
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:82` — Сообщение не отправлено. Проверьте соединение и попробуйте ещё раз
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:87` — Слишком много сообщений — это не отправлено. Попробуйте {formatRetryAfter(limitedFor)}
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:91` — Тема
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:92` — Коротко: о чём вопрос
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:100` — Сообщение
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:101` — Что случилось и что нужно
+- `frontend/src/features/settings/profile/ContactAdminForm.tsx:113` — Отправить
+- `frontend/src/features/settings/profile/HotkeysBlock.tsx:23` — Горячие клавиши
+- `frontend/src/features/settings/profile/HotkeysBlock.tsx:26` — Основные сочетания совпадают с Jivo — переучиваться не нужно. Всё то же самое
+- `frontend/src/features/settings/profile/HotkeysBlock.tsx:27` — по-прежнему можно сделать мышью.
+- `frontend/src/features/settings/profile/HotkeysBlock.tsx:35` — Показать сочетания
+- `frontend/src/features/settings/profile/HotkeysBlock.tsx:38` — Или нажмите «?» в любом месте программы
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:41` — Мои каналы
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:44` — Обращения этих каналов попадают к вам во «Входящие». Состав настраивает администратор.
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:51` — Загружаем…
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:56` — Не получилось загрузить список каналов
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:63` — Каналы не назначены
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:64` — Новые обращения во «Входящие» к вам не попадут. Напишите администратору формой выше.
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:76` — открыт всем
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:80` — назначен
+- `frontend/src/features/settings/profile/MyChannelsBlock.tsx:88` — «Открыт всем» — на канал не назначен ни один оператор, поэтому его обращения видят все.
+- `frontend/src/features/settings/profile/ProfilePage.tsx:15` — Администратор
+- `frontend/src/features/settings/profile/ProfilePage.tsx:16` — Руководитель
+- `frontend/src/features/settings/profile/ProfilePage.tsx:17` — Менеджер
+- `frontend/src/features/settings/profile/ProfilePage.tsx:18` — Наблюдатель
+- `frontend/src/features/settings/profile/ProfilePage.tsx:22` — полный доступ, включая аккаунты Авито и команду
+- `frontend/src/features/settings/profile/ProfilePage.tsx:23` — видит все диалоги, передаёт их и пишет заметки — отвечать клиенту не может
+- `frontend/src/features/settings/profile/ProfilePage.tsx:24` — отвечает клиентам, ведёт свои диалоги и передаёт их коллегам
+- `frontend/src/features/settings/profile/ProfilePage.tsx:25` — только чтение диалогов
+- `frontend/src/features/settings/profile/ProfilePage.tsx:60` — Учётная запись
+- `frontend/src/features/settings/profile/ProfilePage.tsx:83` — Пароль меняет администратор — напишите ему формой ниже или в поддержку Telegram
+- `frontend/src/features/settings/profile/ProfilePage.tsx:104` — Интерфейс
+- `frontend/src/features/settings/profile/ProfilePage.tsx:116` — Быстрые ответы
+- `frontend/src/features/settings/profile/ProfilePage.tsx:120` — Личные шаблоны видите только вы. Вставляются в диалоге по «/» или кнопке
+- `frontend/src/features/settings/profile/ProfilePage.tsx:121` — быстрых ответов
+- `frontend/src/features/settings/profile/ProfilePage.tsx:136` — Ваши данные, каналы и личные настройки
+- `frontend/src/features/settings/profile/ProfilePage.tsx:136` — Профиль
+- `frontend/src/features/settings/profile/ProfilePage.tsx:138` — Разделы профиля
+- `frontend/src/features/settings/team/AuditLogTab.tsx:19` — Всё время
+- `frontend/src/features/settings/team/AuditLogTab.tsx:20` — Сегодня
+- `frontend/src/features/settings/team/AuditLogTab.tsx:21` — 7 дней
+- `frontend/src/features/settings/team/AuditLogTab.tsx:22` — 30 дней
+- `frontend/src/features/settings/team/AuditLogTab.tsx:23` — Произвольный
+- `frontend/src/features/settings/team/AuditLogTab.tsx:43` — система
+- `frontend/src/features/settings/team/AuditLogTab.tsx:58` — детали
+- `frontend/src/features/settings/team/AuditLogTab.tsx:58` — скрыть
+- `frontend/src/features/settings/team/AuditLogTab.tsx:120` — Журнал аудита
+- `frontend/src/features/settings/team/AuditLogTab.tsx:125` — Период журнала
+- `frontend/src/features/settings/team/AuditLogTab.tsx:145` — Произвольный период журнала
+- `frontend/src/features/settings/team/AuditLogTab.tsx:146` — Выберите даты
+- `frontend/src/features/settings/team/AuditLogTab.tsx:164` — Сотрудник
+- `frontend/src/features/settings/team/AuditLogTab.tsx:165` — Сотрудник: все
+- `frontend/src/features/settings/team/AuditLogTab.tsx:179` — Действие
+- `frontend/src/features/settings/team/AuditLogTab.tsx:180` — Действие: любое
+- `frontend/src/features/settings/team/AuditLogTab.tsx:201` — Не получилось загрузить журнал
+- `frontend/src/features/settings/team/AuditLogTab.tsx:205` — Повторить
+- `frontend/src/features/settings/team/AuditLogTab.tsx:210` — За выбранный период записей нет
+- `frontend/src/features/settings/team/AuditLogTab.tsx:217` — Время
+- `frontend/src/features/settings/team/AuditLogTab.tsx:218` — Сотрудник
+- `frontend/src/features/settings/team/AuditLogTab.tsx:219` — Действие
+- `frontend/src/features/settings/team/AuditLogTab.tsx:220` — Объект
+- `frontend/src/features/settings/team/AuditLogTab.tsx:221` — Детали
+- `frontend/src/features/settings/team/AuditLogTab.tsx:234` — {offset + 1}–{offset + shown} из {total}
+- `frontend/src/features/settings/team/AuditLogTab.tsx:243` — Назад
+- `frontend/src/features/settings/team/AuditLogTab.tsx:251` — Вперёд
+- `frontend/src/features/settings/team/InviteModal.tsx:51` — Сотрудник с таким email уже существует
+- `frontend/src/features/settings/team/InviteModal.tsx:55` — Не получилось пригласить. Попробуйте ещё раз
+- `frontend/src/features/settings/team/InviteModal.tsx:71` — Пригласить сотрудника
+- `frontend/src/features/settings/team/InviteModal.tsx:80` — Имя
+- `frontend/src/features/settings/team/InviteModal.tsx:98` — Роль
+- `frontend/src/features/settings/team/InviteModal.tsx:119` — Отмена
+- `frontend/src/features/settings/team/InviteModal.tsx:122` — Пригласить
+- `frontend/src/features/settings/team/OneTimeLinkModal.tsx:38` — Передайте сотруднику ссылку установки пароля:
+- `frontend/src/features/settings/team/OneTimeLinkModal.tsx:44` — Ссылка показывается один раз и действует 72 часа. Потеряли — перевыпустите в меню сотрудника.
+- `frontend/src/features/settings/team/OneTimeLinkModal.tsx:48` — Скопировано
+- `frontend/src/features/settings/team/OneTimeLinkModal.tsx:48` — 📋 Скопировать
+- `frontend/src/features/settings/team/OneTimeLinkModal.tsx:50` — Готово
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:45` — отключён
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:46` — ждёт пароля
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:47` — активен
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:63` — отошёл
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:65` — в сети
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:66` — не в сети
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:109` — Нельзя оставить систему без администратора
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:113` — Не получилось выполнить действие. Попробуйте ещё раз
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:222` — Сотрудники
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:227` — Поиск сотрудника
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:228` — Имя или email
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:236` — Фильтр по роли
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:237` — Роль: любая
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:248` — Показывать отключённых
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:256` — + Пригласить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:275` — Не получилось загрузить список сотрудников
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:279` — Повторить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:289` — Никого не нашлось
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:289` — Пригласите первого сотрудника
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:301` — Сотрудник
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:303` — Роль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:310` — Отдел
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:311` — Ведёт диалоги
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:312` — Статус
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:313` — Онлайн
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:315` — Действия
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:325` — Сотрудник
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:327` — Роль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:331` — Роль: ${u.full_name}
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:343` — Отдел
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:347` — Отдел: ${u.full_name}
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:362` — Ведёт диалоги
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:365` — Ведёт диалоги: ${u.full_name}
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:380` — Статус
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:381` — Онлайн
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:396` — Действия: ${u.full_name}
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:411` — Выслать новую ссылку
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:411` — Сбросить пароль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:420` — Задать пароль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:431` — Отключить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:431` — Отключить (нельзя себя)
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:440` — Включить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:452` — Удалить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:452` — Удалить (нельзя себя)
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:466` — {offset + 1}–{offset + shown} из {total}
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:475` — Назад
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:483` — Вперёд
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:494` — ${issued.user.full_name} приглашён
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:494` — Ссылка установки пароля
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:505` — Сменить роль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:507` — Отключить сотрудника
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:509` — Удалить сотрудника
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:510` — Включить сотрудника
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:521` — {pending.user.full_name} станет: {ROLE_LABELS[pending.role]}. Права применятся немедленно.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:526` — {pending.user.full_name} потеряет доступ прямо сейчас — открытые окна перестанут работать.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:527` — Открытые диалоги останутся назначенными на него: переназначьте их через фильтр «Менеджер» в Чатах.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:532` — {pending.user.full_name} исчезнет из всех списков, доступ оборвётся сразу, а
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:533` — незакрытые диалоги вернутся в «Входящие» — их разберёт смена. В журнале аудита
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:534` — человек останется: иначе на вопрос «кто это сделал» ответить будет нечем.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:535` — Отменить удаление нельзя.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:540` — {pending.user.full_name} снова сможет войти с прежним паролем.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:545` — Отмена
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:553` — Сменить роль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:555` — Отключить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:557` — Удалить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:558` — Включить
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:576` — Задать пароль сотруднику
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:585` — {passwordFor?.full_name} сможет войти с этим паролем сразу — ссылку присылать не
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:586` — нужно. Все открытые окна этого сотрудника закроются.
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:589` — Новый пароль
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:590` — Минимум 10 знаков
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:606` — Отмена
+- `frontend/src/features/settings/team/TeamMembersTab.tsx:615` — Задать пароль
+- `frontend/src/features/settings/team/TeamPage.tsx:27` — Сотрудники
+- `frontend/src/features/settings/team/TeamPage.tsx:33` — Журнал аудита
+- `frontend/src/features/settings/team/TeamPage.tsx:47` — Команда
+- `frontend/src/features/settings/team/TeamPage.tsx:47` — Сотрудники, их роли и журнал действий
+- `frontend/src/features/settings/team/TeamPage.tsx:51` — Для вашей роли здесь пока нет разделов
+- `frontend/src/features/settings/team/TeamPage.tsx:54` — Разделы команды
+- `frontend/src/features/settings/team/auditActions.ts:8` — Вход в систему
+- `frontend/src/features/settings/team/auditActions.ts:9` — Выход из системы
+- `frontend/src/features/settings/team/auditActions.ts:10` — Приглашение сотрудника
+- `frontend/src/features/settings/team/auditActions.ts:11` — Пароль установлен по приглашению
+- `frontend/src/features/settings/team/auditActions.ts:12` — Смена роли
+- `frontend/src/features/settings/team/auditActions.ts:13` — Сотрудник отключён
+- `frontend/src/features/settings/team/auditActions.ts:14` — Сотрудник включён
+- `frontend/src/features/settings/team/auditActions.ts:15` — Аккаунт Авито подключён
+- `frontend/src/features/settings/team/auditActions.ts:16` — Аккаунт Авито отключён
+- `frontend/src/features/settings/team/auditActions.ts:17` — Аккаунт Авито включён
+- `frontend/src/features/settings/team/auditActions.ts:18` — Смена статуса диалога
+- `frontend/src/features/settings/team/auditActions.ts:19` — Назначение диалога
+- `frontend/src/features/settings/team/auditActions.ts:20` — Диалог открыт заново
+- `frontend/src/features/settings/team/auditActions.ts:21` — Получен телефон клиента
+- `frontend/src/features/settings/team/auditActions.ts:22` — Бот передал диалог оператору
+- `frontend/src/features/settings/team/auditActions.ts:23` — Бот выключен вмешательством оператора
+- `frontend/src/features/settings/team/auditActions.ts:24` — Изменён сценарий бота
+- `frontend/src/features/settings/team/auditActions.ts:25` — Создан шаблон
+- `frontend/src/features/settings/team/auditActions.ts:26` — Изменён шаблон
+- `frontend/src/features/settings/team/auditActions.ts:27` — Удалён шаблон
+- `frontend/src/features/settings/team/auditActions.ts:28` — Выгрузка статистики
+- `frontend/src/features/settings/team/auditActions.ts:37` — Сотрудник
+- `frontend/src/features/settings/team/auditActions.ts:38` — Аккаунт
+- `frontend/src/features/settings/team/auditActions.ts:39` — Аккаунт
+- `frontend/src/features/settings/team/auditActions.ts:40` — Диалог
+- `frontend/src/features/settings/team/auditActions.ts:41` — Клиент
+- `frontend/src/features/settings/team/auditActions.ts:42` — Сообщение
+- `frontend/src/features/settings/team/auditActions.ts:43` — Шаблон
+- `frontend/src/features/settings/team/auditActions.ts:44` — Бот
+- `frontend/src/features/settings/team/auditActions.ts:45` — Статистика
+- `frontend/src/features/settings/team/roles.ts:6` — Администратор
+- `frontend/src/features/settings/team/roles.ts:7` — Руководитель
+- `frontend/src/features/settings/team/roles.ts:8` — Менеджер
+- `frontend/src/features/settings/team/roles.ts:9` — Наблюдатель
+- `frontend/src/features/settings/team/roles.ts:13` — Весь интерфейс: сотрудники, аккаунты Авито, боты, статистика, журнал
+- `frontend/src/features/settings/team/roles.ts:14` — Все диалоги без отправки, статистика всех сотрудников, журнал аудита
+- `frontend/src/features/settings/team/roles.ts:15` — Переписка с клиентами, личные шаблоны и своя статистика за день
+- `frontend/src/features/settings/team/roles.ts:16` — Только чтение диалогов: без ответов, заметок и смены статусов
+- `frontend/src/features/settings/templates/TemplatesPage.tsx:15` — Быстрые ответы
+- `frontend/src/features/settings/templates/TemplatesPage.tsx:16` — Общие шаблоны видит вся команда, личные — только вы
+- `frontend/src/features/stats/MyTodayWidget.tsx:35` — В работе сейчас
+- `frontend/src/features/stats/MyTodayWidget.tsx:36` — Ждут моего ответа
+- `frontend/src/features/stats/MyTodayWidget.tsx:37` — Взято сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:38` — Закрыто сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:39` — Отправлено сообщений
+- `frontend/src/features/stats/MyTodayWidget.tsx:40` — Первый ответ (медиана)
+- `frontend/src/features/stats/MyTodayWidget.tsx:41` — Отвечено диалогов
+- `frontend/src/features/stats/MyTodayWidget.tsx:78` — Статистика за сегодня недоступна
+- `frontend/src/features/stats/MyTodayWidget.tsx:87` — Моя статистика за сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:89` — Сегодня: {formatNumber(d.taken_today)} взято · {formatNumber(d.closed_today)} закрыто
+- `frontend/src/features/stats/MyTodayWidget.tsx:106` — Моя статистика за сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:126` — Моя статистика за сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:128` — Моя статистика за сегодня
+- `frontend/src/features/stats/MyTodayWidget.tsx:131` — Статистика за сегодня недоступна
+- `frontend/src/features/stats/StatsPage.tsx:87` — ${r.full_name} (отключён)
+- `frontend/src/features/stats/StatsPage.tsx:123` — Статистика
+- `frontend/src/features/stats/StatsPage.tsx:146` — Не получилось загрузить статистику
+- `frontend/src/features/stats/StatsPage.tsx:158` — Повторить
+- `frontend/src/features/stats/components/ExportModal.tsx:9` — Сводка
+- `frontend/src/features/stats/components/ExportModal.tsx:10` — Менеджеры
+- `frontend/src/features/stats/components/ExportModal.tsx:11` — Диалоги
+- `frontend/src/features/stats/components/ExportModal.tsx:51` — Выгрузка статистики
+- `frontend/src/features/stats/components/ExportModal.tsx:54` — Период: {formatPeriodLabel(period, formatDayLabel)}
+- `frontend/src/features/stats/components/ExportModal.tsx:58` — Формат
+- `frontend/src/features/stats/components/ExportModal.tsx:61` — Формат выгрузки
+- `frontend/src/features/stats/components/ExportModal.tsx:71` — Листы
+- `frontend/src/features/stats/components/ExportModal.tsx:74` — Листы выгрузки
+- `frontend/src/features/stats/components/ExportModal.tsx:84` — CSV содержит только лист «Диалоги» — по строке на диалог
+- `frontend/src/features/stats/components/ExportModal.tsx:90` — Выгрузка учитывает выбранный фильтр по менеджерам ({managerIds.length})
+- `frontend/src/features/stats/components/ExportModal.tsx:96` — Отмена
+- `frontend/src/features/stats/components/ExportModal.tsx:103` — Выгрузить
+- `frontend/src/features/stats/components/ExportModal.tsx:109` — Предыдущая выгрузка ещё готовится — дождитесь её окончания
+- `frontend/src/features/stats/components/Heatmap.tsx:29` — Тепловая карта входящих
+- `frontend/src/features/stats/components/Heatmap.tsx:33` — Когда пишут клиенты
+- `frontend/src/features/stats/components/Heatmap.tsx:36` — Входящие сообщения, день недели × час — видно, когда нужен дежурный
+- `frontend/src/features/stats/components/Heatmap.tsx:41` — все менеджеры
+- `frontend/src/features/stats/components/Heatmap.tsx:51` — Не получилось загрузить карту
+- `frontend/src/features/stats/components/Heatmap.tsx:54` — Повторить
+- `frontend/src/features/stats/components/Heatmap.tsx:59` — Входящие по дням недели и часам
+- `frontend/src/features/stats/components/Heatmap.tsx:91` — меньше
+- `frontend/src/features/stats/components/Heatmap.tsx:95` — больше
+- `frontend/src/features/stats/components/ManagersTable.tsx:31` — Менеджер
+- `frontend/src/features/stats/components/ManagersTable.tsx:35` — ИТОГО
+- `frontend/src/features/stats/components/ManagersTable.tsx:39` — Принято
+- `frontend/src/features/stats/components/ManagersTable.tsx:47` — Отвечено
+- `frontend/src/features/stats/components/ManagersTable.tsx:55` — Закрыто
+- `frontend/src/features/stats/components/ManagersTable.tsx:63` — Первый ответ
+- `frontend/src/features/stats/components/ManagersTable.tsx:64` — Медиана времени от сообщения клиента до первого ответа оператора — за все часы суток
+- `frontend/src/features/stats/components/ManagersTable.tsx:72` — В рабочие часы
+- `frontend/src/features/stats/components/ManagersTable.tsx:73` — То же время первого ответа, но считаются только рабочие часы: ночное ожидание в него не попадает
+- `frontend/src/features/stats/components/ManagersTable.tsx:81` — Сообщений
+- `frontend/src/features/stats/components/ManagersTable.tsx:117` — Таблица менеджеров
+- `frontend/src/features/stats/components/ManagersTable.tsx:119` — Менеджеры
+- `frontend/src/features/stats/components/ManagersTable.tsx:128` — Таблица менеджеров
+- `frontend/src/features/stats/components/ManagersTable.tsx:130` — Менеджеры
+- `frontend/src/features/stats/components/ManagersTable.tsx:134` — Не получилось загрузить таблицу
+- `frontend/src/features/stats/components/ManagersTable.tsx:137` — Повторить
+- `frontend/src/features/stats/components/ManagersTable.tsx:147` — Таблица менеджеров
+- `frontend/src/features/stats/components/ManagersTable.tsx:149` — Менеджеры
+- `frontend/src/features/stats/components/ManagersTable.tsx:154` — Нет данных за выбранный период
+- `frontend/src/features/stats/components/ManagersTable.tsx:198` — Действия
+- `frontend/src/features/stats/components/ManagersTable.tsx:221` — Показать статистику: ${row.full_name}
+- `frontend/src/features/stats/components/ManagersTable.tsx:224` — отключён
+- `frontend/src/features/stats/components/ManagersTable.tsx:232` — Открыть диалоги этого менеджера
+- `frontend/src/features/stats/components/ManagersTable.tsx:236` — Диалоги: ${row.full_name}
+- `frontend/src/features/stats/components/MetricChart.tsx:14` — Новые диалоги
+- `frontend/src/features/stats/components/MetricChart.tsx:15` — Закрыто диалогов
+- `frontend/src/features/stats/components/MetricChart.tsx:16` — Входящие сообщения
+- `frontend/src/features/stats/components/MetricChart.tsx:17` — Исходящие сообщения
+- `frontend/src/features/stats/components/MetricChart.tsx:18` — Первый ответ (медиана)
+- `frontend/src/features/stats/components/MetricChart.tsx:19` — Собрано телефонов
+- `frontend/src/features/stats/components/MetricChart.tsx:65` — 00 ммм
+- `frontend/src/features/stats/components/MetricChart.tsx:109` — нет данных
+- `frontend/src/features/stats/components/MetricChart.tsx:148` — График метрики
+- `frontend/src/features/stats/components/MetricChart.tsx:151` — График
+- `frontend/src/features/stats/components/MetricChart.tsx:157` — Метрика графика
+- `frontend/src/features/stats/components/MetricChart.tsx:166` — Группировка
+- `frontend/src/features/stats/components/MetricChart.tsx:174` — по дням
+- `frontend/src/features/stats/components/MetricChart.tsx:177` — «По часам» доступно при периоде не больше 7 дней
+- `frontend/src/features/stats/components/MetricChart.tsx:191` — по часам
+- `frontend/src/features/stats/components/MetricChart.tsx:204` — Не получилось загрузить график
+- `frontend/src/features/stats/components/MetricChart.tsx:207` — Повторить
+- `frontend/src/features/stats/components/MetricChart.tsx:216` — ${METRIC_LABELS[metric]}, группировка ${group === "day" ? "по дням" : "по часам"}
+- `frontend/src/features/stats/components/MetricChart.tsx:340` — Нет данных за выбранный период
+- `frontend/src/features/stats/components/StatCard.tsx:20` — пп
+- `frontend/src/features/stats/components/StatCard.tsx:51` — к пред.
+- `frontend/src/features/stats/components/StatsFilters.tsx:75` — Период
+- `frontend/src/features/stats/components/StatsFilters.tsx:91` — Произвольный период
+- `frontend/src/features/stats/components/StatsFilters.tsx:92` — Выберите даты
+- `frontend/src/features/stats/components/StatsFilters.tsx:112` — Менеджеры
+- `frontend/src/features/stats/components/StatsFilters.tsx:113` — Менеджеры: все
+- `frontend/src/features/stats/components/StatsFilters.tsx:124` — Аккаунт Авито
+- `frontend/src/features/stats/components/StatsFilters.tsx:125` — Аккаунт: все
+- `frontend/src/features/stats/components/StatsFilters.tsx:134` — Агрегаты обновляются раз в час
+- `frontend/src/features/stats/components/StatsFilters.tsx:141` — ⬇ Экспорт
+- `frontend/src/features/stats/components/SummaryCards.tsx:38` — За период
+- `frontend/src/features/stats/components/SummaryCards.tsx:39` — Метрики за выбранный период
+- `frontend/src/features/stats/components/SummaryCards.tsx:42` — Новые диалоги
+- `frontend/src/features/stats/components/SummaryCards.tsx:45` — Диалоги, где первое сообщение клиента пришло в выбранный период
+- `frontend/src/features/stats/components/SummaryCards.tsx:49` — Закрыто
+- `frontend/src/features/stats/components/SummaryCards.tsx:52` — Диалоги, переведённые в статус «Закрыт» в выбранный период
+- `frontend/src/features/stats/components/SummaryCards.tsx:59` — Прямо сейчас
+- `frontend/src/features/stats/components/SummaryCards.tsx:60` — не зависит от выбранного периода
+- `frontend/src/features/stats/components/SummaryCards.tsx:62` — Состояние на текущий момент
+- `frontend/src/features/stats/components/SummaryCards.tsx:65` — В работе
+- `frontend/src/features/stats/components/SummaryCards.tsx:68` — сейчас
+- `frontend/src/features/stats/components/SummaryCards.tsx:69` — Снимок на сейчас — с прошлым периодом не сравнивается
+- `frontend/src/features/stats/components/SummaryCards.tsx:73` — Ждут ответа
+- `frontend/src/features/stats/components/SummaryCards.tsx:76` — сейчас
+- `frontend/src/features/stats/components/SummaryCards.tsx:78` — Диалоги в работе, где последнее сообщение — от клиента
+- `frontend/src/features/stats/components/SummaryCards.tsx:85` — Качество работы за период
+- `frontend/src/features/stats/components/SummaryCards.tsx:86` — Качество работы за период
+- `frontend/src/features/stats/components/SummaryCards.tsx:89` — Первый ответ (медиана)
+- `frontend/src/features/stats/components/SummaryCards.tsx:94` — Медиана ${formatDuration(frt.median_sec)} · среднее ${formatDuration(frt.avg_sec)}. 
+- `frontend/src/features/stats/components/SummaryCards.tsx:95` — В рабочие часы 10:00–20:00: медиана ${formatDuration(frt.median_biz_sec)} · среднее ${formatDuration(frt.avg_biz_sec)}. 
+- `frontend/src/features/stats/components/SummaryCards.tsx:96` — Отвечено ${formatNumber(frt.answered)}, без ответа ${formatNumber(frt.unanswered)}.
+- `frontend/src/features/stats/components/SummaryCards.tsx:97` — Нет данных за период
+- `frontend/src/features/stats/components/SummaryCards.tsx:102` — Закрыто ботом
+- `frontend/src/features/stats/components/SummaryCards.tsx:105` — пп
+- `frontend/src/features/stats/components/SummaryCards.tsx:108` — ${formatNumber(bot.closed_by_bot)} из ${formatNumber(bot.closed_total)} закрытых диалогов бот довёл без оператора
+- `frontend/src/features/stats/components/SummaryCards.tsx:109` — Нет данных за период
+- `frontend/src/features/stats/components/SummaryCards.tsx:114` — Телефонов
+- `frontend/src/features/stats/components/SummaryCards.tsx:119` — Бот ${formatNumber(phones.by_source?.bot ?? 0)} · из текста ${formatNumber(phones.by_source?.regex ?? 0)} · вручную ${formatNumber(phones.by_source?.manual ?? 0)}
+- `frontend/src/features/stats/components/SummaryCards.tsx:120` — Нет данных за период
+- `frontend/src/features/stats/components/SummaryCards.tsx:125` — Повторные
+- `frontend/src/features/stats/components/SummaryCards.tsx:130` — ↩ вернулись · было ${formatNumber(repeat.prev_reopened)}
+- `frontend/src/features/stats/components/SummaryCards.tsx:131` — ↩ вернулись
+- `frontend/src/features/stats/components/SummaryCards.tsx:135` — Реоткрытых диалогов ${formatNumber(repeat.reopened)}; уникальных клиентов, обратившихся повторно, — ${formatNumber(repeat.repeat_clients)}
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:23` — выгрузка
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:28` — Предыдущий экспорт ещё готовится
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:29` — Лимит выгрузок на сегодня исчерпан
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:30` — Период больше 366 дней — сузьте диапазон
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:33` — Не получилось запустить выгрузку
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:60` — Готовим выгрузку…
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:61` — Файл появится здесь через несколько секунд
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:67` — Выгрузка не запущена
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:82` — Выгрузка готова
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:85` — Скачать {fileNameFromUrl(url)}
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:88` — Файл готов
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:99` — Выгрузка не удалась
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:100` — Попробуйте сузить период
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:115` — Статус выгрузки недоступен
+- `frontend/src/features/stats/hooks/useStatsExport.tsx:116` — Проверьте соединение и запустите выгрузку заново
+- `frontend/src/features/stats/lib/delta.ts:48` — быстрее
+- `frontend/src/features/stats/lib/delta.ts:48` — медленнее
+- `frontend/src/features/stats/lib/format.ts:18` — ${s} с
+- `frontend/src/features/stats/lib/format.ts:22` — ${minutes} м
+- `frontend/src/features/stats/lib/format.ts:22` — ${minutes} м ${rest} с
+- `frontend/src/features/stats/lib/format.ts:26` — ${hours} ч
+- `frontend/src/features/stats/lib/format.ts:26` — ${hours} ч ${String(restMin).padStart(2, "0")} м
+- `frontend/src/features/stats/lib/format.ts:36` — пп
+- `frontend/src/features/stats/lib/format.ts:58` — Данные на ${MSK_TIME_FMT.format(d)}
+- `frontend/src/features/stats/lib/heatmap.ts:42` — вс
+- `frontend/src/features/stats/lib/heatmap.ts:42` — вт
+- `frontend/src/features/stats/lib/heatmap.ts:42` — пн
+- `frontend/src/features/stats/lib/heatmap.ts:42` — пт
+- `frontend/src/features/stats/lib/heatmap.ts:42` — сб
+- `frontend/src/features/stats/lib/heatmap.ts:42` — ср
+- `frontend/src/features/stats/lib/heatmap.ts:42` — чт
+- `frontend/src/features/stats/lib/heatmap.ts:44` — Понедельник
+- `frontend/src/features/stats/lib/heatmap.ts:45` — Вторник
+- `frontend/src/features/stats/lib/heatmap.ts:46` — Среда
+- `frontend/src/features/stats/lib/heatmap.ts:47` — Четверг
+- `frontend/src/features/stats/lib/heatmap.ts:48` — Пятница
+- `frontend/src/features/stats/lib/heatmap.ts:49` — Суббота
+- `frontend/src/features/stats/lib/heatmap.ts:50` — Воскресенье
+- `frontend/src/features/stats/lib/heatmap.ts:63` — входящее
+- `frontend/src/features/stats/lib/heatmap.ts:64` — входящих
+- `frontend/src/features/stats/lib/heatmap.ts:65` — входящих
+- `frontend/src/features/table/TablePage.tsx:46` — Новый
+- `frontend/src/features/table/TablePage.tsx:47` — В работе
+- `frontend/src/features/table/TablePage.tsx:48` — Закрыт
+- `frontend/src/features/table/TablePage.tsx:54` — 7 дней
+- `frontend/src/features/table/TablePage.tsx:55` — 30 дней
+- `frontend/src/features/table/TablePage.tsx:56` — 90 дней
+- `frontend/src/features/table/TablePage.tsx:57` — За всё время
+- `frontend/src/features/table/TablePage.tsx:58` — Свой период
+- `frontend/src/features/table/TablePage.tsx:105` — ${sec} с
+- `frontend/src/features/table/TablePage.tsx:107` — ${m} мин
+- `frontend/src/features/table/TablePage.tsx:109` — ${h} ч ${m % 60} м
+- `frontend/src/features/table/TablePage.tsx:181` — Клиент
+- `frontend/src/features/table/TablePage.tsx:185` — Клиент
+- `frontend/src/features/table/TablePage.tsx:193` — Статус
+- `frontend/src/features/table/TablePage.tsx:203` — Оператор
+- `frontend/src/features/table/TablePage.tsx:212` — Канал
+- `frontend/src/features/table/TablePage.tsx:221` — Первый ответ
+- `frontend/src/features/table/TablePage.tsx:235` — Длительность
+- `frontend/src/features/table/TablePage.tsx:241` — Сообщений
+- `frontend/src/features/table/TablePage.tsx:247` — Объявление
+- `frontend/src/features/table/TablePage.tsx:256` — Последнее (МСК)
+- `frontend/src/features/table/TablePage.tsx:284` — Не удалось выгрузить — попробуйте ещё раз
+- `frontend/src/features/table/TablePage.tsx:285` — Выгрузка не получилась
+- `frontend/src/features/table/TablePage.tsx:317` — Диалоги
+- `frontend/src/features/table/TablePage.tsx:320` — Разбор обращений: скорость ответа, объём переписки, кто вёл.
+- `frontend/src/features/table/TablePage.tsx:324` — Найдено: {total}
+- `frontend/src/features/table/TablePage.tsx:331` — Период
+- `frontend/src/features/table/TablePage.tsx:342` — Фильтр по статусу
+- `frontend/src/features/table/TablePage.tsx:343` — Статус: любой
+- `frontend/src/features/table/TablePage.tsx:354` — Фильтр по каналу
+- `frontend/src/features/table/TablePage.tsx:355` — Канал: все
+- `frontend/src/features/table/TablePage.tsx:367` — Фильтр по оператору
+- `frontend/src/features/table/TablePage.tsx:368` — Оператор: все
+- `frontend/src/features/table/TablePage.tsx:380` — Фильтр по боту
+- `frontend/src/features/table/TablePage.tsx:381` — Бот: неважно
+- `frontend/src/features/table/TablePage.tsx:384` — Бот ведёт
+- `frontend/src/features/table/TablePage.tsx:385` — Бот выключен
+- `frontend/src/features/table/TablePage.tsx:403` — Фильтр по метке
+- `frontend/src/features/table/TablePage.tsx:404` — Метка: любая
+- `frontend/src/features/table/TablePage.tsx:418` — Произвольный период
+- `frontend/src/features/table/TablePage.tsx:419` — Выберите даты
+- `frontend/src/features/table/TablePage.tsx:431` — Сбросить
+- `frontend/src/features/table/TablePage.tsx:441` — Выгрузить CSV
+- `frontend/src/features/table/TablePage.tsx:452` — Не получилось загрузить
+- `frontend/src/features/table/TablePage.tsx:455` — Повторить
+- `frontend/src/features/table/TablePage.tsx:462` — Ничего не нашлось
+- `frontend/src/features/table/TablePage.tsx:463` — Попробуйте расширить период или снять фильтры
+- `frontend/src/features/table/TablePage.tsx:466` — Сбросить фильтры
+- `frontend/src/features/table/TablePage.tsx:509` — Открыть диалог
+- `frontend/src/features/table/TablePage.tsx:531` — Назад
+- `frontend/src/features/table/TablePage.tsx:534` — {offset + 1}–{Math.min(offset + PAGE, total)} из {total}
+- `frontend/src/features/table/TablePage.tsx:542` — Дальше
+- `frontend/src/features/templates/TemplatesManager.tsx:20` — {имя}
+- `frontend/src/features/templates/TemplatesManager.tsx:20` — {менеджер}
+- `frontend/src/features/templates/TemplatesManager.tsx:20` — {объявление}
+- `frontend/src/features/templates/TemplatesManager.tsx:34` — ${t.title} (копия)
+- `frontend/src/features/templates/TemplatesManager.tsx:61` — Шаблон обновлён
+- `frontend/src/features/templates/TemplatesManager.tsx:61` — Шаблон создан
+- `frontend/src/features/templates/TemplatesManager.tsx:64` — Не сохранилось
+- `frontend/src/features/templates/TemplatesManager.tsx:64` — Попробуйте ещё раз
+- `frontend/src/features/templates/TemplatesManager.tsx:73` — Новый быстрый ответ
+- `frontend/src/features/templates/TemplatesManager.tsx:73` — Редактировать быстрый ответ
+- `frontend/src/features/templates/TemplatesManager.tsx:79` — Название
+- `frontend/src/features/templates/TemplatesManager.tsx:85` — Текст
+- `frontend/src/features/templates/TemplatesManager.tsx:94` — {body.length} символов · вставить:
+- `frontend/src/features/templates/TemplatesManager.tsx:104` — Папка
+- `frontend/src/features/templates/TemplatesManager.tsx:105` — без папки
+- `frontend/src/features/templates/TemplatesManager.tsx:119` — Общий шаблон — его увидит вся команда
+- `frontend/src/features/templates/TemplatesManager.tsx:120` — Личный шаблон — виден только вам. Перевести личный в общий нельзя: создайте новый общий
+- `frontend/src/features/templates/TemplatesManager.tsx:125` — Отмена
+- `frontend/src/features/templates/TemplatesManager.tsx:139` — Сохранить
+- `frontend/src/features/templates/TemplatesManager.tsx:164` — Шаблон удалён
+- `frontend/src/features/templates/TemplatesManager.tsx:167` — Не удалилось
+- `frontend/src/features/templates/TemplatesManager.tsx:167` — Попробуйте ещё раз
+- `frontend/src/features/templates/TemplatesManager.tsx:191` — Область шаблонов
+- `frontend/src/features/templates/TemplatesManager.tsx:199` — Общие
+- `frontend/src/features/templates/TemplatesManager.tsx:208` — Мои
+- `frontend/src/features/templates/TemplatesManager.tsx:214` — поиск
+- `frontend/src/features/templates/TemplatesManager.tsx:215` — Поиск по шаблонам
+- `frontend/src/features/templates/TemplatesManager.tsx:224` — + Шаблон
+- `frontend/src/features/templates/TemplatesManager.tsx:231` — Все
+- `frontend/src/features/templates/TemplatesManager.tsx:239` — без папки
+- `frontend/src/features/templates/TemplatesManager.tsx:253` — Не получилось загрузить
+- `frontend/src/features/templates/TemplatesManager.tsx:256` — Повторить
+- `frontend/src/features/templates/TemplatesManager.tsx:263` — Личных шаблонов нет
+- `frontend/src/features/templates/TemplatesManager.tsx:263` — Общих шаблонов нет
+- `frontend/src/features/templates/TemplatesManager.tsx:266` — Создайте первые — их увидит вся команда
+- `frontend/src/features/templates/TemplatesManager.tsx:267` — Быстрые ответы экономят десятки минут в день
+- `frontend/src/features/templates/TemplatesManager.tsx:302` — Название
+- `frontend/src/features/templates/TemplatesManager.tsx:303` — Текст
+- `frontend/src/features/templates/TemplatesManager.tsx:304` — Папка
+- `frontend/src/features/templates/TemplatesManager.tsx:305` — Действия
+- `frontend/src/features/templates/TemplatesManager.tsx:311` — Название
+- `frontend/src/features/templates/TemplatesManager.tsx:314` — Текст
+- `frontend/src/features/templates/TemplatesManager.tsx:317` — Папка
+- `frontend/src/features/templates/TemplatesManager.tsx:323` — Действия: ${t.title}
+- `frontend/src/features/templates/TemplatesManager.tsx:329` — Редактировать
+- `frontend/src/features/templates/TemplatesManager.tsx:332` — Дублировать
+- `frontend/src/features/templates/TemplatesManager.tsx:335` — Удалить
+- `frontend/src/features/templates/TemplatesManager.tsx:359` — Удалить быстрый ответ?
+- `frontend/src/features/templates/TemplatesManager.tsx:363` — Шаблон «{confirmDelete?.title}» исчезнет из пикера у всех, кто им пользуется
+- `frontend/src/features/templates/TemplatesManager.tsx:367` — Отмена
+- `frontend/src/features/templates/TemplatesManager.tsx:374` — Удалить
+- `frontend/src/features/templates/vars.ts:21` — Клиент
+- `frontend/src/features/templates/vars.ts:23` — const PATTERN = /\{(имя|менеджер|объявление)\}/g;
+- `frontend/src/features/templates/vars.ts:28` — имя
+- `frontend/src/features/templates/vars.ts:30` — менеджер
+- `frontend/src/features/templates/vars.ts:32` — объявление
+- `frontend/src/features/uikit/UiKitPage.tsx:43` — ! Парт - 7 / Ист - В43 МНЧ !
+- `frontend/src/features/uikit/UiKitPage.tsx:44` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:45` — Николай Петров
+- `frontend/src/features/uikit/UiKitPage.tsx:46` — Ремонт холодильника Bosch
+- `frontend/src/features/uikit/UiKitPage.tsx:47` — Здравствуйте! Холодильник не морозит
+- `frontend/src/features/uikit/UiKitPage.tsx:139` — Живой каталог: компоненты настоящие, данные выдуманные. Переключите тему —
+- `frontend/src/features/uikit/UiKitPage.tsx:140` — всё ниже обязано остаться читаемым.
+- `frontend/src/features/uikit/UiKitPage.tsx:147` — Светлая тема
+- `frontend/src/features/uikit/UiKitPage.tsx:147` — Тёмная тема
+- `frontend/src/features/uikit/UiKitPage.tsx:151` — Компоненты берут цвет только отсюда; HEX в компоненте — ошибка ревью.
+- `frontend/src/features/uikit/UiKitPage.tsx:151` — Цвета
+- `frontend/src/features/uikit/UiKitPage.tsx:152` — Поверхности
+- `frontend/src/features/uikit/UiKitPage.tsx:155` — Текст
+- `frontend/src/features/uikit/UiKitPage.tsx:159` — У каждого акцента пара: яркий — для рамок, иконок и фокуса (нужно 3:1),
+- `frontend/src/features/uikit/UiKitPage.tsx:160` — плотный — под заливку с текстом (нужно 4.5:1).
+- `frontend/src/features/uikit/UiKitPage.tsx:170` — Inter / SF Pro Display, интерлиньяж 150%.
+- `frontend/src/features/uikit/UiKitPage.tsx:170` — Типографика
+- `frontend/src/features/uikit/UiKitPage.tsx:172` — Заголовок страницы — 24 Semibold
+- `frontend/src/features/uikit/UiKitPage.tsx:175` — Заголовок секции — 18 Semibold
+- `frontend/src/features/uikit/UiKitPage.tsx:178` — Заголовок карточки — 16 Medium
+- `frontend/src/features/uikit/UiKitPage.tsx:181` — Основной текст — 14 Regular. Клиент пишет про холодильник, оператор отвечает.
+- `frontend/src/features/uikit/UiKitPage.tsx:184` — Подпись — 12 Regular
+- `frontend/src/features/uikit/UiKitPage.tsx:188` — Форма и глубина
+- `frontend/src/features/uikit/UiKitPage.tsx:189` — Радиусы
+- `frontend/src/features/uikit/UiKitPage.tsx:196` — Тени
+- `frontend/src/features/uikit/UiKitPage.tsx:203` — Сетка 8pt
+- `frontend/src/features/uikit/UiKitPage.tsx:215` — Кнопки
+- `frontend/src/features/uikit/UiKitPage.tsx:216` — Каждое состояние — отдельный столбец. Наведите и нажмите: hover 150 мс, нажатие — 0.98.
+- `frontend/src/features/uikit/UiKitPage.tsx:220` — Обычная
+- `frontend/src/features/uikit/UiKitPage.tsx:221` — Недоступна
+- `frontend/src/features/uikit/UiKitPage.tsx:222` — Загрузка
+- `frontend/src/features/uikit/UiKitPage.tsx:223` — Принять
+- `frontend/src/features/uikit/UiKitPage.tsx:224` — Отклонить
+- `frontend/src/features/uikit/UiKitPage.tsx:227` — Размеры
+- `frontend/src/features/uikit/UiKitPage.tsx:235` — Поля ввода
+- `frontend/src/features/uikit/UiKitPage.tsx:236` — Состояния
+- `frontend/src/features/uikit/UiKitPage.tsx:237` — Обычное
+- `frontend/src/features/uikit/UiKitPage.tsx:238` — С ошибкой
+- `frontend/src/features/uikit/UiKitPage.tsx:238` — Так нельзя
+- `frontend/src/features/uikit/UiKitPage.tsx:239` — Недоступно
+- `frontend/src/features/uikit/UiKitPage.tsx:241` — С иконкой
+- `frontend/src/features/uikit/UiKitPage.tsx:243` — С иконкой
+- `frontend/src/features/uikit/UiKitPage.tsx:246` — Прочее
+- `frontend/src/features/uikit/UiKitPage.tsx:247` — В работе
+- `frontend/src/features/uikit/UiKitPage.tsx:247` — Закрыт
+- `frontend/src/features/uikit/UiKitPage.tsx:247` — Новый
+- `frontend/src/features/uikit/UiKitPage.tsx:247` — Селект
+- `frontend/src/features/uikit/UiKitPage.tsx:248` — Многострочное
+- `frontend/src/features/uikit/UiKitPage.tsx:250` — Переключатели
+- `frontend/src/features/uikit/UiKitPage.tsx:251` — Флажок
+- `frontend/src/features/uikit/UiKitPage.tsx:252` — Недоступен
+- `frontend/src/features/uikit/UiKitPage.tsx:254` — Первый
+- `frontend/src/features/uikit/UiKitPage.tsx:255` — Второй
+- `frontend/src/features/uikit/UiKitPage.tsx:257` — Тумблер
+- `frontend/src/features/uikit/UiKitPage.tsx:261` — Бейджи и подсказки
+- `frontend/src/features/uikit/UiKitPage.tsx:262` — Бейджи
+- `frontend/src/features/uikit/UiKitPage.tsx:263` — По умолчанию
+- `frontend/src/features/uikit/UiKitPage.tsx:264` — Успех
+- `frontend/src/features/uikit/UiKitPage.tsx:265` — Ошибка
+- `frontend/src/features/uikit/UiKitPage.tsx:266` — Внимание
+- `frontend/src/features/uikit/UiKitPage.tsx:267` — Мягкий
+- `frontend/src/features/uikit/UiKitPage.tsx:268` — Контурный
+- `frontend/src/features/uikit/UiKitPage.tsx:270` — Всплывающее
+- `frontend/src/features/uikit/UiKitPage.tsx:271` — Подсказка появляется через 400 мс
+- `frontend/src/features/uikit/UiKitPage.tsx:272` — Наведите
+- `frontend/src/features/uikit/UiKitPage.tsx:276` — Меню
+- `frontend/src/features/uikit/UiKitPage.tsx:279` — Действия
+- `frontend/src/features/uikit/UiKitPage.tsx:280` — Передать
+- `frontend/src/features/uikit/UiKitPage.tsx:281` — В архив
+- `frontend/src/features/uikit/UiKitPage.tsx:283` — Заблокировать
+- `frontend/src/features/uikit/UiKitPage.tsx:286` — Модальное окно
+- `frontend/src/features/uikit/UiKitPage.tsx:288` — Тосты
+- `frontend/src/features/uikit/UiKitPage.tsx:289` — Диалог принят
+- `frontend/src/features/uikit/UiKitPage.tsx:289` — Клиент ждёт ответа
+- `frontend/src/features/uikit/UiKitPage.tsx:290` — Успех
+- `frontend/src/features/uikit/UiKitPage.tsx:292` — Диалог передан вам
+- `frontend/src/features/uikit/UiKitPage.tsx:292` — Николай Петров
+- `frontend/src/features/uikit/UiKitPage.tsx:293` — Сообщение
+- `frontend/src/features/uikit/UiKitPage.tsx:295` — Вебхук молчит
+- `frontend/src/features/uikit/UiKitPage.tsx:295` — Сообщения доедут с задержкой
+- `frontend/src/features/uikit/UiKitPage.tsx:296` — Внимание
+- `frontend/src/features/uikit/UiKitPage.tsx:298` — Не удалось отправить
+- `frontend/src/features/uikit/UiKitPage.tsx:298` — Токен канала отозван
+- `frontend/src/features/uikit/UiKitPage.tsx:299` — Ошибка (ждёт человека)
+- `frontend/src/features/uikit/UiKitPage.tsx:306` — Карточка диалога
+- `frontend/src/features/uikit/UiKitPage.tsx:307` — Настоящий компонент списка. Наведите — появится «Передать». Две последние строки — пороги ожидания: 5 и 15 минут.
+- `frontend/src/features/uikit/UiKitPage.tsx:313` — негатив
+- `frontend/src/features/uikit/UiKitPage.tsx:327` — 12 мин
+- `frontend/src/features/uikit/UiKitPage.tsx:353` — Пузыри переписки
+- `frontend/src/features/uikit/UiKitPage.tsx:353` — Пять типов; исходящий — градиент primary.
+- `frontend/src/features/uikit/UiKitPage.tsx:356` — Здравствуйте! Холодильник не морозит, гудит и тёплый. Сколько будет диагностика?
+- `frontend/src/features/uikit/UiKitPage.tsx:359` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:362` — Добрый день! Диагностика 500 ₽, при ремонте — бесплатно.
+- `frontend/src/features/uikit/UiKitPage.tsx:362` — Николай Петров
+- `frontend/src/features/uikit/UiKitPage.tsx:365` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:368` — Здравствуйте! Я помощник Lead Partner. Уточните, пожалуйста, модель техники.
+- `frontend/src/features/uikit/UiKitPage.tsx:371` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:374` — Клиент постоянный, был ремонт в марте — можно скидку.
+- `frontend/src/features/uikit/UiKitPage.tsx:374` — Мария Кузнецова
+- `frontend/src/features/uikit/UiKitPage.tsx:377` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:380` — Николай Петров
+- `frontend/src/features/uikit/UiKitPage.tsx:380` — Отправляю адрес мастера
+- `frontend/src/features/uikit/UiKitPage.tsx:380` — токен канала отозван
+- `frontend/src/features/uikit/UiKitPage.tsx:383` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:387` — Диалог передан: Мария Кузнецова → Николай Петров
+- `frontend/src/features/uikit/UiKitPage.tsx:390` — Алексей Смирнов
+- `frontend/src/features/uikit/UiKitPage.tsx:393` — Набор текста
+- `frontend/src/features/uikit/UiKitPage.tsx:404` — Пустые состояния
+- `frontend/src/features/uikit/UiKitPage.tsx:408` — Новые обращения появятся здесь
+- `frontend/src/features/uikit/UiKitPage.tsx:408` — Очередь пуста
+- `frontend/src/features/uikit/UiKitPage.tsx:409` — Выберите диалог слева
+- `frontend/src/features/uikit/UiKitPage.tsx:409` — или нажмите Ctrl+K для поиска
+- `frontend/src/features/uikit/UiKitPage.tsx:410` — Ищем по имени, телефону и тексту сообщений
+- `frontend/src/features/uikit/UiKitPage.tsx:410` — Ничего не нашлось
+- `frontend/src/features/uikit/UiKitPage.tsx:411` — Не получилось загрузить
+- `frontend/src/features/uikit/UiKitPage.tsx:412` — И диалоги появятся через минуту
+- `frontend/src/features/uikit/UiKitPage.tsx:412` — Подключите первый аккаунт
+- `frontend/src/features/uikit/UiKitPage.tsx:413` — Ботов пока нет
+- `frontend/src/features/uikit/UiKitPage.tsx:414` — Быстрых ответов нет
+- `frontend/src/features/uikit/UiKitPage.tsx:415` — Закрытых диалогов нет
+- `frontend/src/features/uikit/UiKitPage.tsx:425` — Иконки
+- `frontend/src/features/uikit/UiKitPage.tsx:425` — Сетка 24, обводка 2, цвет — currentColor.
+- `frontend/src/features/uikit/UiKitPage.tsx:441` — Передать диалог
+- `frontend/src/features/uikit/UiKitPage.tsx:443` — Заголовок 18/600, тело 24px отступа, подложка затемнена и размыта.
+- `frontend/src/features/uikit/UiKitPage.tsx:446` — Отмена
+- `frontend/src/features/uikit/UiKitPage.tsx:447` — Передать
+- `frontend/src/features/updates/UpdatesPage.tsx:22` — новое:        ,
+- `frontend/src/features/updates/UpdatesPage.tsx:22` — Новое
+- `frontend/src/features/updates/UpdatesPage.tsx:23` — улучшено:           ,
+- `frontend/src/features/updates/UpdatesPage.tsx:23` — Улучшено
+- `frontend/src/features/updates/UpdatesPage.tsx:24` — исправлено:             ,
+- `frontend/src/features/updates/UpdatesPage.tsx:24` — Исправлено
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — апреля
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — июня
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — марта
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — мая
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — февраля
+- `frontend/src/features/updates/UpdatesPage.tsx:28` — января
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — августа
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — декабря
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — июля
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — ноября
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — октября
+- `frontend/src/features/updates/UpdatesPage.tsx:29` — сентября
+- `frontend/src/features/updates/UpdatesPage.tsx:46` — Что нового
+- `frontend/src/features/updates/UpdatesPage.tsx:49` — Здесь появляется всё, что меняется в вашей работе. Технические работы сюда не
+- `frontend/src/features/updates/UpdatesPage.tsx:50` — попадают — только то, что видно на экране.
+- `frontend/src/features/updates/changelog.ts:21` — исправлено
+- `frontend/src/features/updates/changelog.ts:21` — новое
+- `frontend/src/features/updates/changelog.ts:21` — улучшено
+- `frontend/src/features/updates/changelog.ts:41` — Передача с подтверждением, чёрный список и разгрузка очереди
+- `frontend/src/features/updates/changelog.ts:44` — новое
+- `frontend/src/features/updates/changelog.ts:45` — Диалог не считается переданным, пока коллега его не принял
+- `frontend/src/features/updates/changelog.ts:46` — Раньше передал — и всё, диалог у другого, а знает он об этом или нет, неизвестно. Теперь передача висит предложением: пока её не приняли, диалог остаётся за вами и отвечаете клиенту вы. Коллеге приходит уведомление с вашим комментарием, у него кнопки «Принять» и «Отказаться». Не ответил за 15 минут — предложение снимается само, диалог никуда не делся.
+- `frontend/src/features/updates/changelog.ts:49` — новое
+- `frontend/src/features/updates/changelog.ts:50` — Кнопка «Позвать» рядом с «Передать»
+- `frontend/src/features/updates/changelog.ts:51` — Когда нужен второй человек, а не замена. Мастер по холодильникам скажет, чинится ли модель, старший подскажет, что делать со скандалом. Диалог при этом остаётся за вами: позванный получает уведомление с причиной и видит диалог в своих «Моих», но отвечаете за клиента по-прежнему вы.
+- `frontend/src/features/updates/changelog.ts:54` — новое
+- `frontend/src/features/updates/changelog.ts:55` — Клиента можно пометить как нежелательного
+- `frontend/src/features/updates/changelog.ts:56` — Тот, кто пишет каждый день и ничего не заказывает, перестаёт требовать внимания: его диалоги не встают в очередь и не звенят. Сообщения при этом приходят и сохраняются — ничего не теряется, вы просто перестаёте на них отвлекаться. Пометку видно в карточке вместе с причиной.
+- `frontend/src/features/updates/changelog.ts:59` — новое
+- `frontend/src/features/updates/changelog.ts:60` — Кнопка «Разгрузить…» во «Входящих»
+- `frontend/src/features/updates/changelog.ts:61` — Закрывает диалоги, которые стоят в очереди и в которых давно тихо. Сначала показывает, сколько закроется и кого именно, — и только потом закрывает. Взятые кем-то не трогаются. Если клиент напишет снова, диалог вернётся сам.
+- `frontend/src/features/updates/changelog.ts:64` — новое
+- `frontend/src/features/updates/changelog.ts:65` — Сотрудник может администрировать и не вести диалоги
+- `frontend/src/features/updates/changelog.ts:66` — Раньше роль решала всё сразу. Теперь «ведёт диалоги» — отдельный переключатель: руководитель может иметь права администратора, но не получать обращения. Появились отделы — по ним удобно фильтровать статистику.
+- `frontend/src/features/updates/changelog.ts:69` — улучшено
+- `frontend/src/features/updates/changelog.ts:70` — Вкладки списка: «Входящие · Мои · Все», состояние ушло в фильтр
+- `frontend/src/features/updates/changelog.ts:71` — Пять кнопок в ряд отвечали на два разных вопроса вперемешку — чей диалог и в каком он состоянии. Теперь вкладки отвечают только на первый, а «Новый/В работе/Закрыт» выбирается фильтром рядом.
+- `frontend/src/features/updates/changelog.ts:74` — улучшено
+- `frontend/src/features/updates/changelog.ts:75` — Всё помещается на любом экране
+- `frontend/src/features/updates/changelog.ts:76` — На ноутбуке карточка клиента больше не отжимает переписку до нечитаемой ширины. На телефоне видно имя клиента и телефон целиком, а таблицы превращаются в карточки вместо горизонтальной прокрутки.
+- `frontend/src/features/updates/changelog.ts:79` — улучшено
+- `frontend/src/features/updates/changelog.ts:80` — Приложение открывается заметно быстрее
+- `frontend/src/features/updates/changelog.ts:81` — Главный файл интерфейса стал вчетверо меньше. Это чувствуется на первой загрузке, особенно на мобильном интернете.
+- `frontend/src/features/updates/changelog.ts:84` — исправлено
+- `frontend/src/features/updates/changelog.ts:85` — Файл к сообщению клиенту больше не пропадает молча
+- `frontend/src/features/updates/changelog.ts:86` — Авито не принимает от нас файлы, и раньше сообщение с текстом и картинкой уходило одним текстом: картинка исчезала, а вы видели галочку «доставлено». Теперь об этом говорится сразу, до отправки. К заметке файл приложить по-прежнему можно.
+- `frontend/src/features/updates/changelog.ts:89` — исправлено
+- `frontend/src/features/updates/changelog.ts:90` — Опечатки коллег больше не мешают вам войти
+- `frontend/src/features/updates/changelog.ts:91` — Защита от подбора пароля считала неудачные попытки на весь офис — десяти хватало, чтобы не вошёл никто, включая тех, кто набирал пароль верно. Теперь ваши попытки считаются отдельно от чужих.
+- `frontend/src/features/updates/changelog.ts:94` — улучшено
+- `frontend/src/features/updates/changelog.ts:95` — Токен канала можно обновить одной кнопкой
+- `frontend/src/features/updates/changelog.ts:96` — Раньше при проблемах с каналом оставалось только полное переподключение — с походом в Авито и входом под учёткой канала. Теперь на карточке канала есть «Обновить токен»: секунда, и без паролей.
+- `frontend/src/features/updates/changelog.ts:103` — Разбор диалогов и автоматическая раздача
+- `frontend/src/features/updates/changelog.ts:106` — новое
+- `frontend/src/features/updates/changelog.ts:107` — Раздел «Разбор диалогов»: обращения таблицей, с цифрами
+- `frontend/src/features/updates/changelog.ts:108` — Видно, сколько ждали первого ответа, сколько длилась переписка и сколько было сообщений. Можно отобрать за период, по каналу или оператору и выгрузить в Excel. Красным — где ответили дольше пятнадцати минут.
+- `frontend/src/features/updates/changelog.ts:111` — новое
+- `frontend/src/features/updates/changelog.ts:112` — Диалоги можно раздавать автоматически
+- `frontend/src/features/updates/changelog.ts:113` — «Настройки → Распределение»: обращение сразу уходит тому, кто свободнее всех и сейчас в сети. Там же ставится потолок диалогов на человека. По умолчанию выключено — пока всё как раньше, вручную.
+- `frontend/src/features/updates/changelog.ts:116` — новое
+- `frontend/src/features/updates/changelog.ts:117` — Диалог не зависнет у того, кто вышел из сети
+- `frontend/src/features/updates/changelog.ts:118` — Если система отдала обращение, а оператор ушёл, не притронувшись к нему, — оно вернётся во «Входящие», где его видят все. Взятые вручную и те, где уже ответили, не трогаются.
+- `frontend/src/features/updates/changelog.ts:121` — исправлено
+- `frontend/src/features/updates/changelog.ts:122` — У кнопок вернулась заливка
+- `frontend/src/features/updates/changelog.ts:123` — Из-за ошибки в подключении стилей кнопки во всей системе выглядели простым текстом — по ним было неочевидно, что можно нажать.
+- `frontend/src/features/updates/changelog.ts:126` — исправлено
+- `frontend/src/features/updates/changelog.ts:127` — Нельзя случайно снять роль администратора с самого себя
+- `frontend/src/features/updates/changelog.ts:128` — Раньше это удавалось, и вернуть роль было уже нечем: для этого нужно право, которое только что отдал.
+- `frontend/src/features/updates/changelog.ts:135` — Новый вид и порядок в списке
+- `frontend/src/features/updates/changelog.ts:138` — исправлено
+- `frontend/src/features/updates/changelog.ts:139` — Наверху списка теперь тот, кто ждёт ответа дольше всех
+- `frontend/src/features/updates/changelog.ts:140` — Раньше выше оказывался написавший минуту назад, а ждущий полчаса уезжал вниз — и отвечали не тому.
+- `frontend/src/features/updates/changelog.ts:143` — новое
+- `frontend/src/features/updates/changelog.ts:144` — В строке видно, сколько клиент ждёт ответа
+- `frontend/src/features/updates/changelog.ts:145` — После пяти минут появляется отметка, после пятнадцати она становится красной. Открывать диалог, чтобы это узнать, больше не нужно.
+- `frontend/src/features/updates/changelog.ts:148` — исправлено
+- `frontend/src/features/updates/changelog.ts:149` — Поиск ищет по всем вкладкам, включая закрытые диалоги
+- `frontend/src/features/updates/changelog.ts:150` — Раньше из вкладки «Мои» диалог коллеги не находился никогда, и на вопрос «я к вам обращался» можно было ошибочно ответить «нет».
+- `frontend/src/features/updates/changelog.ts:153` — новое
+- `frontend/src/features/updates/changelog.ts:154` — Фильтр по каналу рядом с фильтром по менеджеру
+- `frontend/src/features/updates/changelog.ts:155` — У вас девять каналов, и раньше нужный приходилось искать глазами в каждой строке.
+- `frontend/src/features/updates/changelog.ts:158` — новое
+- `frontend/src/features/updates/changelog.ts:159` — Горячие клавиши на приём, отказ, закрытие и передачу
+- `frontend/src/features/updates/changelog.ts:160` — Полный список — в «Настройки → Профиль → Горячие клавиши». Всё то же самое по-прежнему делается мышью.
+- `frontend/src/features/updates/changelog.ts:163` — улучшено
+- `frontend/src/features/updates/changelog.ts:164` — Принятый диалог больше не закрывает очередь, а после закрытия сразу открывается следующий
+- `frontend/src/features/updates/changelog.ts:165` — Не нужно возвращаться в список за каждым следующим обращением.
+- `frontend/src/features/updates/changelog.ts:168` — новое
+- `frontend/src/features/updates/changelog.ts:169` — Отказ от диалога можно отменить
+- `frontend/src/features/updates/changelog.ts:170` — После отказа появляется кнопка «Вернуть» — если нажали случайно, диалог возвращается к вам.
+- `frontend/src/features/updates/changelog.ts:173` — исправлено
+- `frontend/src/features/updates/changelog.ts:174` — Быстрый ответ вставляется в место курсора и не стирает набранное
+- `frontend/src/features/updates/changelog.ts:175` — Раньше он заменял весь текст, и написанное вручную приветствие пропадало.
+- `frontend/src/features/updates/changelog.ts:178` — исправлено
+- `frontend/src/features/updates/changelog.ts:179` — Своё отправленное сообщение сразу видно, даже если переписка прокручена вверх
+- `frontend/src/features/updates/changelog.ts:180` — Раньше оно пряталось за кнопкой «новые сообщения», и его отправляли второй раз — клиент получал два одинаковых.
+- `frontend/src/features/updates/changelog.ts:183` — новое
+- `frontend/src/features/updates/changelog.ts:184` — Телефон клиента — прямо в шапке переписки
+- `frontend/src/features/updates/changelog.ts:185` — Нажатие набирает номер. Раньше за ним нужно было идти в правую колонку.
+- `frontend/src/features/updates/changelog.ts:188` — улучшено
+- `frontend/src/features/updates/changelog.ts:189` — Тёмное оформление по умолчанию, светлое — в профиле
+- `frontend/src/features/updates/changelog.ts:190` — «Настройки → Профиль → Оформление». Выбор запоминается для этого компьютера.
+- `frontend/src/features/updates/changelog.ts:197` — Очередь обращений и каналы
+- `frontend/src/features/updates/changelog.ts:200` — новое
+- `frontend/src/features/updates/changelog.ts:201` — Вкладка «Входящие»: новое обращение ждёт, пока кто-то нажмёт «Принять»
+- `frontend/src/features/updates/changelog.ts:202` — Видно, сколько людей уже отказалось, и если отказались все — руководитель получает уведомление.
+- `frontend/src/features/updates/changelog.ts:205` — новое
+- `frontend/src/features/updates/changelog.ts:206` — Назначение операторов на каналы
+- `frontend/src/features/updates/changelog.ts:207` — В личную очередь попадают только обращения со своих каналов. Канал, на который никого не назначили, виден всем.
+- `frontend/src/features/updates/changelog.ts:210` — новое
+- `frontend/src/features/updates/changelog.ts:211` — Центр уведомлений вместо телеграм-бота
+- `frontend/src/features/updates/changelog.ts:212` — Всё важное приходит внутрь системы: колокольчик в шапке.
+- `frontend/src/platform/UpdateBanner.tsx:25` — Доступно обновление
+- `frontend/src/platform/UpdateBanner.tsx:28` — Доступна версия {update.version}
+- `frontend/src/platform/UpdateBanner.tsx:42` — Перезапустить
+- `frontend/src/platform/UpdateBanner.tsx:45` — Позже
+- `frontend/src/platform/bridge.ts:117` — Офлайн-очередь доступна только в приложении для Windows
+- `frontend/src/platform/index.ts:31` — [platform] мост не инициализирован:
+- `frontend/src/platform/index.ts:57` — [platform] переход из уведомления не удался:
+- `frontend/src/platform/tauri/index.ts:71` — [platform] opener недоступен, пробуем запасной путь:
+- `frontend/src/platform/tauri/ipc.ts:28` — Tauri IPC недоступен: приложение запущено не в WebView Tauri
+- `frontend/src/platform/tauri/ipc.ts:46` — [platform] ${cmd} не выполнена:
+- `frontend/src/platform/tauri/ipc.ts:88` — [platform] событие «${event}» не отправлено:
+- `frontend/src/platform/tauri/ipc.ts:90` — [platform] событие «${event}» не отправлено:
+- `frontend/src/platform/tauri/ipc.ts:103` — [platform] подписка на «${event}» не удалась:
+- `frontend/src/platform/tauri/notifier.ts:100` — ${m} ${plural(m, "новое сообщение", "новых сообщения", "новых сообщений")} в ${d} ${plural( ⏎       d, ⏎       "диалоге", ⏎       "диалогах", ⏎       "диалогах", ⏎     )}
+- `frontend/src/platform/tauri/notifier.ts:236` — [platform] тост не показан:
+- `frontend/src/platform/tauri/offline.ts:84` — Клиент
+- `frontend/src/platform/tauri/updater.ts:55` — Не удалось установить обновление
+- `frontend/src/platform/toast.ts:34` — Новое сообщение
+- `frontend/src/platform/toast.ts:54` — Вложение
+- `frontend/src/platform/toast.ts:85` — Откройте центр уведомлений
+- `frontend/src/platform/toast.ts:98` — Диалог передан вам
+- `frontend/src/shared/api/http.ts:43` — Запрос завершился с кодом ${res.status}
+- `frontend/src/shared/api/http.ts:69` — Сервер недоступен. Проверьте соединение
+- `frontend/src/shared/api/http.ts:147` — Сервер недоступен. Проверьте соединение
+- `frontend/src/shared/api/http.ts:200` — // PUT появился ради PUT /presence (#34): контракт 01 §11.6 называет именно
+- `frontend/src/shared/api/http.ts:201` — // его, и подменять глагол на POST ради удобства клиента значит разойтись с
+- `frontend/src/shared/api/http.ts:202` — // документом, по которому пишут обе стороны.
+- `frontend/src/shared/api/http.ts:215` — Сервер недоступен
+- `frontend/src/shared/api/rateLimit.ts:28` — позже
+- `frontend/src/shared/api/rateLimit.ts:29` — через ${sec} ${plural(sec, "секунду", "секунды", "секунд")}
+- `frontend/src/shared/api/rateLimit.ts:31` — через ${minutes} ${plural(minutes, "минуту", "минуты", "минут")}
+- `frontend/src/shared/api/rateLimit.ts:33` — через ${hours} ${plural(hours, "час", "часа", "часов")}
+- `frontend/src/shared/lib/formatTime.ts:12` — авг
+- `frontend/src/shared/lib/formatTime.ts:12` — апр
+- `frontend/src/shared/lib/formatTime.ts:12` — дек
+- `frontend/src/shared/lib/formatTime.ts:12` — июл
+- `frontend/src/shared/lib/formatTime.ts:12` — июн
+- `frontend/src/shared/lib/formatTime.ts:12` — мар
+- `frontend/src/shared/lib/formatTime.ts:12` — мая
+- `frontend/src/shared/lib/formatTime.ts:12` — ноя
+- `frontend/src/shared/lib/formatTime.ts:12` — окт
+- `frontend/src/shared/lib/formatTime.ts:12` — сен
+- `frontend/src/shared/lib/formatTime.ts:12` — фев
+- `frontend/src/shared/lib/formatTime.ts:12` — янв
+- `frontend/src/shared/lib/formatTime.ts:14` — января
+- `frontend/src/shared/lib/formatTime.ts:15` — февраля
+- `frontend/src/shared/lib/formatTime.ts:16` — марта
+- `frontend/src/shared/lib/formatTime.ts:17` — апреля
+- `frontend/src/shared/lib/formatTime.ts:18` — мая
+- `frontend/src/shared/lib/formatTime.ts:19` — июня
+- `frontend/src/shared/lib/formatTime.ts:20` — июля
+- `frontend/src/shared/lib/formatTime.ts:21` — августа
+- `frontend/src/shared/lib/formatTime.ts:22` — сентября
+- `frontend/src/shared/lib/formatTime.ts:23` — октября
+- `frontend/src/shared/lib/formatTime.ts:24` — ноября
+- `frontend/src/shared/lib/formatTime.ts:25` — декабря
+- `frontend/src/shared/lib/formatTime.ts:49` — вчера
+- `frontend/src/shared/lib/formatTime.ts:57` — Сегодня
+- `frontend/src/shared/lib/formatTime.ts:58` — Вчера
+- `frontend/src/shared/lib/period.ts:97` — Сегодня
+- `frontend/src/shared/lib/period.ts:98` — Вчера
+- `frontend/src/shared/lib/period.ts:99` — 7 дней
+- `frontend/src/shared/lib/period.ts:100` — 30 дней
+- `frontend/src/shared/lib/period.ts:101` — Этот месяц
+- `frontend/src/shared/lib/period.ts:102` — Прошлый месяц
+- `frontend/src/shared/lib/period.ts:103` — Произвольный
+- `frontend/src/shared/lib/waiting.ts:28` — ${minutes} мин
+- `frontend/src/shared/lib/waiting.ts:29` — ${Math.floor(minutes / 60)} ч
+- `frontend/src/shared/lib/waiting.ts:30` — ${Math.floor(minutes / (60 * 24))} дн
+- `frontend/src/shared/realtime/applyWsEvent.ts:39` — негатив
+- `frontend/src/shared/realtime/applyWsEvent.ts:595` — Диалог передан вам
+- `frontend/src/shared/realtime/applyWsEvent.ts:596` — Передал(а): ${e.data.assigned_by.full_name}${e.data.comment ? 
+- `frontend/src/shared/realtime/applyWsEvent.ts:608` — Аккаунт Авито требует переподключения
+- `frontend/src/shared/realtime/applyWsEvent.ts:609` — «${e.data.title}»: приём сообщений остановлен
+- `frontend/src/shared/stores/badges.ts:60` — в очереди: ${queue}
+- `frontend/src/shared/stores/badges.ts:61` — непрочитанных: ${unread}
+- `frontend/src/shared/stores/badges.ts:62` — Чаты
+- `frontend/src/shared/stores/badges.ts:62` — Чаты — ${parts.join(", ")}
+- `frontend/src/shared/stores/sessionStore.ts:14` — [session] платформенный слой недоступен:
+
+## Бэкенд: все строки с кириллицей вне docstring
+
+- `app/api/routes/audit.py:36` — Фильтр по сотруднику
+- `app/api/routes/audit.py:37` — Точное имя события
+- `app/api/routes/audit.py:39` — Дата по Москве, включительно (06 §0.1)
+- `app/api/routes/audit.py:40` — Дата по Москве, включительно
+- `app/api/routes/audit.py:49` — Начало периода позже его конца
+- `app/api/routes/auth.py:149` — Вход заблокирован: 
+- `app/api/routes/auth.py:151` —  временно заблокирована после серии неудачных попыток входа. Если это сам сотрудник — вышлите ему новую ссылку для входа.
+- `app/api/routes/auth.py:151` — Учётная запись 
+- `app/api/routes/auth.py:183` — Учётная запись отключена, обратитесь к администратору
+- `app/api/routes/auth.py:292` — Пароль уже установлен
+- `app/api/routes/auth.py:354` — Текущий пароль не подходит
+- `app/api/routes/auth.py:361` — Новый пароль совпадает с текущим
+- `app/api/routes/auth.py:405` — Имя не может быть пустым
+- `app/api/routes/avito_accounts.py:159` — Сотрудник не найден
+- `app/api/routes/avito_accounts.py:188` — Аккаунт не найден
+- `app/api/routes/avito_accounts.py:196` — Авито сейчас не отвечает — попробуйте позже
+- `app/api/routes/avito_connect.py:170` — Аккаунт Авито не найден
+- `app/api/routes/avito_connect.py:337` — Ключи не заданы
+- `app/api/routes/avito_connect.py:341` — Не удалось связаться с Авито — проверьте адрес
+- `app/api/routes/avito_connect.py:343` — Авито не принял ключи: 
+- `app/api/routes/avito_connect.py:344` — встроенный имитатор
+- `app/api/routes/avito_connect.py:344` — настоящий Авито
+- `app/api/routes/avito_connect.py:345` — Связь есть, отвечает 
+- `app/api/routes/avito_connect.py:424` — Авито не принял эти ключи. Проверьте Client ID и Client Secret
+- `app/api/routes/avito_connect.py:436` — Не удалось связаться с Авито — попробуйте ещё раз через минуту
+- `app/api/routes/avito_connect.py:444` — Авито принял ключи, но отказал в доступе к мессенджеру. Проверьте, что приложению выданы права messenger:read и messenger:write
+- `app/api/routes/avito_connect.py:751` — Подписаться можно только на включённом канале
+- `app/api/routes/avito_connect.py:767` — Авито не принял подписку — попробуйте ещё раз через минуту
+- `app/api/routes/avito_connect.py:854` — Доступ отозван — обновлять нечего, нужно переподключение
+- `app/api/routes/avito_connect.py:867` — Авито отозвал доступ — требуется переподключение
+- `app/api/routes/avito_connect.py:873` — Токен уже обновляется — подождите несколько секунд
+- `app/api/routes/avito_connect.py:901` — Аккаунт требует переподключения через OAuth
+- `app/api/routes/avito_connect.py:913` — Токены аккаунта истекли — требуется переподключение
+- `app/api/routes/bots.py:117` — Бот не найден
+- `app/api/routes/bots.py:167` — Сессия песочницы истекла — начните заново
+- `app/api/routes/bots.py:169` — AI недоступен: 
+- `app/api/routes/bots.py:332` — PUT заменяет бота целиком — поле scenario обязательно
+- `app/api/routes/bots.py:424` — Аккаунт Авито не найден
+- `app/api/routes/bots.py:462` — Бот привязан к аккаунтам — сначала отвяжите их
+- `app/api/routes/clients.py:57` — Клиент не найден
+- `app/api/routes/conversations.py:140` — Эти фильтры неприменимы к вкладке «Входящие»
+- `app/api/routes/conversations.py:147` — неприменим при tab=inbox
+- `app/api/routes/conversations.py:370` — Сотрудник не найден
+- `app/api/routes/conversations.py:381` —  позвал(а) в диалог: 
+- `app/api/routes/conversations.py:399` — Вас позвали в диалог
+- `app/api/routes/conversations.py:401` —  просит посмотреть
+- `app/api/routes/conversations.py:441` — сотрудник
+- `app/api/routes/conversations.py:443` —  вышел(а) из диалога
+- `app/api/routes/conversations.py:445` —  убрал(а) из диалога: 
+- `app/api/routes/conversations.py:519` — Диалог принят: 
+- `app/api/routes/conversations.py:550` — Отказ от передачи: 
+- `app/api/routes/conversations.py:714` —  передаёт вам диалог
+- `app/api/routes/inbox.py:107` — Канал Авито
+- `app/api/routes/inbox.py:412` — Сколько дней в переписке тихо
+- `app/api/routes/internal.py:80` — Резервное копирование не выполнилось
+- `app/api/routes/internal.py:82` — Ночная копия базы не создана. Пока это так, восстанавливать систему в случае аварии будет не из чего.
+- `app/api/routes/internal.py:89` — Копия не уехала в облако
+- `app/api/routes/internal.py:91` — Копия базы сделана, но осталась только на самом сервере. Если сервер погибнет, погибнет и она.
+- `app/api/routes/internal.py:101` — Резервная копия вдвое меньше вчерашней
+- `app/api/routes/internal.py:103` — Копия создана, но заметно похудела. Так выглядит потеря данных: стоит убедиться, что диалоги и сообщения на месте.
+- `app/api/routes/internal.py:110` — Резервная копия не читается
+- `app/api/routes/internal.py:112` — Файл копии есть, но проверка его не прочитала. Копия, из которой нельзя восстановиться, копией не является.
+- `app/api/routes/internal.py:119` — Пробное восстановление не прошло
+- `app/api/routes/internal.py:120` — Регулярная проверка «поднимется ли система из копии» завершилась неудачей.
+- `app/api/routes/internal.py:125` — Диск заполняется
+- `app/api/routes/internal.py:126` — Место на сервере заканчивается. При 100% система встаёт целиком.
+- `app/api/routes/internal.py:131` — Планировщик не подаёт признаков жизни
+- `app/api/routes/internal.py:133` — Внешняя проверка не видит планировщик. Без него встают партиции, обновление токенов Авито и сверка пропущенных сообщений.
+- `app/api/routes/internal.py:142` — Система не отвечает снаружи
+- `app/api/routes/internal.py:144` — Внешний наблюдатель не смог достучаться до сервера несколько раз подряд. Сотрудники сейчас не могут работать.
+- `app/api/routes/internal.py:217` —  ⏎  ⏎ Подробность от скрипта: 
+- `app/api/routes/internal.py:219` —  ⏎ (сообщил 
+- `app/api/routes/internal.py:250` — Неизвестный вид события
+- `app/api/routes/media.py:48` —  МБ
+- `app/api/routes/media.py:48` — Файл больше 
+- `app/api/routes/media.py:93` — Файл не найден
+- `app/api/routes/media.py:97` — Файл не найден
+- `app/api/routes/notifications.py:76` — Тип события из каталога 14 §2
+- `app/api/routes/notifications.py:77` — Дата по Москве, включительно (06 §0.1)
+- `app/api/routes/notifications.py:78` — Дата по Москве, включительно
+- `app/api/routes/notifications.py:79` — Только непрочитанные
+- `app/api/routes/notifications.py:89` — Неизвестная важность
+- `app/api/routes/notifications.py:98` — Начало периода позже его конца
+- `app/api/routes/presence.py:70` — Состояние может быть «на месте» или «отошёл»
+- `app/api/routes/stats.py:50` — Дата по Москве, включительно
+- `app/api/routes/stats.py:51` — Дата по Москве, включительно
+- `app/api/routes/support.py:32` — Заявка принята. Если такая учётная запись есть, администратор получит её и вышлет новую ссылку для входа.
+- `app/api/routes/support.py:35` — Сообщение отправлено администратору.
+- `app/api/routes/support.py:51` — нужен адрес вида имя@домен
+- `app/api/routes/support.py:66` — пустое значение
+- `app/api/routes/templates.py:86` — Поле не может быть пустым
+- `app/api/routes/templates.py:99` — Поле не может быть пустым
+- `app/api/routes/templates.py:125` — Шаблон не найден
+- `app/api/routes/templates.py:130` — Общие шаблоны меняет только администратор или руководитель
+- `app/api/routes/templates.py:136` — Шаблон не найден
+- `app/api/routes/templates.py:218` — Создавать общие шаблоны может только администратор или руководитель
+- `app/api/routes/users.py:140` — Поиск по имени или email
+- `app/bots/ai.py:90` — Ты — ассистент сервисного центра Lead Partner (ремонт техники: смартфоны, планшеты, ⏎ ноутбуки, бытовая техника). Ты отвечаешь клиентам в чате Авито от имени сервиса, ⏎ пока мастер недоступен. Твоя задача — дать первичную консультацию по типовым ⏎ вопросам (ориентировочные цены, сроки, порядок работы) и собрать контекст для мастера. ⏎  ⏎ ПРАВИЛА (нарушать их нельзя ни при каких условиях): ⏎ 1. Отвечай ТОЛЬКО на основе базы знаний, приведённой ниже. Если ответа в базе нет — ⏎    не отвечай по существу: верни needs_operator=true и низкую confidence. ⏎ 2. НИКОГДА не обещай точную стоимость или срок ремонта. Любая цена — «ориентировочно, ⏎    от N ₽, точная стоимость после бесплатной диагностики». ⏎ 3. НИКОГДА не выдумывай услуги, акции, скидки, адреса или гарантийные условия, ⏎    которых нет в базе знаний. ⏎ 4. Не проси предоплату, не давай реквизитов, не отправляй ссылок. ⏎ 5. Не выдавай себя за живого мастера, но и не подчёркивай, что ты бот, если не спросили. ⏎    Если спросили прямо — честно скажи, что ты автоответчик сервиса, и предложи позвать мастера. ⏎ 6. Пиши по-русски, дружелюбно и коротко: 1–3 предложения, без списков и заголовков, ⏎    без эмодзи-спама (максимум один эмодзи). Обращайся на «вы». ⏎ 7. Если клиент раздражён, ругается, говорит о жалобе/возврате/споре — не спорь, ⏎    верни needs_operator=true. ⏎ 8. Если вопрос не про ремонт техники (спам, реклама, другая тема) — needs_operator=true, ⏎    confidence не выше 0.2. ⏎ 9. Сомневаешься — needs_operator=true. Передать мастеру — всегда лучше, чем ошибиться. ⏎  ⏎ Ответ верни ТОЛЬКО вызовом инструмента submit_answer. Поля: ⏎ - reply: текст ответа клиенту (даже при needs_operator=true — вежливая фраза-мост, ⏎   например «Передаю ваш вопрос мастеру, он ответит в ближайшее время»); ⏎ - confidence: число 0..1 — насколько ответ покрыт базой знаний ⏎   (1.0 — прямой ответ из базы; 0.5 — частично; ниже 0.4 — базы не хватает); ⏎ - needs_operator: true, если нужен живой сотрудник (нет ответа в базе, негатив, ⏎   нетиповой случай, просьба позвать человека).
+- `app/bots/ai.py:123` — === БАЗА ЗНАНИЙ LEAD PARTNER === ⏎ {knowledge_base} ⏎ === КОНЕЦ БАЗЫ ЗНАНИЙ ===
+- `app/bots/ai.py:125` — (база знаний пуста)
+- `app/bots/ai.py:128` — Ты — классификатор сообщений клиентов сервиса ремонта техники Lead Partner. ⏎ Тебе дают последние сообщения клиента из чата Авито. Определи: ⏎ 1) sentiment: negative — если клиент зол, ругается, жалуется на сервис, грозит отзывом, спором на Авито, возвратом денег, юристом; neutral — обычный вопрос; positive — благодарность, согласие. ⏎ 2) wants_human: просит ли клиент живого человека (примеры: «позовите оператора», «есть тут кто живой?», «хватит мне писать ботом», «дайте мастера», «соедините с менеджером»). ⏎ Иронию и вежливое недовольство («ну отлично, конечно…») тоже считай негативом. ⏎ Ответь только вызовом инструмента classify.
+- `app/bots/ai.py:141` — Извлеки данные из сообщений клиента сервиса ремонта техники. Не выдумывай: если чего-то нет в тексте — верни null. Модель техники нормализуй (айфон 13 про -> iPhone 13 Pro). Ответь только вызовом инструмента extract.
+- `app/bots/ai.py:151` — Вернуть структурированный ответ для клиента сервиса Lead Partner.
+- `app/bots/ai.py:158` — Ответ клиенту, 1-3 предложения, по-русски
+- `app/bots/ai.py:162` — 0..1, покрытие ответа базой знаний
+- `app/bots/ai.py:166` — true, если нужен живой сотрудник
+- `app/bots/ai.py:176` — Классифицировать сообщение клиента сервиса ремонта техники.
+- `app/bots/ai.py:184` — negative = злость, жалоба, угроза отзывом/спором, мат, обвинения
+- `app/bots/ai.py:189` — true, если клиент просит живого человека/мастера/менеджера (в т.ч. перефразированно)
+- `app/bots/ai.py:195` — краткое объяснение по-русски, до 15 слов
+- `app/bots/ai.py:205` — Извлечь структурированные данные из переписки с клиентом сервиса ремонта.
+- `app/bots/ai.py:212` — телефон в формате +7XXXXXXXXXX или null
+- `app/bots/ai.py:216` — производитель: Apple, Samsung, HP, LG, Bosch... или null
+- `app/bots/ai.py:220` — модель как можно точнее: iPhone 13, MacBook Air M1... или null
+- `app/bots/ai.py:224` — суть неисправности одним предложением по-русски или null
+- `app/bots/ai.py:353` — Здравствуйте! Ориентировочно ремонт от 1500 ₽, точная цена после диагностики.
+- `app/bots/ai.py:355` — верните деньги
+- `app/bots/ai.py:355` — жалоб
+- `app/bots/ai.py:355` — кошмар
+- `app/bots/ai.py:355` — отвратительн
+- `app/bots/ai.py:355` — ужасн
+- `app/bots/ai.py:355` — хамств
+- `app/bots/ai.py:356` — живой человек
+- `app/bots/ai.py:356` — мастера
+- `app/bots/ai.py:356` — менеджер
+- `app/bots/ai.py:356` — оператор
+- `app/bots/ai.py:356` — позовите человека
+- `app/bots/ai.py:368` — Передаю ваш вопрос мастеру, он ответит в ближайшее время.
+- `app/bots/ai.py:382` — AI_FAKE: классификация по ключевым словам
+- `app/bots/ai.py:413` — [Контекст: клиент пишет по объявлению «
+- `app/bots/engine.py:59` — 🤖 AI недоступен, передал оператору
+- `app/bots/engine.py:60` — 🤖 Диалог закрыт ботом (шаг {step})
+- `app/bots/handoff.py:39` — негатив
+- `app/bots/handoff.py:43` — клиент попросил живого человека
+- `app/bots/handoff.py:44` — AI не уверен в ответе
+- `app/bots/handoff.py:45` — негатив или жалоба клиента
+- `app/bots/handoff.py:46` — клиент пишет мимо сценария
+- `app/bots/handoff.py:47` — сценарий дошёл до передачи оператору
+- `app/bots/handoff.py:48` — клиент не ответил в отведённое время
+- `app/bots/handoff.py:49` — не удалось получить корректный ответ
+- `app/bots/handoff.py:50` — сработала защита от зацикливания
+- `app/bots/handoff.py:51` — AI недоступен
+- `app/bots/handoff.py:52` — сценарий изменился во время диалога
+- `app/bots/handoff.py:58` — Телефон
+- `app/bots/handoff.py:59` — Проблема
+- `app/bots/handoff.py:60` — Тип техники
+- `app/bots/handoff.py:61` — Бренд
+- `app/bots/handoff.py:62` — Модель
+- `app/bots/handoff.py:189` — 🤖 Бот передал диалог оператору. Причина: 
+- `app/bots/handoff.py:191` — Шаг сценария: 
+- `app/bots/handoff.py:207` — Собрано ботом:
+- `app/bots/handoff.py:213` — 🤖 Бот передал диалог оператору (причина: 
+- `app/bots/sandbox.py:58` — [AI-ответ по базе знаний]
+- `app/bots/sandbox.py:60` — кошмар
+- `app/bots/sandbox.py:60` — отвратительн
+- `app/bots/sandbox.py:60` — ужасн
+- `app/bots/sandbox.py:60` — хамств
+- `app/bots/sandbox.py:61` — живой человек
+- `app/bots/sandbox.py:61` — менеджер
+- `app/bots/sandbox.py:61` — оператор
+- `app/bots/sandbox.py:61` — позовите человека
+- `app/bots/sandbox.py:97` — заглушка песочницы
+- `app/bots/sandbox.py:110` — модуль app.bots.ai недоступен
+- `app/bots/sandbox.py:114` — ANTHROPIC_API_KEY не задан
+- `app/bots/sandbox.py:223` — Песочница
+- `app/bots/sandbox.py:241` — Черновик в песочнице
+- `app/bots/scenarios/__init__.py:24` — Первичный приём
+- `app/bots/schedule.py:148` — никогда
+- `app/bots/schedule.py:155` — пн–вс
+- `app/bots/steps.py:342` — е
+- `app/bots/steps.py:342` — ё
+- `app/bots/steps.py:377` — оператор
+- `app/bots/steps.py:378` — менеджер
+- `app/bots/steps.py:379` — человек
+- `app/bots/steps.py:380` — живой
+- `app/bots/steps.py:381` — мастера позов
+- `app/bots/steps.py:382` — позовите
+- `app/bots/steps.py:383` — соедините
+- `app/bots/steps.py:384` — хватит бот
+- `app/bots/steps.py:385` — не бот
+- `app/bots/validator.py:454` — неизвестный тип в схеме: 
+- `app/bots/validator.py:461` — неподдерживаемый $ref: 
+- `app/bots/validator.py:486` — ожидается тип 
+- `app/bots/validator.py:489` — допустимо только значение 
+- `app/bots/validator.py:493` — допустимые значения: 
+- `app/bots/validator.py:497` — минимальная длина — 
+- `app/bots/validator.py:499` — максимальная длина — 
+- `app/bots/validator.py:501` — не соответствует формату 
+- `app/bots/validator.py:505` — минимальное значение — 
+- `app/bots/validator.py:507` — максимальное значение — 
+- `app/bots/validator.py:511` — минимум элементов — 
+- `app/bots/validator.py:513` — максимум элементов — 
+- `app/bots/validator.py:521` — обязательное поле
+- `app/bots/validator.py:529` — неизвестное поле
+- `app/bots/validator.py:536` — не подходит ни под один вариант
+- `app/bots/validator.py:548` — это значение
+- `app/bots/validator.py:549` — недопустимо: 
+- `app/bots/validator.py:589` — Дубль id шага
+- `app/bots/validator.py:590` — Стартовый шаг entry не найден среди steps
+- `app/bots/validator.py:591` — Ссылка на несуществующий шаг
+- `app/bots/validator.py:592` — Шаг недостижим из стартового
+- `app/bots/validator.py:593` — Из шага нет пути к handoff или close — сценарий повиснет
+- `app/bots/validator.py:594` — Цикл без вопроса клиенту — бот зациклится сам на себе
+- `app/bots/validator.py:595` — Переменная не объявлена ни одним ask/menu до этого шага
+- `app/bots/validator.py:596` — Два шага пишут в одну переменную
+- `app/bots/validator.py:597` — Регулярное выражение не компилируется
+- `app/bots/validator.py:598` — Ключевое слово встречается в нескольких вариантах меню
+- `app/bots/validator.py:599` — Шаг ai_answer при пустой базе знаний
+- `app/bots/validator.py:600` — Шаг ждёт ответ бесконечно (timeout: null)
+- `app/bots/validator.py:601` — Сценарий стартует молчаливым ожиданием
+- `app/bots/validator.py:602` — Сценарий не соответствует схеме
+- `app/bots/validator.py:603` — Сценарий должен быть JSON-объектом
+- `app/bots/validator.py:645` — Шаг 
+- `app/bots/validator.py:672` — Шаг 
+- `app/bots/validator.py:673` — сценарий
+- `app/bots/validator.py:902` —  уже пишет шаг 
+- `app/bots/validator.py:944` — длиннее 200 символов
+- `app/bots/validator.py:973` —  и 
+- `app/bots/validator.py:973` — » в вариантах 
+- `app/bots/validator.py:1025` — Сценарий не прошёл валидацию
+- `app/cli.py:50` — Сервисные команды LeadChat (runbook 05 §8)
+- `app/cli.py:89` — Invite URL (одноразовая, до 
+- `app/cli.py:95` — Email администратора
+- `app/cli.py:96` — Администратор
+- `app/cli.py:96` — Отображаемое имя
+- `app/cli.py:99` — Установить пароль сразу (dev). Без флага печатается invite-ссылка.
+- `app/cli.py:129` —  (пароль установлен)
+- `app/cli.py:138` — Email сотрудника
+- `app/cli.py:139` — Новая роль: 
+- `app/cli.py:175` — . Доступны: 
+- `app/cli.py:175` — Неизвестная роль: 
+- `app/cli.py:180` —  не найден
+- `app/cli.py:180` — Сотрудник с адресом 
+- `app/cli.py:185` — : роль уже «
+- `app/cli.py:185` — », ничего не меняю
+- `app/cli.py:201` — : роль 
+- `app/cli.py:204` — Новая роль действует сразу — перезаходить не нужно.
+- `app/cli.py:209` — Email сотрудника
+- `app/cli.py:210` — Роль: admin | head | manager | observer
+- `app/cli.py:211` — Отображаемое имя
+- `app/cli.py:211` — Сотрудник
+- `app/cli.py:215` —  (ожидается одна из 
+- `app/cli.py:215` — Недопустимая роль: 
+- `app/cli.py:233` —  пароль уже установлен — invite не нужен
+- `app/cli.py:233` — У пользователя 
+- `app/cli.py:260` — SMOKE (служебный)
+- `app/cli.py:331` — SMOKE (служебный)
+- `app/cli.py:353` — Адрес smoke-пользователя (по умолчанию SMOKE_USER_EMAIL)
+- `app/cli.py:356` — Пароль smoke-пользователя (CI: секрет SMOKE_USER_PASSWORD)
+- `app/cli.py:359` — Секрет вебхука аккаунта-заглушки (иначе будет сгенерирован)
+- `app/cli.py:361` — Напечатать webhook-секрет заглушки
+- `app/cli.py:386` — smoke-пользователь: 
+- `app/cli.py:386` — обновлён
+- `app/cli.py:386` — создан
+- `app/cli.py:388` —   ! пароль не задан — залогиниться нельзя. Повторите с --password
+- `app/cli.py:390` — аккаунт-заглушка: 
+- `app/cli.py:391` — обновлён
+- `app/cli.py:391` — создан
+- `app/cli.py:396` — служебный диалог: 
+- `app/cli.py:397` — создан
+- `app/cli.py:397` — уже был
+- `app/cli.py:408` — Sentry не сконфигурирован: пуст SENTRY_DSN или не установлен sentry-sdk
+- `app/cli.py:411` — LeadChat sentry-test: контрольное исключение
+- `app/cli.py:417` — Событие отправлено — проверьте проект leadchat-backend в Sentry
+- `app/core/config.py:257` — MEDIA_SIGN_KEY на проде равен строке-заглушке из репозитория. Этим ключом подписываются ссылки на вложения, а раздача файлов идёт без входа по паролю — известный ключ означает, что переписку клиентов может скачать кто угодно. Задайте настоящий: openssl rand -hex 32
+- `app/core/errors.py:38` — Запрос не прошёл валидацию
+- `app/core/errors.py:39` — Требуется авторизация
+- `app/core/errors.py:40` — Недостаточно прав
+- `app/core/errors.py:41` — Не найдено
+- `app/core/errors.py:42` — Конфликт данных
+- `app/core/errors.py:43` — Тело запроса больше лимита
+- `app/core/errors.py:44` — Операция неприменима к текущему состоянию
+- `app/core/errors.py:45` — Слишком много запросов, попробуйте позже
+- `app/core/errors.py:46` — Внутренняя ошибка сервера
+- `app/core/errors.py:47` — Внешний сервис временно недоступен
+- `app/core/errors.py:49` — Неверный email или пароль
+- `app/core/errors.py:50` — Слишком много неудачных попыток входа, попробуйте позже
+- `app/core/errors.py:51` — Ссылка недействительна или устарела
+- `app/core/errors.py:52` — Режим просмотра — назначьте менеджера или передайте диалог
+- `app/db/migrations/versions/0005_bots_engine.py:60` — Первичный приём
+- `app/db/migrations/versions/0005_bots_engine.py:73` — Здравствуйте, {client_name}! Это сервис Lead Partner 👋 ⏎ Подскажите, что случилось с техникой — модель и проблему?
+- `app/db/migrations/versions/0005_bots_engine.py:128` — Клиент описал проблему, бот дал предварительный ответ
+- `app/db/migrations/versions/0005_bots_engine.py:129` — первичный-приём
+- `app/db/migrations/versions/0005_bots_engine.py:135` — Мастер ответит утром. Оставьте телефон — перезвоним первыми ✔
+- `app/db/migrations/versions/0005_bots_engine.py:146` — Кажется, это не номер телефона 🙂 Напишите в формате +7 900 000-00-00
+- `app/db/migrations/versions/0005_bots_engine.py:158` — контакт собран
+- `app/db/migrations/versions/0005_bots_engine.py:165` — 🤖 Бот собрал контакт: {phone} ⏎ Проблема со слов клиента: {problem}
+- `app/db/migrations/versions/0005_bots_engine.py:174` — Ночной диалог: проблема зафиксирована, перезвонить утром первыми
+- `app/db/migrations/versions/0005_bots_engine.py:175` — ночной-лид
+- `app/db/migrations/versions/0005_bots_engine.py:183` — Клиент не ответил на первый вопрос — диалог возвращён в общую очередь
+- `app/integrations/avito/adapter.py:116` — : ожидался объект, получено 
+- `app/integrations/avito/adapter.py:123` — : поле 'created' не время
+- `app/integrations/avito/adapter.py:128` — : 'created' вне диапазона времени
+- `app/integrations/avito/adapter.py:133` — : 'created' не ISO-время: 
+- `app/integrations/avito/adapter.py:135` — : отсутствует или нечитаемо поле 'created'
+- `app/integrations/avito/adapter.py:140` —  должно быть числом
+- `app/integrations/avito/adapter.py:140` — : поле 
+- `app/integrations/avito/adapter.py:146` —  должно быть непустой строкой
+- `app/integrations/avito/adapter.py:146` — : поле 
+- `app/integrations/avito/adapter.py:179` — Фотография
+- `app/integrations/avito/adapter.py:180` — Голосовое сообщение
+- `app/integrations/avito/adapter.py:181` — Видео
+- `app/integrations/avito/adapter.py:182` — Файл
+- `app/integrations/avito/adapter.py:183` — Геопозиция
+- `app/integrations/avito/adapter.py:184` — Ссылка
+- `app/integrations/avito/adapter.py:185` — Звонок
+- `app/integrations/avito/adapter.py:186` — Объявление
+- `app/integrations/avito/adapter.py:256` — Вложение (
+- `app/integrations/avito/adapter.py:337` — вебхук
+- `app/integrations/avito/adapter.py:338` — вебхук: поле 'payload'
+- `app/integrations/avito/adapter.py:341` — вебхук: в 'payload' нет строкового поля 'type'
+- `app/integrations/avito/adapter.py:349` — вебхук
+- `app/integrations/avito/adapter.py:363` — вебхук message: поле 'payload.value'
+- `app/integrations/avito/adapter.py:364` — вебхук message
+- `app/integrations/avito/adapter.py:388` — чат
+- `app/integrations/avito/adapter.py:389` — чат
+- `app/integrations/avito/adapter.py:447` — сообщение истории
+- `app/integrations/avito/adapter.py:448` — сообщение истории
+- `app/integrations/avito/client.py:158` — Авито: 
+- `app/integrations/avito/client.py:165` —  — ответ не JSON
+- `app/integrations/avito/client.py:165` — Авито: 
+- `app/integrations/avito/client.py:167` —  — ожидался JSON-объект
+- `app/integrations/avito/client.py:167` — Авито: 
+- `app/integrations/avito/client.py:185` — обмен кода
+- `app/integrations/avito/client.py:186` — обмен кода
+- `app/integrations/avito/client.py:212` — проверка ключей приложения
+- `app/integrations/avito/client.py:213` — проверка ключей приложения
+- `app/integrations/avito/client.py:230` — refresh токена
+- `app/integrations/avito/client.py:231` — refresh токена
+- `app/integrations/avito/client.py:237` —  — в ответе нет поля 
+- `app/integrations/avito/client.py:237` — Авито: 
+- `app/integrations/avito/client.py:245` — профиль аккаунта
+- `app/integrations/avito/client.py:246` — профиль аккаунта
+- `app/integrations/avito/client.py:248` — Авито: профиль аккаунта без числового id
+- `app/integrations/avito/client.py:256` — регистрация вебхука
+- `app/integrations/avito/client.py:283` — список подписок
+- `app/integrations/avito/client.py:284` — список подписок
+- `app/integrations/avito/client.py:287` — Авито: ответ о подписках без списка `subscriptions`
+- `app/integrations/avito/client.py:295` — снятие вебхука
+- `app/integrations/avito/client.py:315` — список чатов
+- `app/integrations/avito/client.py:316` — список чатов
+- `app/integrations/avito/client.py:319` — Авито: список чатов — поле 'chats' не массив
+- `app/integrations/avito/client.py:351` — история чата
+- `app/integrations/avito/client.py:355` — Авито: история чата — ответ не JSON
+- `app/integrations/avito/client.py:362` — Авито: история чата — не удалось найти массив сообщений
+- `app/integrations/avito/errors.py:43` — Авито: токен не принят (
+- `app/integrations/avito/errors.py:66` — Не удалось связаться с Авито
+- `app/integrations/avito/errors.py:74` — Авито: refresh-токен не принят (400)
+- `app/integrations/avito/errors.py:83` — Авито: rate limit, retry after 
+- `app/scheduler/jobs/awaiting.py:209` —  мин
+- `app/scheduler/jobs/awaiting.py:209` — Клиент ждёт ответа 
+- `app/scheduler/jobs/awaiting.py:254` —  не отвечает клиенту 
+- `app/scheduler/jobs/awaiting.py:254` — Сотрудник
+- `app/scheduler/jobs/awaiting.py:255` —  мин
+- `app/scheduler/jobs/cleanup.py:82` — . Их никто не взял, и клиент молчал дольше 
+- `app/scheduler/jobs/cleanup.py:82` — Закрыто обращений: 
+- `app/scheduler/jobs/cleanup.py:83` —  дн. Если клиент напишет снова, диалог вернётся в очередь сам.
+- `app/scheduler/jobs/watchdog.py:97` — Просроченный сертификат чинится на сервере (certbot renew) — из браузера нажать нечего
+- `app/scheduler/jobs/watchdog.py:260` — Приём сообщений остановился
+- `app/scheduler/jobs/watchdog.py:262` —  мин назад, хотя подключённых аккаунтов Авито: 
+- `app/scheduler/jobs/watchdog.py:262` — Последнее сообщение от клиента пришло 
+- `app/scheduler/jobs/watchdog.py:263` — . В рабочее время такой тишины не бывает — скорее всего, приём встал и клиенты пишут в пустоту.
+- `app/scheduler/jobs/watchdog.py:306` — Очередь входящих не разбирается
+- `app/scheduler/jobs/watchdog.py:308` —  мин. Сообщения от клиентов приходят, но до менеджеров не доезжают.
+- `app/scheduler/jobs/watchdog.py:308` —  сообщений, самое старое ждёт 
+- `app/scheduler/jobs/watchdog.py:308` — В очереди 
+- `app/scheduler/jobs/watchdog.py:345` —  ГБ. Это уже край: когда места не останется, встанет всё — приём сообщений, вложения и резервные копии.
+- `app/scheduler/jobs/watchdog.py:345` — %, свободно 
+- `app/scheduler/jobs/watchdog.py:345` — Занято 
+- `app/scheduler/jobs/watchdog.py:351` —  ГБ. Пока всё работает, но место кончается — стоит убрать старые копии или расширить диск.
+- `app/scheduler/jobs/watchdog.py:351` — %, свободно 
+- `app/scheduler/jobs/watchdog.py:351` — Занято 
+- `app/scheduler/jobs/watchdog.py:357` — Диск заполнен на 
+- `app/scheduler/jobs/watchdog.py:413` — Сертификат сайта истёк
+- `app/scheduler/jobs/watchdog.py:415` — Браузеры показывают предупреждение вместо системы, десктоп-клиенты не подключаются. Автопродление не сработало.
+- `app/scheduler/jobs/watchdog.py:423` —  дн.
+- `app/scheduler/jobs/watchdog.py:423` — Сертификат сайта истекает через 
+- `app/scheduler/jobs/watchdog.py:425` — Обычно он продлевается сам за месяц до конца. Если этого до сих пор не случилось — стоит проверить продление, иначе сайт перестанет открываться.
+- `app/scheduler/jobs/watchdog.py:460` —  с назад
+- `app/scheduler/jobs/watchdog.py:460` — отметка пропала совсем
+- `app/scheduler/jobs/watchdog.py:460` — последняя отметка была 
+- `app/scheduler/jobs/watchdog.py:464` — Проверка живости планировщика не работает
+- `app/scheduler/jobs/watchdog.py:466` — . Пока так, зависший планировщик уже никто не перезапустит автоматически.
+- `app/scheduler/jobs/watchdog.py:466` — Планировщик работает — это сообщение отправил он сам, — но 
+- `app/scheduler/jobs/watchdog.py:504` —  ч назад
+- `app/scheduler/jobs/watchdog.py:504` — Последняя успешная копия сделана 
+- `app/scheduler/jobs/watchdog.py:506` — Отметка о последней копии испорчена
+- `app/scheduler/jobs/watchdog.py:508` — Успешных копий не было ни разу с момента запуска
+- `app/scheduler/jobs/watchdog.py:512` — Резервное копирование не выполнилось
+- `app/scheduler/jobs/watchdog.py:514` — , а копия должна делаться каждую ночь. Пока это так, восстанавливать систему в случае аварии будет не из чего.
+- `app/scheduler/jobs/watchdog.py:581` — Сообщения от клиентов не разбираются
+- `app/scheduler/jobs/watchdog.py:583` —  сообщений от Авито. Они сохранены целиком, но до операторов не дошли: скорее всего Авито поменял формат. Разбирать — по журналу webhook_raw_log.
+- `app/scheduler/jobs/watchdog.py:583` — За последний час не разобрано 
+- `app/scheduler/jobs/watchdog.py:652` — Канал отобрали: подписка на события пропала
+- `app/scheduler/jobs/watchdog.py:654` —  наша подписка на события Авито больше не стоит. Обращения из них не приходят вовсе. Авито держит на аккаунт одну подписку — значит на неё подписался кто-то другой. Лечится кнопкой перерегистрации вебхука на карточке канала.
+- `app/scheduler/jobs/watchdog.py:654` — У аккаунтов 
+- `app/schemas/bots.py:54` — Начало и конец интервала совпадают — интервал пустой
+- `app/schemas/bots.py:73` — Неизвестная таймзона: 
+- `app/schemas/bots.py:79` — Без интервалов расписание не включит бота никогда
+- `app/schemas/bots.py:151` — Имя бота не может быть пустым
+- `app/schemas/users.py:99` — Некорректный адрес почты
+- `app/schemas/users.py:101` — Имя не может быть пустым
+- `app/schemas/users.py:121` — Имя не может быть пустым
+- `app/schemas/users.py:130` — Нужно передать хотя бы одно изменяемое поле
+- `app/services/account_operators.py:208` — Сотрудник отключён
+- `app/services/account_operators.py:210` — Роль не отвечает клиентам
+- `app/services/account_operators.py:331` — Канал не найден
+- `app/services/account_operators.py:352` — Сотрудник не найден
+- `app/services/account_operators.py:360` — Сотрудник отключён — сначала включите его, потом назначайте на канал: 
+- `app/services/account_operators.py:369` — Эти сотрудники не отвечают клиентам и не могут вести канал: 
+- `app/services/account_operators.py:473` — » ведут другие операторы
+- `app/services/account_operators.py:473` — Диалог канала «
+- `app/services/account_operators.py:475` — Диалог другого канала — принять его может назначенный оператор
+- `app/services/app_settings.py:119` — Ожидалось «да» или «нет»
+- `app/services/app_settings.py:132` — Ожидалось целое число или «без ограничения»
+- `app/services/app_settings.py:139` —  либо «без ограничения»
+- `app/services/app_settings.py:139` — Допустимо от 1 до 
+- `app/services/app_settings.py:159` — Ожидался час суток
+- `app/services/app_settings.py:166` — Час суток — от 0 до 23
+- `app/services/app_settings.py:180` — Ожидалось число дней
+- `app/services/app_settings.py:187` —  дней
+- `app/services/app_settings.py:187` —  до 
+- `app/services/app_settings.py:187` — Допустимо от 
+- `app/services/app_settings.py:246` — Неизвестная настройка: 
+- `app/services/audit.py:38` — Вход в систему
+- `app/services/audit.py:39` — Выход из системы
+- `app/services/audit.py:41` — Смена статуса диалога
+- `app/services/audit.py:42` — Назначение диалога
+- `app/services/audit.py:43` — Диалог переоткрыт — клиент вернулся
+- `app/services/audit.py:48` — Оператор отказался от диалога
+- `app/services/audit.py:49` — Оператор забрал отказ обратно
+- `app/services/audit.py:50` — Система распределила диалог оператору
+- `app/services/audit.py:55` — Диалог предложен другому сотруднику
+- `app/services/audit.py:56` — Сотрудник принял переданный диалог
+- `app/services/audit.py:57` — Сотрудник отказался от переданного диалога
+- `app/services/audit.py:58` — Передача отменена — никто не ответил
+- `app/services/audit.py:61` — В диалог позвали коллегу
+- `app/services/audit.py:62` — Диалог возвращён в очередь — оператор не в сети
+- `app/services/audit.py:66` — Массово закрыты зависшие диалоги во «Входящих»
+- `app/services/audit.py:67` — Получен телефон клиента
+- `app/services/audit.py:70` — Клиент помечен как нежелательный
+- `app/services/audit.py:71` — С клиента снята пометка
+- `app/services/audit.py:73` — Приглашён сотрудник
+- `app/services/audit.py:74` — Приглашение принято — пароль установлен
+- `app/services/audit.py:78` — Сотрудник сменил свой пароль
+- `app/services/audit.py:79` — Сотрудник изменил своё имя
+- `app/services/audit.py:80` — Изменена роль сотрудника
+- `app/services/audit.py:81` — Изменено участие сотрудника в работе с диалогами
+- `app/services/audit.py:82` — Сотрудник отключён
+- `app/services/audit.py:87` — Сотрудник удалён
+- `app/services/audit.py:88` — Сотрудник включён
+- `app/services/audit.py:90` — Обновлён сценарий бота
+- `app/services/audit.py:91` — Бот передал диалог оператору
+- `app/services/audit.py:92` — Бот отключён в диалоге — вмешался оператор
+- `app/services/audit.py:94` — Подключён аккаунт Авито
+- `app/services/audit.py:95` — Аккаунт Авито отключён
+- `app/services/audit.py:96` — Аккаунт Авито включён
+- `app/services/audit.py:97` — Канал Авито удалён
+- `app/services/audit.py:98` — Канал Авито переименован
+- `app/services/audit.py:99` — Ключи приложения Авито изменены
+- `app/services/audit.py:100` — Ключи приложения Авито сброшены к настройкам сервера
+- `app/services/audit.py:101` — Подписка на входящие обновлена
+- `app/services/audit.py:102` — Подписку на входящие обновить не удалось
+- `app/services/audit.py:105` — Токен канала обновлён вручную
+- `app/services/audit.py:107` — Изменён состав операторов канала
+- `app/services/audit.py:109` — Создан шаблон
+- `app/services/audit.py:110` — Изменён шаблон
+- `app/services/audit.py:111` — Удалён шаблон
+- `app/services/audit.py:113` — Выгрузка статистики
+- `app/services/audit.py:115` — Изменены настройки распределения диалогов
+- `app/services/audit.py:119` — Изменены рабочие часы статистики
+- `app/services/audit.py:122` — Перерегистрирована подписка на события Авито
+- `app/services/audit.py:124` — Созданы служебные сущности smoke-регрессии
+- `app/services/audit.py:156` — В работе
+- `app/services/audit.py:156` — Закрыт
+- `app/services/audit.py:156` — Новый
+- `app/services/audit.py:158` — администратор
+- `app/services/audit.py:159` — руководитель
+- `app/services/audit.py:160` — менеджер
+- `app/services/audit.py:161` — наблюдатель
+- `app/services/audit.py:163` — бот
+- `app/services/audit.py:163` — оператор
+- `app/services/audit.py:163` — система
+- `app/services/audit.py:165` — из текста сообщения
+- `app/services/audit.py:166` — получен ботом
+- `app/services/audit.py:167` — внесён вручную
+- `app/services/audit.py:170` — Диалог взят в работу
+- `app/services/audit.py:171` — Диалог передан коллеге
+- `app/services/audit.py:172` — Диалог переназначен руководителем
+- `app/services/audit.py:173` — Диалог назначен автоматически
+- `app/services/audit.py:193` — Неудачная попытка входа
+- `app/services/audit.py:198` — Статус диалога: 
+- `app/services/audit.py:205` — Диалог возвращён во «Входящие»
+- `app/services/audit.py:207` — С диалога снят ответственный
+- `app/services/audit.py:210` — Диалог принят из очереди
+- `app/services/audit.py:214` —  (причина: 
+- `app/services/audit.py:225` —  (ревизия 
+- `app/services/audit.py:227` —  (причина: 
+- `app/services/avito_accounts.py:447` — Аккаунт Авито требует переподключения
+- `app/services/avito_accounts.py:448` — »: ключи приложения больше не принимаются
+- `app/services/avito_accounts.py:755` — не удалось определить клиента чата
+- `app/services/avito_accounts.py:897` —  диалогов
+- `app/services/avito_accounts.py:897` — »: загружено 
+- `app/services/avito_accounts.py:897` — Аккаунт «
+- `app/services/avito_accounts.py:899` —  — подробности в журнале сервера
+- `app/services/avito_accounts.py:899` — , не удалось загрузить 
+- `app/services/avito_accounts.py:905` — История загружена
+- `app/services/avito_accounts.py:905` — История загружена частично
+- `app/services/avito_accounts.py:926` — Загрузка истории сорвалась
+- `app/services/avito_accounts.py:928` — »: загрузка прервалась. Уже загруженное на месте, повтор продолжит с того же места.
+- `app/services/avito_accounts.py:928` — Аккаунт «
+- `app/services/avito_accounts.py:1062` — Уведомление не привязано к аккаунту — переподключите его в настройках
+- `app/services/avito_accounts.py:1071` — Аккаунт Авито не найден — возможно, он уже удалён
+- `app/services/avito_accounts.py:1079` — Откройте страницу Авито и подтвердите доступ — ссылка действует 10 минут
+- `app/services/avito_app.py:216` — Укажите Client ID приложения Авито
+- `app/services/avito_app.py:219` — Адрес должен начинаться с http:// или https://
+- `app/services/avito_app.py:224` — Укажите Client Secret приложения Авито
+- `app/services/conversation_table.py:124` — По этой колонке сортировать нельзя
+- `app/services/conversation_table.py:147` — Слишком глубокая страница — уточните фильтр
+- `app/services/conversation_table.py:219` — Клиент
+- `app/services/conversation_table.py:220` — Телефон
+- `app/services/conversation_table.py:221` — Канал
+- `app/services/conversation_table.py:222` — Статус
+- `app/services/conversation_table.py:223` — Оператор
+- `app/services/conversation_table.py:224` — Объявление
+- `app/services/conversation_table.py:225` — Метки
+- `app/services/conversation_table.py:226` — Сообщений
+- `app/services/conversation_table.py:227` — Первый ответ, сек
+- `app/services/conversation_table.py:228` — Длительность, сек
+- `app/services/conversation_table.py:229` — Последнее сообщение
+- `app/services/conversation_table.py:235` — В работе
+- `app/services/conversation_table.py:235` — Закрыт
+- `app/services/conversation_table.py:235` — Новый
+- `app/services/conversation_table.py:257` — ) — сузьте период или фильтры
+- `app/services/conversation_table.py:257` — Слишком много строк (
+- `app/services/conversations.py:39` — негатив
+- `app/services/conversations.py:57` — Выезд назначен
+- `app/services/conversations.py:58` — Отказ
+- `app/services/conversations.py:59` — Не наш профиль
+- `app/services/conversations.py:60` — Спам
+- `app/services/conversations.py:61` — Нет ответа
+- `app/services/conversations.py:64` — Новый
+- `app/services/conversations.py:65` — В работе
+- `app/services/conversations.py:66` — Закрыт
+- `app/services/conversations.py:386` — Недопустимое значение tab
+- `app/services/conversations.py:619` — Диалог не найден
+- `app/services/conversations.py:634` — Диалог не найден
+- `app/services/conversations.py:805` — Недопустимый статус
+- `app/services/conversations.py:817` — Диалог уже в этом статусе
+- `app/services/conversations.py:827` — Закрытый диалог возвращается только в работу — или сам, когда клиент напишет
+- `app/services/conversations.py:836` — Неизвестный результат обращения
+- `app/services/conversations.py:850` — Результат обращения ставится только при закрытии
+- `app/services/conversations.py:860` — Сумма указывается только у выезда
+- `app/services/conversations.py:884` — Статус: 
+- `app/services/conversations.py:886` —  — взял(а) в работу
+- `app/services/conversations.py:922` — Сотрудник не найден
+- `app/services/conversations.py:929` — Сотрудник отключён
+- `app/services/conversations.py:936` — Этому сотруднику нельзя передать диалог — он не отвечает клиентам
+- `app/services/conversations.py:967` — Диалог уже назначен на этого сотрудника
+- `app/services/conversations.py:969` — У диалога и так нет ответственного
+- `app/services/conversations.py:988` — Диалог предложен: 
+- `app/services/conversations.py:990` — . Комментарий: 
+- `app/services/conversations.py:1029` — Диалог возвращён в «Новые». 
+- `app/services/conversations.py:1031` — Диалог взят в работу: 
+- `app/services/conversations.py:1033` — Диалог передан: 
+- `app/services/conversations.py:1037` — . Комментарий: 
+- `app/services/conversations.py:1106` — Невалидный курсор
+- `app/services/conversations.py:1125` — before и after одновременно нельзя
+- `app/services/crypto.py:52` — TOKEN_ENC_KEY должен быть 32 байта в base64 (openssl rand -base64 32) или hex
+- `app/services/crypto.py:78` — шифртекст короче минимальной длины nonce+tag
+- `app/services/crypto.py:82` — шифртекст повреждён или ключ не совпадает
+- `app/services/inbox.py:155` —  с
+- `app/services/inbox.py:158` —  мин
+- `app/services/inbox.py:161` —  мин
+- `app/services/inbox.py:161` —  ч
+- `app/services/inbox.py:161` —  ч 
+- `app/services/inbox.py:163` —  дн
+- `app/services/inbox.py:163` —  дн 
+- `app/services/inbox.py:163` —  ч
+- `app/services/inbox.py:274` — Диалог распределён: 
+- `app/services/inbox.py:524` — Принять диалог может только тот, кто отвечает клиентам — назначьте менеджера
+- `app/services/inbox.py:568` — Диалог закрыт — принимать нечего
+- `app/services/inbox.py:577` — Диалог не ждёт принятия
+- `app/services/inbox.py:583` — Диалог уже принят: 
+- `app/services/inbox.py:585` — Вы уже приняли этот диалог
+- `app/services/inbox.py:649` — Диалог не найден
+- `app/services/inbox.py:680` — Диалог не найден
+- `app/services/inbox.py:704` — Диалог не найден
+- `app/services/inbox.py:710` — Диалог принят: 
+- `app/services/inbox.py:712` — . Ждал 
+- `app/services/inbox.py:774` —  символов
+- `app/services/inbox.py:774` — Причина длиннее 
+- `app/services/inbox.py:851` — Диалог отклонён: 
+- `app/services/inbox.py:853` — . Причина: 
+- `app/services/inbox.py:946` — Отказ отменён: 
+- `app/services/inbox.py:980` — клиент
+- `app/services/inbox.py:982` —  ждёт
+- `app/services/inbox.py:982` — Все операторы отказались от диалога — 
+- `app/services/inbox.py:985` — . Назначьте ответственного вручную.
+- `app/services/inbox.py:987` —  Последняя причина отказа: 
+- `app/services/inbox.py:993` — Диалог никто не принял
+- `app/services/inbox.py:1039` — Диалог и так никем не принят
+- `app/services/inbox.py:1047` — Вернуть диалог в очередь может тот, кто его принял
+- `app/services/inbox.py:1061` — Диалог возвращён во «Входящие»: 
+- `app/services/media.py:139` — Ожидается multipart/form-data с полем 'file'
+- `app/services/media.py:153` — В Content-Type не найден boundary
+- `app/services/media.py:215` — В теле запроса нет файла в поле '
+- `app/services/media.py:248` — Хранилище вложений недоступно — сообщите администратору
+- `app/services/media.py:259` — Файл пустой
+- `app/services/media.py:266` —  МБ
+- `app/services/media.py:266` — Файл больше 
+- `app/services/media.py:274` — Допустимы только изображения (jpeg, png, webp) и pdf
+- `app/services/media.py:318` — Ссылка без подписи
+- `app/services/media.py:322` — Ссылка с некорректной подписью
+- `app/services/media.py:329` — Ссылка с некорректной подписью
+- `app/services/media.py:331` — Ссылка истекла, обновите диалог
+- `app/services/media.py:406` —  вложений в сообщении
+- `app/services/media.py:406` — Не больше 
+- `app/services/media.py:416` — Вложение не найдено или устарело — загрузите файл заново
+- `app/services/messages.py:149` — Тот же client_message_id с другим текстом — проверьте генерацию идентификатора
+- `app/services/messages.py:194` — Диалог не найден
+- `app/services/messages.py:203` — Пустое сообщение
+- `app/services/messages.py:210` —  символов
+- `app/services/messages.py:210` — Текст длиннее 
+- `app/services/messages.py:229` — Диалог закрыт — верните его в работу, чтобы ответить
+- `app/services/messages.py:237` — Аккаунт Авито требует переподключения — обратитесь к администратору
+- `app/services/messages.py:374` — Диалог не найден
+- `app/services/messages.py:514` — Диалог не найден
+- `app/services/messages.py:639` — Сообщение не найдено
+- `app/services/messages.py:642` — Повторить отправку может только автор сообщения или админ
+- `app/services/messages.py:655` — Повторить можно только неотправленное сообщение
+- `app/services/notifications.py:129` — Переподключить
+- `app/services/notifications.py:135` — Перерегистрировать
+- `app/services/notifications.py:141` — Выслать новую ссылку
+- `app/services/notifications.py:188` — Аккаунт Авито требует переподключения
+- `app/services/notifications.py:196` — Приём сообщений остановился
+- `app/services/notifications.py:201` — Резервное копирование не выполнилось
+- `app/services/notifications.py:204` — Планировщик не подаёт признаков жизни
+- `app/services/notifications.py:209` — Система не отвечает снаружи
+- `app/services/notifications.py:217` — Очередь разгружена автоматически
+- `app/services/notifications.py:221` — Очередь входящих не разбирается
+- `app/services/notifications.py:224` — Сообщения не уходят клиентам
+- `app/services/notifications.py:226` — На диске мало места
+- `app/services/notifications.py:227` — Сертификат скоро истекает
+- `app/services/notifications.py:228` — AI временно недоступен
+- `app/services/notifications.py:233` — Сотрудник не может войти — просит новый пароль
+- `app/services/notifications.py:241` — Сообщение администратору
+- `app/services/notifications.py:248` — Учётная запись заблокирована после неудачных попыток входа
+- `app/services/notifications.py:257` — Клиент недоволен
+- `app/services/notifications.py:269` — Клиент ждёт вашего ответа
+- `app/services/notifications.py:287` — Ваш ответ не дошёл до клиента
+- `app/services/notifications.py:302` — Сообщения от клиентов не разбираются
+- `app/services/notifications.py:314` — Канал отобрали: подписка на события пропала
+- `app/services/notifications.py:322` — Диалог больше 30 минут без ответа
+- `app/services/notifications.py:329` — Клиент вернулся в закрытый диалог
+- `app/services/notifications.py:336` — Вам передали диалог
+- `app/services/notifications.py:348` — Диалог никто не принял
+- `app/services/notifications.py:359` — Кнопки нет: причина у этой поломки каждый раз своя (секрет вебхука, квота Авито, упавший воркер). Уведомление ведёт на аккаунт, дальше — рантбук 05 §8
+- `app/services/notifications.py:363` — Бэкап живёт вне приложения (14 §4) — нажать на него из UI нечего
+- `app/services/notifications.py:364` — Планировщик поднимается на сервере; из браузера его не перезапустить
+- `app/services/notifications.py:366` — Сервер поднимают руками: если система не отвечает снаружи, то и кнопка в её собственном интерфейсе нажиматься неоткуда
+- `app/services/notifications.py:372` — Сертификат перевыпускается на сервере (certbot), из браузера нажать нечего
+- `app/services/notifications.py:512` — неизвестная важность уведомления: 
+- `app/services/notifications.py:519` — : нужен ровно один адрес — recipient_id ЛИБО audience
+- `app/services/notifications.py:519` — уведомление 
+- `app/services/notifications.py:522` — неизвестная роль-получатель: 
+- `app/services/notifications.py:819` — Уведомление не найдено
+- `app/services/notifications.py:900` — У этого уведомления нет действия
+- `app/services/notifications.py:912` — Действие пока недоступно — сделайте это вручную в настройках
+- `app/services/participants.py:70` — Этот сотрудник и так ведёт диалог
+- `app/services/pins.py:76` — Закреплять можно только свои диалоги
+- `app/services/pins.py:103` —  закреплённых — открепите что-нибудь
+- `app/services/pins.py:103` — Больше 
+- `app/services/queue_cleanup.py:62` —  дней
+- `app/services/queue_cleanup.py:62` —  до 
+- `app/services/queue_cleanup.py:62` — Срок молчания — от 
+- `app/services/queue_cleanup.py:187` —  дн и обращение никто не взял
+- `app/services/queue_cleanup.py:187` — Закрыт автоматически: клиент молчал дольше 
+- `app/services/queue_cleanup.py:190` —  дн. 
+- `app/services/queue_cleanup.py:190` — Закрыт массово: в переписке тихо дольше 
+- `app/services/stats.py:152` — date_from должен быть не позже date_to
+- `app/services/stats.py:163` —  дней — сузьте диапазон
+- `app/services/stats.py:163` — Период больше 
+- `app/services/stats.py:461` —  ⏎ WITH last_close AS ( ⏎     SELECT DISTINCT ON (a.entity_id) ⏎            a.entity_id::uuid   AS conversation_id, ⏎            a.details->>'by'    AS closed_by ⏎     FROM audit_log a ⏎     WHERE a.action = 'conversation.status_changed' ⏎       AND a.entity = 'conversation' ⏎       AND a.details->>'to' = 'closed' ⏎       AND a.created_at >= :ts_from AND a.created_at < :ts_to ⏎       -- Фильтр по менеджеру — по СНИМКУ ответственного в событии, ровно как в ⏎       -- «закрыто за период» (06 §2.3): иначе closed_total этой карточки и ⏎       -- карточка «закрыто» в одном ответе /stats/summary разъезжаются на ⏎       -- каждом переданном диалоге (у conversations.assignee_id снимка нет). ⏎       AND (CAST(:manager_ids AS uuid[]) IS NULL ⏎            OR (a.details->>'assignee_id')::uuid = ANY(CAST(:manager_ids AS uuid[]))) ⏎     ORDER BY a.entity_id, a.created_at DESC ⏎ ), ⏎ flagged AS ( ⏎     SELECT lc.conversation_id, ⏎            (lc.closed_by = 'bot' ⏎             AND NOT EXISTS ( ⏎                 SELECT 1 FROM messages m ⏎                 WHERE m.conversation_id = lc.conversation_id ⏎                   AND m.direction = 'out' AND m.sender_type = 'operator' ⏎             )) AS bot_only ⏎     FROM last_close lc ⏎     JOIN conversations c ON c.id = lc.conversation_id ⏎     WHERE (CAST(:account_id AS uuid) IS NULL OR c.account_id = :account_id) ⏎ ) ⏎ SELECT count(*)                         AS closed_total, ⏎        count(*) FILTER (WHERE bot_only) AS closed_by_bot, ⏎        round(100.0 * count(*) FILTER (WHERE bot_only) ⏎              / NULLIF(count(*), 0), 1)  AS bot_closed_pct ⏎ FROM flagged ⏎ 
+- `app/services/stats.py:522` —  ⏎ SELECT count(*)                                               AS phones_collected, ⏎        count(*) FILTER (WHERE a.details->>'source' = 'bot')    AS by_bot, ⏎        count(*) FILTER (WHERE a.details->>'source' = 'regex')  AS by_regex, ⏎        count(*) FILTER (WHERE a.details->>'source' = 'manual') AS by_manual ⏎ FROM audit_log a ⏎ LEFT JOIN conversations c ON c.id = (a.details->>'conversation_id')::uuid ⏎ WHERE a.action = 'client.phone_captured' ⏎   AND a.created_at >= :ts_from AND a.created_at < :ts_to ⏎   AND (CAST(:account_id AS uuid) IS NULL OR c.account_id = :account_id) ⏎   -- Менеджер — это АКТОР события (кто внёс телефон), а не ответственный за ⏎   -- диалог: у «собрано телефонов» смысл «сделал сотрудник», а не «случилось ⏎   -- в его диалоге». Следствие: под фильтром по менеджеру источники bot/regex ⏎   -- дают нули — у них actor NULL (06 §0.3). ⏎   AND (CAST(:manager_ids AS uuid[]) IS NULL ⏎        OR a.user_id = ANY(CAST(:manager_ids AS uuid[]))) ⏎ 
+- `app/services/stats.py:801` — Неизвестная метрика: 
+- `app/services/stats.py:808` — Неизвестная группировка: 
+- `app/services/stats.py:815` —  дней
+- `app/services/stats.py:815` — Почасовая группировка доступна на периоде до 
+- `app/services/stats.py:931` —  s ⏎     WHERE s.first_client_at >= :ts_from AND s.first_client_at < :ts_to ⏎       AND s.first_operator_user_id IS NOT NULL ⏎       AND (CAST(:account_id AS uuid) IS NULL OR s.account_id = :account_id) ⏎     GROUP BY 1 ⏎ ), ⏎ taken AS ( ⏎     SELECT (a.details->>'assignee_id')::uuid AS user_id, ⏎            count(*) AS taken ⏎     FROM audit_log a ⏎     JOIN conversations c ON c.id = a.entity_id::uuid ⏎     WHERE a.action = 'conversation.assigned' ⏎       AND a.entity = 'conversation' ⏎       AND a.details->>'assignee_id' IS NOT NULL ⏎       AND a.created_at >= :ts_from AND a.created_at < :ts_to ⏎       AND (CAST(:account_id AS uuid) IS NULL OR c.account_id = :account_id) ⏎     GROUP BY 1 ⏎ ), ⏎ closed AS ( ⏎     SELECT a.user_id, ⏎            count(DISTINCT a.entity_id) AS closed ⏎     FROM audit_log a ⏎     JOIN conversations c ON c.id = a.entity_id::uuid ⏎     WHERE a.action = 'conversation.status_changed' ⏎       AND a.entity = 'conversation' ⏎       AND a.details->>'to' = 'closed' ⏎       AND a.user_id IS NOT NULL ⏎       AND a.created_at >= :ts_from AND a.created_at < :ts_to ⏎       AND (CAST(:account_id AS uuid) IS NULL OR c.account_id = :account_id) ⏎     GROUP BY 1 ⏎ ), ⏎ sent AS ( ⏎     SELECT m.sender_user_id AS user_id, ⏎            count(*) AS messages_sent ⏎     FROM messages m ⏎     WHERE m.created_at >= :ts_from AND m.created_at < :ts_to ⏎       AND m.direction = 'out' AND m.sender_type = 'operator' ⏎       AND m.delivery_status <> 'failed' ⏎       AND (CAST(:account_id AS uuid) IS NULL OR EXISTS ( ⏎             SELECT 1 FROM conversations c ⏎             WHERE c.id = m.conversation_id AND c.account_id = :account_id)) ⏎     GROUP BY 1 ⏎ ) ⏎ SELECT u.id AS manager_id, u.full_name, u.is_active, ⏎        COALESCE(t.taken, 0)          AS taken, ⏎        COALESCE(f.answered, 0)       AS answered, ⏎        COALESCE(cl.closed, 0)        AS closed, ⏎        f.frt_avg_sec, f.frt_median_sec, f.frt_median_biz_sec, ⏎        COALESCE(s.messages_sent, 0)  AS messages_sent ⏎ FROM users u ⏎ LEFT JOIN frt    f  ON f.user_id  = u.id ⏎ LEFT JOIN taken  t  ON t.user_id  = u.id ⏎ LEFT JOIN closed cl ON cl.user_id = u.id ⏎ LEFT JOIN sent   s  ON s.user_id  = u.id ⏎ WHERE u.role IN ('admin', 'manager') ⏎   -- служебный smoke-пользователь (домен .local, 07 §6) не участвует в рейтинге ⏎   AND lower(u.email) NOT LIKE :service_email_pattern ⏎   AND (CAST(:manager_ids AS uuid[]) IS NULL OR u.id = ANY(CAST(:manager_ids AS uuid[]))) ⏎   AND (u.is_active ⏎        OR COALESCE(t.taken, f.answered, cl.closed, s.messages_sent) IS NOT NULL) ⏎ ORDER BY {sort} {order} NULLS LAST, u.full_name ASC ⏎ 
+- `app/services/stats.py:1027` — ' не поддерживается
+- `app/services/stats.py:1027` — Сортировка по '
+- `app/services/stats.py:1034` — order — только asc или desc
+- `app/services/stats.py:1213` — Первое сообщение (МСК)
+- `app/services/stats.py:1214` — Аккаунт
+- `app/services/stats.py:1215` — Клиент
+- `app/services/stats.py:1216` — Телефон
+- `app/services/stats.py:1217` — Объявление
+- `app/services/stats.py:1218` — Статус
+- `app/services/stats.py:1219` — Ответственный
+- `app/services/stats.py:1220` — Автор первого ответа
+- `app/services/stats.py:1221` — FRT оператора, с
+- `app/services/stats.py:1222` — FRT оператора (раб.), с
+- `app/services/stats.py:1223` — FRT бота, с
+- `app/services/stats.py:1224` — Сообщений вх.
+- `app/services/stats.py:1225` — Сообщений исх. (оператор)
+- `app/services/stats.py:1226` — Сообщений исх. (бот)
+- `app/services/stats.py:1227` — Закрыт кем
+- `app/services/stats.py:1228` — Закрыт когда (МСК)
+- `app/services/stats.py:1239` — Результат
+- `app/services/stats.py:1240` — Сумма, ₽
+- `app/services/stats.py:1245` — Менеджер
+- `app/services/stats.py:1246` — Принято
+- `app/services/stats.py:1247` — Отвечено
+- `app/services/stats.py:1248` — Закрыто
+- `app/services/stats.py:1249` — FRT ср., с
+- `app/services/stats.py:1250` — FRT мед., с
+- `app/services/stats.py:1251` — FRT мед. (раб.), с
+- `app/services/stats.py:1252` — Отправлено
+- `app/services/stats.py:1297` — У вас уже выполняется экспорт — дождитесь его завершения
+- `app/services/stats.py:1308` — Исчерпан дневной лимит выгрузок (
+- `app/services/stats.py:1370` — Очередь задач недоступна — повторите позже
+- `app/services/stats.py:1385` — Задача выгрузки не найдена
+- `app/services/stats.py:1411` —  с
+- `app/services/stats.py:1414` —  мин 
+- `app/services/stats.py:1414` —  с
+- `app/services/stats.py:1416` —  мин
+- `app/services/stats.py:1416` —  ч 
+- `app/services/stats.py:1427` — Период
+- `app/services/stats.py:1428` — Аккаунт
+- `app/services/stats.py:1428` — все
+- `app/services/stats.py:1430` — Менеджеры
+- `app/services/stats.py:1431` — все
+- `app/services/stats.py:1433` — Выгружено
+- `app/services/stats.py:1434` — Диалогов новых
+- `app/services/stats.py:1435` — Диалогов закрыто
+- `app/services/stats.py:1436` — В работе сейчас
+- `app/services/stats.py:1437` — Ждут ответа сейчас
+- `app/services/stats.py:1438` — FRT оператора, медиана, с
+- `app/services/stats.py:1439` — FRT оператора, медиана
+- `app/services/stats.py:1440` — FRT оператора, среднее, с
+- `app/services/stats.py:1441` — FRT оператора (раб. часы), медиана, с
+- `app/services/stats.py:1442` — FRT оператора (раб. часы), медиана
+- `app/services/stats.py:1443` — Отвечено оператором
+- `app/services/stats.py:1444` — Без ответа
+- `app/services/stats.py:1445` — FRT бота, медиана, с
+- `app/services/stats.py:1446` — Закрыто ботом без оператора, %
+- `app/services/stats.py:1447` — Закрыто ботом без оператора
+- `app/services/stats.py:1448` — Собрано телефонов
+- `app/services/stats.py:1449` —   из них ботом
+- `app/services/stats.py:1450` —   из них автоизвлечением
+- `app/services/stats.py:1451` —   из них вручную
+- `app/services/stats.py:1452` — Переоткрытий
+- `app/services/stats.py:1453` — Повторных клиентов
+- `app/services/stats.py:1457` —  ⏎ SELECT to_char(s.first_client_at AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI') ⏎                                               AS first_client_at_msk, ⏎        acc.title                              AS account_title, ⏎        cl.name                                AS client_name, ⏎        cl.phone                               AS client_phone, ⏎        c.item_title                           AS item_title, ⏎        s.status                               AS status, ⏎        assignee.full_name                     AS assignee_name, ⏎        author.full_name                       AS first_operator_name, ⏎        s.frt_operator_sec, s.frt_operator_biz_sec, s.frt_bot_sec, ⏎        s.msgs_in, s.msgs_out_operator, s.msgs_out_bot, ⏎        s.closed_by, ⏎        to_char(s.closed_at AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI') ⏎                                               AS closed_at_msk, ⏎        -- Из `conversations`, а не из представления: оно и так уже ⏎        -- присоединено ради названия объявления, а пересобирать ⏎        -- материализованное представление ради двух колонок — это блокировка ⏎        -- на время перестройки и лишняя миграция там, где хватает JOIN. ⏎        c.outcome                              AS outcome, ⏎        c.outcome_amount                       AS outcome_amount, ⏎        s.conversation_id::text                AS conversation_id ⏎ FROM 
+- `app/services/stats.py:1563` —  диалогов — сузьте период или фильтры
+- `app/services/stats.py:1563` — Больше 
+- `app/services/stats.py:1582` — XLSX-экспорт недоступен: не установлен openpyxl
+- `app/services/stats.py:1599` —  диалогов — сузьте период или фильтры
+- `app/services/stats.py:1599` — Больше 
+- `app/services/stats.py:1713` — Значение
+- `app/services/stats.py:1713` — Показатель
+- `app/services/stats.py:1713` — Сводка
+- `app/services/stats.py:1731` — Итого
+- `app/services/stats.py:1741` — Менеджеры
+- `app/services/stats.py:1745` — Диалоги
+- `app/services/support.py:211` — ) не может войти и просит новую ссылку. Ссылка одноразовая, действует трое суток.
+- `app/services/support.py:216` — ) отключена, а доступ просят. Сначала решите, работает ли человек у вас, — и только потом высылайте ссылку.
+- `app/services/support.py:216` — ОСТОРОЖНО: учётная запись 
+- `app/services/support.py:223` — Не может войти: 
+- `app/services/transfer.py:94` — Диалог уже ведёт этот сотрудник
+- `app/services/transfer.py:103` — Взять диалог себе можно без передачи
+- `app/services/transfer.py:117` — Этот диалог вам не передавали
+- `app/services/transfer.py:127` — Диалог передан другому сотруднику
+- `app/services/users.py:125` — Сотрудник не найден
+- `app/services/users.py:155` — : это последний администратор системы. Сначала назначьте администратором кого-то ещё.
+- `app/services/users.py:155` — Нельзя 
+- `app/services/users.py:229` — Сотрудник с таким email уже существует
+- `app/services/users.py:251` — Сотрудник с таким email уже существует
+- `app/services/users.py:282` — Пароль уже установлен — нужна не новая ссылка, а сброс пароля
+- `app/services/users.py:285` — перевыпустить ссылку
+- `app/services/users.py:317` — сбросить пароль
+- `app/services/users.py:371` — Нельзя сменить роль самому себе — попросите другого администратора
+- `app/services/users.py:375` — понизить роль
+- `app/services/users.py:440` — Нельзя отключить самого себя — попросите другого администратора
+- `app/services/users.py:445` — отключить сотрудника
+- `app/services/users.py:489` — Свой пароль меняют в профиле — с вводом текущего
+- `app/services/users.py:538` — Нельзя удалить самого себя — попросите другого администратора
+- `app/services/users.py:544` — удалить сотрудника
+- `app/services/users.py:624` — Заявка не привязана к сотруднику — сбросьте пароль на экране «Команда»
+- `app/services/users.py:645` — : сотрудник отключён. Сначала включите учётную запись.
+- `app/services/users.py:645` — Нельзя 
+- `app/workers/deliver.py:57` — Аккаунт Авито требует переподключения
+- `app/workers/deliver.py:58` — Авито: сообщение не доставлено после 5 попыток
+- `app/workers/deliver.py:59` — Отправка вложений в Авито пока недоступна
+- `app/workers/deliver.py:113` — отправка сообщения
+- `app/workers/deliver.py:114` — отправка сообщения
+- `app/workers/deliver.py:117` — Авито: ответ на отправку без идентификатора сообщения
+- `app/ws/presence.py:74` — неизвестный статус присутствия:
